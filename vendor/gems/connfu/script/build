@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+
+if [[ -s "$HOME/.rvm/scripts/rvm" ]] ; then
+  # First try to load from a user install
+  source "$HOME/.rvm/scripts/rvm"
+elif [[ -s "/usr/local/rvm/scripts/rvm" ]] ; then
+  # Then try to load from a root install
+  source "/usr/local/rvm/scripts/rvm"
+else
+  printf "ERROR: An RVM installation was not found.\n"
+fi
+
+echo `bundle config`
+
+rvm use ree-1.8.7-2011.03
+
+echo `ruby -v`
+
+echo "Running build script as `whoami`" && mkdir -p .build && bundle install --path .build/gems && bundle exec rake --trace | tee .build/output
+
+exit $pipestatus[1]

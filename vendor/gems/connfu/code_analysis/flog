@@ -1,0 +1,8 @@
+   494.6: flog total
+    15.0: flog/method average
+
+   169.2: Connfu::DslProcessor#process_iter lib/connfu/dsl_processor.rb:16
+    48.8: Connfu::CallCommands#none
+    31.2: Connfu::IqParser::parse          lib/connfu/iq_parser.rb:3
+    29.4: Connfu::Event::AskComplete#react lib/connfu/event.rb:11
+    29.1: Connfu::IqParser::fire_event     lib/connfu/iq_parser.rb:25
