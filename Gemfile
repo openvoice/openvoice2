@@ -23,6 +23,8 @@ gem 'nokogiri', '1.5.0'
 gem 'niceogiri', '0.0.4'
 gem 'blather', '0.5.3'
 
+gem 'resque'
+
 # Use unicorn as the web server
 # gem 'unicorn'
 
