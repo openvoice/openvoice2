@@ -1,0 +1,1 @@
+Resque.redis = "redis://redistogo:73d5d351c2595cc21b9d9baef231ccc6@catfish.redistogo.com:9458/"
