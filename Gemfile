@@ -16,13 +16,13 @@ gem 'jquery-rails'
 
 gem 'thin'
 
-gem 'connfu', :path => './vendor/gems/connfu'
+gem 'connfu', :path => '/Users/zlu/projects/thelab/play'
 
 gem 'minitest', '2.3.1'
 gem 'nokogiri', '1.5.0'
 gem 'niceogiri', '0.0.4'
 gem 'blather', '0.5.3'
-
+gem 'resque', '1.17.1'
 # Use unicorn as the web server
 # gem 'unicorn'
 

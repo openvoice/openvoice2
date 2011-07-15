@@ -1,17 +1,18 @@
 require 'connfu'
 
 Connfu.setup "usera@46.137.85.52", "1"
+Connfu.redis_uri = "redis://localhost:6379"
 #Connfu.setup "usera@127.0.0.1", "1"
 
 class AnswerExample
   include Connfu::Dsl
 
-  on :offer do |offer|
+  on :answer do |call|
     answer
-    say('hello, this is openvoice powered by connfu')
+    say('hello, this is open voice powered by connfu')
     say('http://www.phono.com/audio/troporocks.mp3')
     hangup
   end
 end
 
-Connfu.start AnswerExample
+Connfu.start *args
