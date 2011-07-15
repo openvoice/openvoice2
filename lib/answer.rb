@@ -1,8 +1,7 @@
 require 'connfu'
 
-Connfu.setup "usera@127.0.0.1", "1"
-Connfu.redis_uri = "redis://localhost:6379"
-#Connfu.setup "usera@127.0.0.1", "1"
+Connfu.setup "usera@46.137.85.52", "1"
+Connfu.redis_uri = "redis://redistogo:73d5d351c2595cc21b9d9baef231ccc6@catfish.redistogo.com:9458/"
 
 class AnswerExample
   include Connfu::Dsl
