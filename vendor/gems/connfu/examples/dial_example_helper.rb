@@ -9,7 +9,7 @@ Connfu.setup "userb@127.0.0.1", "1"
 class DialExampleHelper
   include Connfu::Dsl
 
-  on :offer do
+  on :offer do |call|
     answer
   end
 end

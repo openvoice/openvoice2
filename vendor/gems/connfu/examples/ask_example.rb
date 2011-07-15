@@ -10,7 +10,7 @@ class AskExample
   include Connfu::Dsl
 
   raise '-------------- currently disabled --------------'
-  on :offer do
+  on :offer do |call|
     answer
     ask('please enter your four digit pin') do |result|
       say 'your input is ' + result

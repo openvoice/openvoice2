@@ -16,7 +16,7 @@ gem 'jquery-rails'
 
 gem 'thin'
 
-gem 'connfu', :path => '/Users/zlu/projects/thelab/play'
+gem 'connfu', :path => './vendor/gems/connfu'
 
 gem 'minitest', '2.3.1'
 gem 'nokogiri', '1.5.0'

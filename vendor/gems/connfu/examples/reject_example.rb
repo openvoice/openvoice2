@@ -9,7 +9,7 @@ Connfu.setup "usera@127.0.0.1", "1"
 class RejectExample
   include Connfu::Dsl
 
-  on :offer do
+  on :offer do |call|
     reject
   end
 end

@@ -10,13 +10,13 @@ Connfu.setup "usera@46.137.85.52", "1"
 class RecordingExample
   include Connfu::Dsl
 
-  on :offer do
+  on :offer do |call|
     answer
     start_recording
 
     sleep 10
 
-    stop_recording
+    p stop_recording
 
     sleep 5
     hangup

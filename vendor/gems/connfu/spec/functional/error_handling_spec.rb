@@ -3,7 +3,7 @@ require "spec_helper"
 describe "receiving an error from the server" do
 
   testing_dsl do
-    on :offer do
+    on :offer do |call|
       begin
         answer
         do_something

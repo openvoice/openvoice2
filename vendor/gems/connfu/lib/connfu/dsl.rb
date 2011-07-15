@@ -37,6 +37,12 @@ module Connfu
         yield call_behaviour
         define_method(:call_behaviour) { call_behaviour }
       end
+
+      def handle_any_outgoing_call(&block)
+        call_behaviour = CallBehaviour.new
+        yield call_behaviour
+        define_method(:call_behaviour) { call_behaviour }
+      end
     end
 
     module InstanceMethods
@@ -49,7 +55,7 @@ module Connfu
 
       def say(text)
         send_command Connfu::Commands::Say.new(:text => text, :to => server_address, :from => client_address)
-        wait
+        wait_for Connfu::Event::SayComplete
       end
 
       def answer
@@ -62,7 +68,8 @@ module Connfu
 
       def hangup
         send_command Connfu::Commands::Hangup.new(:to => server_address, :from => client_address)
-        wait
+        wait_for Connfu::Event::Hangup
+        @finished = true
       end
 
       def redirect(redirect_to)
@@ -82,17 +89,19 @@ module Connfu
           command_options = {:transfer_to => transfer_to, :to => server_address, :from => client_address}
           command_options[:timeout] = options[:timeout] * 1000 if options[:timeout]
           send_command Connfu::Commands::Transfer.new(command_options)
-          wait
+          transfer_event = wait_for Connfu::Event::TransferEvent
+          transfer_event.state
         end
       end
 
       def start_recording
-        send_command Connfu::Commands::Recording::Start.new(:to => server_address, :from => client_address)
+        result = send_command Connfu::Commands::Recording::Start.new(:to => server_address, :from => client_address)
+        @ref_id = result.ref_id
       end
 
       def stop_recording
         send_command Connfu::Commands::Recording::Stop.new(:to => server_address, :from => client_address, :ref_id => @ref_id)
-        wait
+        wait_for(Connfu::Event::RecordingStopComplete).uri
       end
 
       def run_any_call_behaviour_for(event)
@@ -103,46 +112,48 @@ module Connfu
 
       def handle_event(event)
         l.debug "Handling event: #{event.inspect}"
-        case event
-          when Connfu::Event::Offer
-            start(event)
-          when Connfu::Event::Ringing
-            run_any_call_behaviour_for(:ringing)
-          when Connfu::Event::Answered
-            run_any_call_behaviour_for(:answer)
-          when Connfu::Event::SayComplete
-            continue
-          when Connfu::Event::TransferSuccess
-            continue(TransferState.answered)
-          when Connfu::Event::TransferTimeout
-            continue(TransferState.timeout)
-          when Connfu::Event::TransferRejected
-            continue(TransferState.rejected)
-          when Connfu::Event::TransferBusy
-            continue(TransferState.busy)
-          when Connfu::Event::Result
-            @ref_id = event.ref_id
-            continue
-          when Connfu::Event::Hangup
-            run_any_call_behaviour_for(:hangup)
-            @finished = true
-            continue
-          when Connfu::Event::Error
-            continue(:error)
-          when Connfu::Event::RecordingStopComplete
-            continue
+
+        if waiting_for?(event)
+          continue(event)
+        else
+          case event
+            when Connfu::Event::Offer
+              start(event)
+            when Connfu::Event::Ringing
+              run_any_call_behaviour_for(:ringing)
+            when Connfu::Event::Answered
+              run_any_call_behaviour_for(:answer)
+            when Connfu::Event::Hangup
+              run_any_call_behaviour_for(:hangup)
+              @finished = true
+          end
         end
       end
 
       private
 
+      def wait_for(*events)
+        @waiting_for = events
+        wait
+      end
+
+      def waiting_for?(event)
+        @waiting_for && @waiting_for.detect do |e|
+          e === event
+        end
+      end
+
       def send_command(command)
         return if @finished
         Connfu.adaptor.send_command command
         l.debug "Sent command: #{command}"
-        result = wait
+        result = wait_for Connfu::Event::Result, Connfu::Event::Error
         l.debug "Result from command #{result}"
-        raise if result == :error
+        if result.is_a? Connfu::Event::Error
+          raise
+        else
+          result
+        end
       end
     end
 

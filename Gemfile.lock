@@ -1,5 +1,5 @@
 PATH
-  remote: /Users/zlu/projects/thelab/play
+  remote: ./vendor/gems/connfu
   specs:
     connfu (0.0.3)
       blather (= 0.5.3)

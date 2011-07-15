@@ -1,5 +1,6 @@
 %w[
   blather/client/client
+  resque
 
   connfu/logger
   connfu/continuation
@@ -12,6 +13,7 @@
   connfu/ozone/iq_builder
   connfu/connection_adaptor
   connfu/commands/base
+  connfu/app
 ].each { |file| require file }
 
 Dir[File.expand_path("../connfu/commands/**/*.rb", __FILE__)].each do |f|
@@ -50,6 +52,24 @@ module Connfu
     end
 
     self.event_processor ||= EventProcessor.new(handler_class)
-    EM.run { @connection.run }
+    EM.run do
+      EventMachine::add_periodic_timer(1) do
+        p "checking for a job"
+          if job = Resque::Job.reserve(Connfu::Jobs::Dial.queue)
+            puts "Performing job..."
+            job.perform
+            puts "...done."
+          else
+            puts "No job found."
+          end
+        end
+
+        @connection.run
+    end
+  end
+
+  def self.redis_uri=(redis_uri)
+    uri = URI.parse(redis_uri)
+    Resque.redis = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
   end
 end
