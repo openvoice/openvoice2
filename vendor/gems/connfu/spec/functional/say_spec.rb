@@ -3,7 +3,7 @@ require "spec_helper"
 describe "say something on a call" do
 
   testing_dsl do
-    on :offer do
+    on :offer do |call|
       say('hello, this is connfu')
       say('http://www.phono.com/audio/troporocks.mp3')
     end

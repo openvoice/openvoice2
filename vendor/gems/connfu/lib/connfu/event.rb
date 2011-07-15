@@ -59,6 +59,12 @@ module Connfu
     end
 
     class RecordingStopComplete < Presence
+      attr_reader :uri
+
+      def initialize(params = {})
+        @call_id = params[:call_id]
+        @uri = params[:uri]
+      end
     end
   end
 end

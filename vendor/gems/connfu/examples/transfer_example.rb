@@ -10,7 +10,7 @@ Connfu.setup "usera@127.0.0.1", "1"
 class TransferExample
   include Connfu::Dsl
 
-  on :offer do
+  on :offer do |call|
     answer
     say 'please wait while we transfer your call'
     #result = transfer 'sip:zlu@213.192.59.75', 'sip:lazyatom@213.192.59.75'

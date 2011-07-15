@@ -11,10 +11,11 @@ class DialExample
   include Connfu::Dsl
 
   def update_status(status)
-    File.open("/tmp/status.log", "a") { |f| f.puts "Status change: #{status}" }
+    #File.open("/tmp/status.log", "a") { |f| f.puts "Status change: #{status}" }
+    p status
   end
 
-  dial :to => 'sip:zlu@213.192.59.75', :from => "sip:usera@127.0.0.1" do |c|
+  dial :to => 'sip:kalv@213.192.59.75', :from => "sip:usera@127.0.0.1" do |c|
     c.on_ringing do
       update_status "The phone is ringing!"
     end

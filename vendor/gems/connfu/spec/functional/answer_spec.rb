@@ -3,7 +3,7 @@ require "spec_helper"
 describe "answering a call" do
 
   testing_dsl do
-    on :offer do
+    on :offer do |call|
       answer
       do_something
     end

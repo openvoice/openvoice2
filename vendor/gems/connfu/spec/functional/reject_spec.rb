@@ -3,7 +3,7 @@ require "spec_helper"
 describe "a call reject" do
 
   testing_dsl do
-    on :offer do
+    on :offer do |call|
       reject
     end
   end

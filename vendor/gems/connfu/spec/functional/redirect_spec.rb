@@ -3,7 +3,7 @@ require "spec_helper"
 describe "a call redirect" do
 
   testing_dsl do
-    on :offer do
+    on :offer do |call|
       redirect('sip:another@connfu.com')
     end
   end

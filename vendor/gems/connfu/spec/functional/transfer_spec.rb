@@ -3,7 +3,7 @@ require "spec_helper"
 describe "a call transfer" do
 
   testing_dsl do
-    on :offer do
+    on :offer do |call|
       answer
       result = transfer('sip:userb@127.0.0.1')
       say('transfer was successful') if result.answered?
@@ -46,7 +46,7 @@ end
 describe "a round-robin call transfer" do
 
   testing_dsl do
-    on :offer do
+    on :offer do |call|
       answer
       result = transfer('sip:userb@127.0.0.1', 'sip:userc@127.0.0.1', :mode => :round_robin)
       say('transfer was successful') if result.answered?
@@ -112,7 +112,7 @@ end
 describe "A transfer that was rejected" do
 
   testing_dsl do
-    on :offer do
+    on :offer do |call|
       answer
       result = transfer('sip:userb@127.0.0.1')
       if result.rejected?
@@ -140,7 +140,7 @@ end
 describe "A transfer that was rejected because far end is busy" do
 
   testing_dsl do
-    on :offer do
+    on :offer do |call|
       answer
       result = transfer('sip:userb@127.0.0.1')
       if result.busy?

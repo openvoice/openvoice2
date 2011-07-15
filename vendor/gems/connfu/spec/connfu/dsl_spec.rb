@@ -47,6 +47,10 @@ describe Connfu::Dsl do
   end
 
   describe 'transfer' do
+    before :each do
+      subject.stub(:wait_for).and_return(Connfu::Event::TransferSuccess.new)
+    end
+
     it 'should send Transfer command to adaptor' do
       transfer_to = 'sip:1652@connfu.com'
       Connfu.adaptor.should_receive(:send_command).with(Connfu::Commands::Transfer.new(:transfer_to => [transfer_to], :from => 'client-address', :to => 'server-address'))
@@ -68,6 +72,7 @@ describe Connfu::Dsl do
 
   describe 'recording' do
     it 'should send a start command to adaptor' do
+      subject.stub(:wait_for).and_return(Connfu::Event::Result.new)
       Connfu.adaptor.should_receive(:send_command).with(Connfu::Commands::Recording::Start.new(
         :from => 'client-address', :to => 'server-address'
       ))
@@ -75,21 +80,10 @@ describe Connfu::Dsl do
     end
 
     it 'should send a stop command to adaptor' do
+      subject.stub(:wait_for).and_return(Connfu::Event::RecordingStopComplete.new)
       subject.instance_eval { @ref_id = 'foo' }
       Connfu.adaptor.should_receive(:send_command).with(Connfu::Commands::Recording::Stop.new(:from => 'client-address', :to => 'server-address', :ref_id => 'foo'))
       subject.stop_recording
-    end
-  end
-
-  describe '#handle_event(event)' do
-    it "a result event" do
-      subject.should_receive(:continue)
-      subject.handle_event(Connfu::Event::Result.new)
-    end
-
-    it "a say complete" do
-      subject.should_receive(:continue)
-      subject.handle_event(Connfu::Event::SayComplete.new)
     end
   end
 end

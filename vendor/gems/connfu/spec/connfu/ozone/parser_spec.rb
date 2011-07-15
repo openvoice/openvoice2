@@ -47,12 +47,16 @@ describe Connfu::Ozone::Parser do
 
     context "a recording stop complete presence" do
       before do
-        @node = create_presence(recording_stop_presence)
+        @node = create_presence(recording_stop_presence('call-id', 'ref-id', 'file:///tmp/recording.mp3'))
         @event = Connfu::Ozone::Parser.parse_event_from(@node)
       end
 
       it "should be an instance of RecordingStopComplete" do
         @event.should be_instance_of Connfu::Event::RecordingStopComplete
+      end
+
+      it "should create an event that contains the uri of the recording" do
+        @event.uri.should == "file:///tmp/recording.mp3"
       end
     end
 

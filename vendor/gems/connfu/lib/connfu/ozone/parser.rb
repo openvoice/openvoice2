@@ -25,8 +25,8 @@ module Connfu
           Connfu::Event::Answered.new(:call_id => call_id)
         elsif node.xpath("//x:hangup", 'x' => "urn:xmpp:ozone:1").any?
           Connfu::Event::Hangup.new(:call_id => call_id)
-        elsif node.xpath('//x:stop', 'x' => 'urn:xmpp:ozone:ext:complete:1').any?
-          Connfu::Event::RecordingStopComplete.new(:call_id => call_id)
+        elsif stop = node.xpath('//x:stop', 'x' => 'urn:xmpp:ozone:ext:complete:1').first
+          Connfu::Event::RecordingStopComplete.new(:call_id => call_id, :uri => stop.attributes['uri'].value)
         else
           self.transfer_complete?(node)
         end

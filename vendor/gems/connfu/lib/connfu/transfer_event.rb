@@ -1,15 +1,30 @@
 module Connfu
   module Event
-    class TransferSuccess < Presence
+    class TransferEvent < Presence
     end
 
-    class TransferTimeout < Presence
+    class TransferSuccess < TransferEvent
+      def state
+        TransferState.answered
+      end
     end
 
-    class TransferRejected < Presence
+    class TransferTimeout < TransferEvent
+      def state
+        TransferState.timeout
+      end
     end
 
-    class TransferBusy < Presence
+    class TransferRejected < TransferEvent
+      def state
+        TransferState.rejected
+      end
+    end
+
+    class TransferBusy < TransferEvent
+      def state
+        TransferState.busy
+      end
     end
   end
 end

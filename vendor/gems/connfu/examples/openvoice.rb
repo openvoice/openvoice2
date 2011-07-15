@@ -9,7 +9,7 @@ Connfu.setup "usera@127.0.0.1", "1"
 class OpenVoice
   include Connfu::Dsl
 
-  on :offer do
+  on :offer do |call|
     answer
     say "Welcome to Zhao's Open Voice communication center"
     unless caller.recorded_name.exists?

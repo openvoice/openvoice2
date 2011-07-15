@@ -10,7 +10,7 @@ Connfu.setup "usera@127.0.0.1", "1"
 class TransferExample
   include Connfu::Dsl
 
-  on :offer do
+  on :offer do |call|
     answer
     say 'please wait while we round robin transfer your call'
     result = transfer 'sip:openvoice@213.192.59.75', 'sip:zlu@213.192.59.75', :timeout => 5, :mode => :round_robin

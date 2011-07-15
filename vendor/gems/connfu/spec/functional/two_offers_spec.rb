@@ -3,7 +3,7 @@ require "spec_helper"
 describe "two simultaneous offers" do
 
   testing_dsl do
-    on :offer do
+    on :offer do |call|
       answer
       say 'this is the first say'
       say 'this is the second say'
