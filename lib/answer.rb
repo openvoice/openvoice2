@@ -6,7 +6,7 @@ Connfu.redis_uri = "redis://redistogo:73d5d351c2595cc21b9d9baef231ccc6@catfish.r
 class AnswerExample
   include Connfu::Dsl
 
-  handle_any_outgoing_call do |call|
+  on :outgoing_call do |call|
     call.on_answer do
       p "Answered call"
       # check call number to see if I dialled it, or has already got voicemail message recorded....
