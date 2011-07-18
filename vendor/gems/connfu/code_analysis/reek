@@ -1,0 +1,67 @@
+lib/connfu.rb -- 5 warnings:
+  Connfu declares the class variable @@base (ClassVariable)
+  Connfu declares the class variable @@dsl_processor (ClassVariable)
+  Connfu#self.included has approx 7 statements (LongMethod)
+  Connfu#self.setup calls l twice (Duplication)
+  Connfu#self.setup has approx 7 statements (LongMethod)
+lib/connfu/call_commands.rb -- 6 warnings:
+  Connfu::CallCommands#redirect_iq calls Connfu.context twice (Duplication)
+  Connfu::CallCommands#redirect_iq calls Connfu.context.values twice (Duplication)
+  Connfu::CallCommands#redirect_iq calls Connfu.context.values.first twice (Duplication)
+  Connfu::CallCommands#redirect_iq doesn't depend on instance state (LowCohesion)
+  Connfu::CallCommands#redirect_iq refers to iq more than self (LowCohesion)
+  Connfu::CallCommands#redirect_iq refers to xml more than self (LowCohesion)
+lib/connfu/call_context.rb -- 1 warning:
+  Connfu::CallContext has no descriptive comment (IrresponsibleModule)
+lib/connfu/component.rb -- 7 warnings:
+  Connfu::Component#ask_iq contains iterators nested 3 deep (NestedIterators)
+  Connfu::Component#ask_iq doesn't depend on instance state (LowCohesion)
+  Connfu::Component#ask_iq has approx 7 statements (LongMethod)
+  Connfu::Component#ask_iq refers to xml more than self (LowCohesion)
+  Connfu::Component#say_iq contains iterators nested 2 deep (NestedIterators)
+  Connfu::Component#say_iq doesn't depend on instance state (LowCohesion)
+  Connfu::Component#say_iq refers to xml more than self (LowCohesion)
+lib/connfu/dsl.rb -- 0 warnings
+lib/connfu/dsl_processor.rb -- 16 warnings:
+  Connfu::DslProcessor has no descriptive comment (IrresponsibleModule)
+  Connfu::DslProcessor#process_iter calls (exp[1][2] == :on) twice (Duplication)
+  Connfu::DslProcessor#process_iter calls exp.shift 5 times (Duplication)
+  Connfu::DslProcessor#process_iter calls exp[1] 5 times (Duplication)
+  Connfu::DslProcessor#process_iter calls exp[1][2] 3 times (Duplication)
+  Connfu::DslProcessor#process_iter calls exp[3] 13 times (Duplication)
+  Connfu::DslProcessor#process_iter calls exp[3][2] twice (Duplication)
+  Connfu::DslProcessor#process_iter calls exp[3][3] twice (Duplication)
+  Connfu::DslProcessor#process_iter calls exp[3][3][1] twice (Duplication)
+  Connfu::DslProcessor#process_iter calls exp[3][i] 5 times (Duplication)
+  Connfu::DslProcessor#process_iter calls exp[3][i][2] twice (Duplication)
+  Connfu::DslProcessor#process_iter calls exp[3][i][3] twice (Duplication)
+  Connfu::DslProcessor#process_iter calls exp[3][i][3][1] twice (Duplication)
+  Connfu::DslProcessor#process_iter has approx 20 statements (LongMethod)
+  Connfu::DslProcessor#process_iter has the variable name 'i' (UncommunicativeName)
+  Connfu::DslProcessor#process_iter refers to exp more than self (LowCohesion)
+lib/connfu/error.rb -- 1 warning:
+  Connfu::Error has no descriptive comment (IrresponsibleModule)
+lib/connfu/event.rb -- 5 warnings:
+  Connfu::Event::AskComplete has no descriptive comment (IrresponsibleModule)
+  Connfu::Event::AskComplete#react has approx 7 statements (LongMethod)
+  Connfu::Event::AskComplete#react has the variable name 'n' (UncommunicativeName)
+  Connfu::Event::Result has no descriptive comment (IrresponsibleModule)
+  Connfu::Event::SayComplete has no descriptive comment (IrresponsibleModule)
+lib/connfu/iq_parser.rb -- 4 warnings:
+  Connfu::IqParser#self.fire_event calls Connfu.dsl_processor twice (Duplication)
+  Connfu::IqParser#self.fire_event calls Connfu.dsl_processor.handlers twice (Duplication)
+  Connfu::IqParser#self.parse calls iq.to_xml 4 times (Duplication)
+  Connfu::IqParser#self.parse has approx 12 statements (LongMethod)
+lib/connfu/logger.rb -- 1 warning:
+  Kernel#l has the name 'l' (UncommunicativeName)
+lib/connfu/offer.rb -- 1 warning:
+  Connfu::Offer has no descriptive comment (IrresponsibleModule)
+lib/connfu/outbound_call.rb -- 5 warnings:
+  Connfu::OutboundCall#dial calls Connfu.connection twice (Duplication)
+  Connfu::OutboundCall#outbound_call_iq doesn't depend on instance state (LowCohesion)
+  Connfu::OutboundCall#outbound_call_iq has 4 parameters (LongParameterList)
+  Connfu::OutboundCall#outbound_call_iq refers to oc_iq more than self (LowCohesion)
+  Connfu::OutboundCall#outbound_call_iq refers to xml more than self (LowCohesion)
+lib/connfu/utils.rb -- 1 warning:
+  Connfu::Utils#self.underscore has approx 7 statements (LongMethod)
+lib/connfu/version.rb -- 0 warnings

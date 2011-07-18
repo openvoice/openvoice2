@@ -1,0 +1,6 @@
+Total score (lower is better) = 64
+
+
+1) IDENTICAL code found in :lasgn (mass*2 = 64)
+  lib/connfu/call_commands.rb:6
+  lib/connfu/call_commands.rb:21
