@@ -2,7 +2,7 @@ require 'connfu'
 
 uri = URI.parse(ENV['CONNFU_URL'])
 jid = "#{uri.userinfo}@#{uri.host}"
-Connfu.setup jid, ENV['CONNFU_PASSWORD']
+Connfu.setup jid, ENV['CONNFU_PASSWD']
 Connfu.redis_uri = "redis://redistogo:73d5d351c2595cc21b9d9baef231ccc6@catfish.redistogo.com:9458/"
 
 class AnswerExample
