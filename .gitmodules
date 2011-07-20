@@ -1,3 +1,0 @@
-[submodule "vendor/gems/connfu"]
-	path = vendor/gems/connfu
-	url = git@github.com:zlu/play.git

@@ -1,0 +1,5 @@
+.idea/*
+.bundle
+.build
+Gemfile.lock
+.rvmrc
