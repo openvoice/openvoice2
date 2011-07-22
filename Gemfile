@@ -31,4 +31,6 @@ gem 'rspec-rails'
 
 group :test do
   gem 'mocha'
+  gem 'cucumber-rails'
+  gem 'database_cleaner'
 end

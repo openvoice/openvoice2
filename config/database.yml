@@ -4,8 +4,11 @@ development:
   username: openvoice2
   password: letmein
 
-test:
+test: &test
   adapter: postgresql
   database: openvoice2_test
   username: openvoice2
   password: letmein
+
+cucumber:
+  <<: *test
