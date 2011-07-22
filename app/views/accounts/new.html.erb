@@ -1,9 +1,21 @@
+<h2>Sign Up</h2>
+
 <%= form_for @account do |form| %>
-  <%= form.label :email %>
-  <%= form.text_field :email %>
-  <%= form.label :password %>
-  <%= form.password_field :password %>
-  <%= form.label :password_confirmation %>
-  <%= form.password_field :password_confirmation %>
-  <%= form.submit "Sign Up" %>
+
+  <P>
+    <%= form.label :email %><br/>
+    <%= form.text_field :email %>
+  </P>
+
+  <P>
+    <%= form.label :password %><br/>
+    <%= form.password_field :password %>
+  </P>
+
+  <p>
+    <%= form.label :password_confirmation %><br/>
+    <%= form.password_field :password_confirmation %>
+  </p>
+
+  <P><%= form.submit "Sign Up" %></P>
 <% end %>
