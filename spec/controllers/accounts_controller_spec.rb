@@ -19,7 +19,7 @@ describe AccountsController do
   describe "POST to create" do
     describe "with valid attributes" do
       before do
-        post :create, :account => {:email => "me@example.com", :password => "password", :password_confirmation => "password"}
+        post :create, :account => Factory.attributes_for(:account)
       end
 
       it "should create an account" do
@@ -29,7 +29,7 @@ describe AccountsController do
 
     describe "with a missing attribute" do
       before do
-        post :create, :account => {:password => "password", :password_confirmation => "password"}
+        post :create, :account => Factory.attributes_for(:account, :email => nil)
       end
 
       it "should not create any accounts" do

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Account do
   describe "(any instance)" do
-    subject { Account.new(:email => 'anything', :password => 'anything') }
+    subject { Factory.build(:account) }
 
     it "is valid with an email and password" do
       subject.should be_valid

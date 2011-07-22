@@ -33,4 +33,5 @@ group :test do
   gem 'mocha'
   gem 'cucumber-rails'
   gem 'database_cleaner'
+  gem 'factory_girl_rails'
 end
