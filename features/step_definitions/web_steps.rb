@@ -110,6 +110,14 @@ Then /^(?:|I )should see "([^"]*)"$/ do |text|
   end
 end
 
+Then /^I should see the notice "([^"]*)"$/ do |message|
+  page.should have_css(".notice", :text => message)
+end
+
+Then /^I should see the error message "([^"]*)"$/ do |message|
+  page.should have_css(".error", :text => message)
+end
+
 Then /^(?:|I )should see \/([^\/]*)\/$/ do |regexp|
   regexp = Regexp.new(regexp)
 

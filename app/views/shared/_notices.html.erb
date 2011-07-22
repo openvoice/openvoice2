@@ -1,0 +1,5 @@
+<% [:notice, :error].each do |n|%>
+  <% if flash[n] %>
+    <div class="<%= n.to_s %>"><%= flash[n] %></div>
+  <% end %>
+<% end %>

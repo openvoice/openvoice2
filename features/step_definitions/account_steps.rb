@@ -11,7 +11,3 @@ end
 When /^I press the sign up button$/ do
   When 'I press "Sign Up"'
 end
-
-Then /^I should see the successful sign up notice$/ do
-  has_css?(".notice", :text => "Sign up was successful").should be_true
-end
