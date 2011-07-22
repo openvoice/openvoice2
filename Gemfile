@@ -18,17 +18,14 @@ gem 'thin'
 
 gem 'connfu', :path => './vendor/gems/connfu'
 
+# Bundle is crap so need this for Connfu
 gem 'minitest', '2.3.1'
 gem 'nokogiri', '1.5.0'
 gem 'niceogiri', '0.0.4'
 gem 'blather', '0.5.3'
 gem 'resque', '1.17.1'
-# Use unicorn as the web server
-# gem 'unicorn'
 
-# Deploy with Capistrano
-# gem 'capistrano'
-
-# To use debugger
-# gem 'ruby-debug19', :require => 'ruby-debug'
-
+group :test do
+  gem 'rspec-rails'
+  gem 'mocha'
+end
