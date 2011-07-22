@@ -5,3 +5,5 @@
 require File.expand_path('../config/application', __FILE__)
 
 OpenVoice2::Application.load_tasks
+
+task :test => :spec
