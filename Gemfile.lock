@@ -73,6 +73,7 @@ GEM
     niceogiri (0.0.4)
       nokogiri (>= 1.4.0)
     nokogiri (1.5.0)
+    pg (0.11.0)
     polyglot (0.3.1)
     rack (1.3.1)
     rack-cache (1.0.2)
@@ -164,6 +165,7 @@ DEPENDENCIES
   mocha
   niceogiri (= 0.0.4)
   nokogiri (= 1.5.0)
+  pg
   rails (= 3.1.0.rc4)
   resque (= 1.17.1)
   rspec-rails
