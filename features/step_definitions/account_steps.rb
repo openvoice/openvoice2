@@ -11,9 +11,9 @@ When /^I click Login$/ do
 end
 
 When /^I enter my email, password and password confirmation$/ do
-  When 'I fill in "Email" with "me@example.com"'
-  And 'I fill in "Password" with "password"'
-  And 'I fill in "Password confirmation" with "password"'
+  When 'I fill in "Email" with "'+ my.email + '"'
+  And 'I fill in "Password" with "'+ my.password + '"'
+  And 'I fill in "Password confirmation" with "'+ my.password + '"'
 end
 
 When /^I press the sign up button$/ do
@@ -25,6 +25,10 @@ When /^I press the login button$/ do
 end
 
 When /^I enter my email and password$/ do
-  When 'I fill in "Email" with "' + my.account.email + '"'
-  When 'I fill in "Password" with "' + my.account.password + '"'
+  When 'I fill in "Email" with "' + my.email + '"'
+  When 'I fill in "Password" with "' + my.password + '"'
+end
+
+Then /^I should be logged in$/ do
+  Then 'I should see "'+ my.email + '"'
 end

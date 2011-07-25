@@ -11,7 +11,7 @@ module NavigationHelpers
     when /^the home\s?page$/
       '/'
     when /^my account page$/
-      account_path(my.account)
+      account_path(Account.find_by_email(my.email))
 
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:

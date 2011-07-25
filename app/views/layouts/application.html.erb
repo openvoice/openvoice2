@@ -9,6 +9,10 @@
 <body>
 <h1>Openvoice</h1>
 
+<% if logged_in? %>
+<p><%= current_account.email %></p>
+<% end %>
+
 <%= render :partial => "shared/notices" %>
 
 <%= yield %>

@@ -8,6 +8,8 @@ Scenario: A signup
   And I press the sign up button
 
   Then I should see the notice "Your account has been created successfully"
+  And I should be logged in
+  And I should be on my account page
 
 Scenario: An unsuccessful signup
 

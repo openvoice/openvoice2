@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
+  helper_method :logged_in?, :current_account
 
   def login(account)
     session[:account_id] = account.id
@@ -18,6 +19,10 @@ class ApplicationController < ActionController::Base
     unless current_account
       redirect_to new_session_path
     end
+  end
+
+  def logged_in?
+    current_account.present?
   end
 
 end
