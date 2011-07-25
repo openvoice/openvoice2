@@ -1,0 +1,9 @@
+<h2>Add a new endpoint</h2>
+
+<%= form_for @endpoint do |endpoint| %>
+  <p>
+    <%= endpoint.label :address %>
+    <%= endpoint.text_field :address %>
+  </p>
+  <p><%= endpoint.submit "Add" %></p>
+<% end %>

@@ -1,1 +1,9 @@
 <h2>My account page</h2>
+
+<%= link_to 'Add a new endpoint', new_endpoint_path %>
+
+<ul id="endpoints">
+<% current_account.endpoints.each do |endpoint| %>
+  <li class='endpoint'><%= endpoint.address %></li>
+<% end %>
+</ul>
