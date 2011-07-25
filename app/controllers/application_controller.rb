@@ -11,6 +11,13 @@ class ApplicationController < ActionController::Base
   end
 
   def current_account
-    @current_account ||= Account.find(session[:account_id])
+    @current_account ||= Account.find_by_id(session[:account_id])
   end
+
+  def authenticate
+    unless current_account
+      redirect_to new_session_path
+    end
+  end
+
 end

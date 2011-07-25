@@ -46,4 +46,51 @@ describe AccountsController do
       end
     end
   end
+
+  describe "When not logged in" do
+    describe "GET to show" do
+      before do
+        get :show, :id => "1"
+      end
+
+      it "should redirect to the login page" do
+        response.should redirect_to new_session_path
+      end
+    end
+  end
+
+  describe "When logged in with an account" do
+    before do
+      @account = Factory(:account)
+      login @account
+    end
+
+    describe "GET to show" do
+      before do
+        get :show, :id => @account.to_param
+      end
+
+      it "should render show template" do
+        response.should render_template("accounts/show")
+      end
+
+      it "should find and assign the account for view template" do
+        assigns[:account].should eq @account
+      end
+    end
+
+    describe "GET to show for a different account" do
+      before do
+        get :show, :id => Factory(:account).to_param
+      end
+
+      it "should redirect to the root path" do
+        response.should redirect_to root_path
+      end
+
+      it "should tell the user that they can not view this account" do
+        flash[:error].should eq "You do not have permission to view this page"
+      end
+    end
+  end
 end

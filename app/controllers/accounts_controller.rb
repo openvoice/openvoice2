@@ -1,4 +1,6 @@
 class AccountsController < ApplicationController
+  before_filter :authenticate, :only => [:show]
+
   def new
     @account = Account.new
   end
@@ -14,5 +16,10 @@ class AccountsController < ApplicationController
   end
 
   def show
+    @account = Account.find_by_id(params[:id])
+    unless current_account == @account
+      flash[:error] = "You do not have permission to view this page"
+      redirect_to root_path
+    end
   end
 end
