@@ -6,9 +6,14 @@ class EndpointsController < ApplicationController
   end
 
   def create
-    @endpoint = current_account.endpoints.create(params[:endpoint])
-    flash[:notice] = "The endpoint has been added to your account"
-    redirect_to current_account
+    @endpoint = current_account.endpoints.new(params[:endpoint])
+    if @endpoint.save
+      flash[:notice] = "The endpoint has been added to your account"
+      redirect_to current_account
+    else
+      flash[:error] = "The endpoint couldn't be added to your account"
+      render "new"
+    end
   end
 
 end
