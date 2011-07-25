@@ -6,6 +6,10 @@ class ApplicationController < ActionController::Base
     self.current_account = account
   end
 
+  def logout
+    self.current_account = nil
+  end
+
   def current_account=(account)
     @current_account = account
     session[:account_id] = account ? account.id : nil
@@ -16,13 +20,7 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate
-    unless current_account
-      redirect_to new_session_path
-    end
-  end
-
-  def logout
-    current_account = nil
+    redirect_to new_session_path unless current_account
   end
 
   def logged_in?
