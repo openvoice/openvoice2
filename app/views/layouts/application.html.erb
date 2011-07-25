@@ -11,6 +11,10 @@
 
 <% if logged_in? %>
 <p><%= current_account.email %></p>
+<p><%= button_to "Logout", session_path(current_account), :method => "delete" %>
+<% else %>
+<p><%= link_to "Sign Up", new_account_path %></p>
+<p><%= link_to "Login", new_session_path %></p>
 <% end %>
 
 <%= render :partial => "shared/notices" %>
