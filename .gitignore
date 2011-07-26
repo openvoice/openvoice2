@@ -4,4 +4,5 @@ log/*.log
 tmp/
 .sass-cache/
 vendor/bundle
+vendor/cache/
 .rvmrc
