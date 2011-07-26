@@ -22,8 +22,9 @@ When /^I click Logout$/ do
   When 'I press "Logout"'
 end
 
-When /^I enter my email, password and password confirmation$/ do
+When /^I enter my email, username, password and password confirmation$/ do
   When 'I fill in "Email" with "'+ my.email + '"'
+  And 'I fill in "Username" with "'+ my.username + '"'
   And 'I fill in "Password" with "'+ my.password + '"'
   And 'I fill in "Password confirmation" with "'+ my.password + '"'
 end
@@ -47,4 +48,8 @@ end
 
 Then /^I should be logged out$/ do
   Then 'I should see "Login"'
+end
+
+Then /^I should see my number$/ do
+  Then 'I should see "'+ my.number + '"'
 end

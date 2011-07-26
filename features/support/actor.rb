@@ -10,8 +10,16 @@ module ActorSupport
       @email ||= "me@example.com"
     end
 
+    def username
+      @username ||= "me"
+    end
+
     def password
       @password ||= "letmein"
+    end
+
+    def number
+      @number ||= "sip:me@127.0.0.1"
     end
   end
 

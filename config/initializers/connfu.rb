@@ -1,0 +1,1 @@
+Connfu.config.uri = ENV['CONNFU_JABBER_URI'] || "jid://usera:1@127.0.0.1"
