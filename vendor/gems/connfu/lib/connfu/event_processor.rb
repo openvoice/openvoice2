@@ -1,5 +1,9 @@
 module Connfu
   class EventProcessor
+    include Connfu::Logging
+
+    attr_reader :handler_class
+
     def initialize(handler_class)
       @handler_class = handler_class
     end
@@ -31,7 +35,7 @@ module Connfu
       handlers.keys.each do |call_id|
         h = handlers[call_id]
         if h.finished?
-          l.debug "Removing handler for call_id #{call_id}"
+          logger.debug "Removing handler for call_id #{call_id}"
           handlers.delete(call_id)
         end
       end

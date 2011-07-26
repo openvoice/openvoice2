@@ -1,5 +1,11 @@
 module Connfu
   module Event
+    autoload :TransferEvent, 'connfu/event/transfer_event'
+    autoload :TransferSuccess, 'connfu/event/transfer_event'
+    autoload :TransferTimeout, 'connfu/event/transfer_event'
+    autoload :TransferRejected, 'connfu/event/transfer_event'
+    autoload :TransferBusy, 'connfu/event/transfer_event'
+
     class Presence
       attr_reader :call_id
 

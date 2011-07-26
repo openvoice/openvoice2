@@ -18,7 +18,7 @@ module Connfu
           end
         end
 
-        l.debug oc_iq
+        logger.debug oc_iq
         oc_iq
       end
     end

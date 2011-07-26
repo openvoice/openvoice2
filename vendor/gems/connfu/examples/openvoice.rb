@@ -29,7 +29,7 @@ class OpenVoice
                 end
               end
             else
-              l.debug 'probably should not be here'
+              logger.debug 'probably should not be here'
           end
         end
       end

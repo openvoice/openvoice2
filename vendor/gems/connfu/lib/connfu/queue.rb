@@ -2,6 +2,9 @@ require "forwardable"
 
 module Connfu
   module Queue
+    autoload :InProcess, 'connfu/queue/in_process'
+    autoload :Worker, 'connfu/queue/worker'
+
     class << self
       attr_writer :implementation
 

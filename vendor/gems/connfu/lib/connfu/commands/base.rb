@@ -1,6 +1,8 @@
 module Connfu
   module Commands
     module Base
+      include Connfu::Logging
+
       def initialize(params)
         @params = params
       end

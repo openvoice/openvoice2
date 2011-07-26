@@ -1,3 +1,5 @@
+require 'connfu/transfer_state'
+
 module Connfu
   module Event
     class TransferEvent < Presence

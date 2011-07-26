@@ -3,6 +3,7 @@ module Connfu
     def self.included(base)
       base.send(:include, Connfu::Continuation)
       base.send(:include, Connfu::Dsl::InstanceMethods)
+      base.send(:include, Connfu::Logging)
       base.extend Connfu::Dsl::ClassMethods
       base.class_eval do
         attr_reader :server_address, :client_address
@@ -127,7 +128,7 @@ module Connfu
       end
 
       def handle_event(event)
-        l.debug "Handling event: #{event.inspect}"
+        logger.debug "Handling event: #{event.inspect}"
 
         if waiting_for?(event)
           continue(event)
@@ -173,10 +174,10 @@ module Connfu
 
       def send_command(command)
         return if @finished
-        Connfu.adaptor.send_command command
-        l.debug "Sent command: #{command}"
+        Connfu.connection.send_command command
+        logger.debug "Sent command: #{command}"
         result = wait_for Connfu::Event::Result, Connfu::Event::Error
-        l.debug "Result from command #{result}"
+        logger.debug "Result from command #{result}"
         if result.is_a?(Connfu::Event::Error)
           raise
         else

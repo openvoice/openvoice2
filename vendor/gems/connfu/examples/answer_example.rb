@@ -1,9 +1,7 @@
 #!/usr/bin/env ruby
 require File.expand_path('../environment', __FILE__)
 
-class AnswerExample
-  include Connfu::Dsl
-
+Connfu.start do
   on :offer do |call|
     answer
     say('hello, this is connfu')
@@ -11,5 +9,3 @@ class AnswerExample
     hangup
   end
 end
-
-Connfu.start AnswerExample
