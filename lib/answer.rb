@@ -7,9 +7,8 @@ Connfu.setup jid, uri.password
 Resque.redis = "redis://redistogo:73d5d351c2595cc21b9d9baef231ccc6@catfish.redistogo.com:9458/"
 # Resque.redis = "redis://localhost:6379"
 
-class AnswerExample
-  include Connfu::Dsl
 
+Connfu.start do
   on :outgoing_call do |call|
     call.on_answer do
       p "Answered call"
@@ -31,5 +30,3 @@ class AnswerExample
     end
   end
 end
-
-Connfu.start AnswerExample
