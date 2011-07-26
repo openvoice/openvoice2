@@ -47,7 +47,7 @@ module Connfu
 
     module InstanceMethods
 
-      def run
+      def run(*args)
       end
 
       def finished?

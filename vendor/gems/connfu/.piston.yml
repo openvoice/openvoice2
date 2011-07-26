@@ -4,5 +4,5 @@ lock: false
 repository_class: Piston::Git::Repository
 format: 1
 handler: 
-  commit: 2e6b05f19f781f3f21b0723a2087d16e50bf3181
+  commit: e5b36feaded4eff17f980c86a0f8bb362adf2e4a
   branch: master

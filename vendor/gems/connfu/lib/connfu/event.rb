@@ -24,7 +24,17 @@ module Connfu
         @presence_to = params[:presence_to]
         @call_id = params[:call_id]
         @from = params[:from]
-        @to = params[:to]
+        @to = parse_address(params[:to])
+      end
+
+      def parse_address(raw_address)
+        address, scheme, username, host = *raw_address.match(%r{^<([^:]+):([^@]+)@([^>]+)>$})
+        {
+          :address => address,
+          :scheme => scheme,
+          :username => username,
+          :host => host
+        }
       end
     end
 
