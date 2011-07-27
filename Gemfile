@@ -27,7 +27,10 @@ gem 'niceogiri', '0.0.4'
 gem 'blather', '0.5.3'
 gem 'resque', '1.17.1'
 
-gem 'rspec-rails'
+group :development do
+  gem 'rspec-rails'
+  gem 'foreman'
+end
 
 group :test do
   gem 'mocha'
