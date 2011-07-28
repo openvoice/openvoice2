@@ -31,7 +31,7 @@ module Connfu
         include Connfu::Commands::Base
 
         def to_iq
-          attributes = { "xmlns" => "urn:xmpp:ozone:record:1", "start-beep" => "true" }
+          attributes = { "xmlns" => rayo("record:1"), "start-beep" => "true" }
           attributes["max-length"] = @params[:max_length] if @params[:max_length]
           attributes["start-beep"] = @params[:beep] if @params.has_key?(:beep)
           attributes.merge!(valid_encoding_attributes)
@@ -79,7 +79,7 @@ module Connfu
         end
 
         def to_iq
-          build_iq "xmlns" => "urn:xmpp:ozone:ext:1"
+          build_iq "xmlns" => rayo("ext:1")
         end
       end
     end

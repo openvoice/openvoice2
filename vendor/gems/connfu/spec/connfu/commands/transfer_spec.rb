@@ -9,7 +9,7 @@ describe Connfu::Commands::Transfer do
     end
 
     it "should generate transfer iq" do
-      subject.xpath("//x:transfer", "x" => "urn:xmpp:ozone:transfer:1").should_not be_empty
+      subject.xpath("//x:transfer", "x" => tropo('transfer:1')).should_not be_empty
     end
 
     it "should be an iq of type 'set'" do
@@ -25,7 +25,7 @@ describe Connfu::Commands::Transfer do
     end
 
     it 'should not contain a timeout attribute' do
-      transfer_node = subject.xpath("x:transfer", "x" => "urn:xmpp:ozone:transfer:1").first
+      transfer_node = subject.xpath("x:transfer", "x" => tropo('transfer:1')).first
       transfer_node.attributes['timeout'].should be_nil
     end
 
@@ -36,14 +36,14 @@ describe Connfu::Commands::Transfer do
       end
 
       it 'should contain a timeout attribute when it is passed in as an option' do
-        transfer_node = subject.xpath("x:transfer", "x" => "urn:xmpp:ozone:transfer:1").first
+        transfer_node = subject.xpath("x:transfer", "x" => tropo('transfer:1')).first
         transfer_node.attributes['timeout'].value.should eq "5000"
       end
     end
 
     context 'when transfer to a single end-point' do
       it "should contain a 'transfer_to' node" do
-        transfer_to_node = subject.xpath("//x:to", "x" => "urn:xmpp:ozone:transfer:1").first
+        transfer_to_node = subject.xpath("//x:to", "x" => tropo('transfer:1')).first
         transfer_to_node.name.should eq 'to'
         transfer_to_node.text.should eq @transfer_to.first
       end
@@ -56,7 +56,7 @@ describe Connfu::Commands::Transfer do
       end
 
       it "should contain correct number of 'transfer_to' nodes" do
-        transfer_to_nodes = subject.xpath("//x:to", "x" => "urn:xmpp:ozone:transfer:1")
+        transfer_to_nodes = subject.xpath("//x:to", "x" => tropo('transfer:1'))
         transfer_to_nodes.size.should eq @transfer_to.length
         transfer_to_nodes.each_with_index do |n, i|
           n.name.should eq 'to'

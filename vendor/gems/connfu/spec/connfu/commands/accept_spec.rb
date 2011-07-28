@@ -8,7 +8,7 @@ describe Connfu::Commands::Accept do
     end
 
     it "should generate accept iq from Accept command" do
-      subject.xpath("//x:accept", "x" => "urn:xmpp:ozone:1").should_not be_empty
+      subject.xpath("//x:accept", "x" => rayo('1')).should_not be_empty
     end
 
     it "should be an iq of type 'set'" do

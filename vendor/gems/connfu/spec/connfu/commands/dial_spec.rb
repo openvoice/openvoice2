@@ -30,11 +30,11 @@ describe Connfu::Commands::Dial do
 
       describe 'dial node' do
         it 'should exist' do
-          subject.xpath("//x:dial", "x" => "urn:xmpp:ozone:1").size.should eq 1
+          subject.xpath("//x:dial", "x" => rayo('1')).size.should eq 1
         end
 
         it 'should have correct to and from attributes' do
-          node = subject.xpath("//x:dial", "x" => "urn:xmpp:ozone:1").first
+          node = subject.xpath("//x:dial", "x" => rayo('1')).first
           node.attributes['to'].value.should eq 'zlu@iptel.org'
           node.attributes['from'].value.should eq 'admin@openvoice.org'
         end
@@ -58,11 +58,11 @@ describe Connfu::Commands::Dial do
 
       describe 'dial headers' do
         it 'should exist' do
-          subject.xpath("//x:dial/x:header", "x" => "urn:xmpp:ozone:1").size.should eq 1
+          subject.xpath("//x:dial/x:header", "x" => rayo('1')).size.should eq 1
         end
 
         it 'should have the correct attributes' do
-          node = subject.xpath("//x:dial/x:header", "x" => "urn:xmpp:ozone:1").first
+          node = subject.xpath("//x:dial/x:header", "x" => rayo('1')).first
           node.attributes['name'].value.should eq "x-jaja-charging"
           node.attributes['value'].value.should eq "123"
         end

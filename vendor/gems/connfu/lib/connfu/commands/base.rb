@@ -2,6 +2,7 @@ module Connfu
   module Commands
     module Base
       include Connfu::Logging
+      include Connfu::Rayo::Namespacing
 
       def initialize(params)
         @params = params
@@ -34,7 +35,7 @@ module Connfu
       end
 
       def build_iq(attributes = {}, &block)
-        Connfu::Ozone::IqBuilder.build_iq(to, from, command, attributes, &block)
+        Connfu::Rayo::IqBuilder.build_iq(to, from, command, attributes, &block)
       end
     end
   end

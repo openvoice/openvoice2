@@ -7,7 +7,7 @@ describe Connfu::Commands::Answer do
     end
 
     it "should generate answer iq from Answer command" do
-      subject.xpath("//x:answer", "x" => "urn:xmpp:ozone:1").should_not be_empty
+      subject.xpath("//x:answer", "x" => rayo('1')).should_not be_empty
     end
 
     it "should be an iq of type 'set'" do

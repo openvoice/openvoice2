@@ -12,17 +12,24 @@ describe "discriminating based on the caller" do
 
   it "exposes who the call is from" do
     dsl_instance.should_receive(:do_something_with).with(
-      hash_including(:from => %{"James Adam <sip:james@127.0.0.1>"})
+      hash_including(:from => "James Adam <sip:james@127.0.0.1>")
     )
 
-    incoming :offer_presence, @server_address, @client_address, :from => %{"James Adam <sip:james@127.0.0.1>"}
+    incoming :offer_presence, @server_address, @client_address, :from => "James Adam <sip:james@127.0.0.1>"
   end
 
   it "exposes who the call is being routed to" do
+    parsed_hash = {
+      :address => "<sip:usera@127.0.0.1>",
+      :scheme => "sip",
+      :username => "usera",
+      :host => "127.0.0.1"
+    }
+
     dsl_instance.should_receive(:do_something_with).with(
-      hash_including(:to => %{"<sip:usera@127.0.0.1>"})
+      hash_including(:to => parsed_hash)
     )
 
-    incoming :offer_presence, @server_address, @client_address, :to => %{"<sip:usera@127.0.0.1>"}
+    incoming :offer_presence, @server_address, @client_address, :to => "<sip:usera@127.0.0.1>"
   end
 end

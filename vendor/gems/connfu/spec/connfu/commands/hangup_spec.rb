@@ -8,7 +8,7 @@ describe Connfu::Commands::Hangup do
     end
 
     it "should generate hangup iq" do
-      subject.xpath("//x:hangup", "x" => "urn:xmpp:ozone:1").should_not be_empty
+      subject.xpath("//x:hangup", "x" => rayo('1')).should_not be_empty
     end
 
     it "should be an iq of type 'set'" do

@@ -13,7 +13,7 @@ module Connfu
       end
 
       def to_iq
-        attributes = { "xmlns" => "urn:xmpp:ozone:ask:1", "mode" => "dtmf", "terminator" => "#" }
+        attributes = { "xmlns" => tropo('ask:1'), "mode" => "dtmf", "terminator" => "#" }
         build_iq(attributes) do |xml|
           xml.prompt do |p|
             p.text prompt

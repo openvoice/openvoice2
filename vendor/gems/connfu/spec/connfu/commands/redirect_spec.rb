@@ -21,11 +21,11 @@ describe Connfu::Commands::Redirect do
     end
 
     it "should generate redirect iq" do
-      subject.xpath("//x:redirect", "x" => "urn:xmpp:ozone:1").should_not be_empty
+      subject.xpath("//x:redirect", "x" => rayo('1')).should_not be_empty
     end
 
     it "should contain a 'redirect_to' attribute" do
-      redirect_node = subject.xpath("//x:redirect", "x" => "urn:xmpp:ozone:1").first
+      redirect_node = subject.xpath("//x:redirect", "x" => rayo('1')).first
       redirect_node.attributes['to'].value.should eq @redirect_to
     end
   end

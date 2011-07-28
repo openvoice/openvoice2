@@ -8,7 +8,7 @@ module Connfu
       end
 
       def to_iq
-        build_iq "xmlns" => "urn:xmpp:ozone:say:1" do |xml|
+        build_iq "xmlns" => tropo('say:1') do |xml|
           unless text.match(/^http:\/\/.*(.mp3|.wav)$/).nil?
             xml.audio('src' => text)
           else

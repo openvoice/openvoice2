@@ -10,7 +10,7 @@ module Connfu
   autoload :EventProcessor, 'connfu/event_processor'
   autoload :Jobs, 'connfu/jobs'
   autoload :Logging, 'connfu/logging'
-  autoload :Ozone, 'connfu/ozone'
+  autoload :Rayo, 'connfu/rayo'
   autoload :Queue, 'connfu/queue'
   autoload :TransferState, 'connfu/transfer_state'
 
@@ -22,7 +22,7 @@ module Connfu
   end
 
   def self.handle_stanza(stanza)
-    event = Connfu::Ozone::Parser.parse_event_from(stanza)
+    event = Connfu::Rayo::Parser.parse_event_from(stanza)
     event_processor.handle_event(event)
   end
 

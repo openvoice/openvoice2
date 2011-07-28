@@ -8,7 +8,7 @@ describe Connfu::Commands::Say do
     end
 
     it "should generate say iq" do
-      subject.xpath("//x:say", "x" => "urn:xmpp:ozone:say:1").should_not be_empty
+      subject.xpath("//x:say", "x" => tropo('say:1')).should_not be_empty
     end
 
     it "should be an iq of type 'set'" do
@@ -24,7 +24,7 @@ describe Connfu::Commands::Say do
     end
 
     it "should include the text to be spoken" do
-      subject.xpath("//x:say", "x" => "urn:xmpp:ozone:say:1").first.inner_text.should eq "Hello"
+      subject.xpath("//x:say", "x" => tropo('say:1')).first.inner_text.should eq "Hello"
     end
   end
 
@@ -35,7 +35,7 @@ describe Connfu::Commands::Say do
     end
 
     it "should contain the 'audio' node with the correct src" do
-      audio_node = subject.xpath('//x:audio', 'x' => 'urn:xmpp:ozone:say:1').first
+      audio_node = subject.xpath('//x:audio', 'x' => tropo('say:1')).first
       audio_node.should_not be_nil
       audio_node.attributes['src'].should_not be_nil
       audio_node.attributes['src'].value.should eq @url
