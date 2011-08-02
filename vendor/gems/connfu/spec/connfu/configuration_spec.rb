@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Connfu::Configuration do
   describe '.new(options = {})' do
     before do
-      ENV['CONNFU_URI'] = 'jid://env-user:env-password@example.com'
+      ENV['CONNFU_JABBER_URI'] = 'jid://env-user:env-password@example.com'
     end
 
     subject do
@@ -11,7 +11,7 @@ describe Connfu::Configuration do
     end
 
     describe 'called without a uri' do
-      it 'sets uri to value of ENV["CONNFU_URI"]' do
+      it 'sets uri to value of ENV["CONNFU_JABBER_URI"]' do
         subject.uri.should eql('jid://env-user:env-password@example.com')
         subject.user.should eql('env-user')
         subject.password.should eql('env-password')

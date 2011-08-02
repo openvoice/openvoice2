@@ -11,8 +11,41 @@ describe Connfu::Dsl do
   end
 
   subject {
-    DslTest.new(:from => "server-address", :to => "client-address")
+    DslTest.new(:from => "server-address", :to => "client-address", :call_id => "call-id")
   }
+
+  describe 'handle_event' do
+    it 'should raise an exception if event is not recognized' do
+      unrecognised_event = Class.new(Connfu::Event::Presence).new
+      lambda do
+        subject.handle_event(unrecognised_event)
+      end.should raise_error
+    end
+  end
+
+  describe 'on' do
+    it 'should raise an exception if context is unexpected' do
+     lambda do
+       DslTest.on(:goobledegook)
+     end.should raise_error
+    end
+  end
+
+  describe 'send_command' do
+    it 'should be able to handle results with same id but different call id' do
+      Connfu.connection.stub(:send_command).and_return('command-id')
+      subject.send_command(Connfu::Commands::Say.new(:text => '', :from => 'client-address', :to => 'server-address'))
+      result = Connfu::Event::Result.new(:call_id => 'different-call-id', :command_id => 'command-id')
+      subject.can_handle_event?(result).should be_true
+    end
+
+    it 'should be able to handle errors with same id but different call id' do
+      Connfu.connection.stub(:send_command).and_return('command-id')
+      subject.send_command(Connfu::Commands::Say.new(:text => '', :from => 'client-address', :to => 'server-address'))
+      error = Connfu::Event::Error.new(:call_id => 'different-call-id', :command_id => 'command-id')
+      subject.can_handle_event?(error).should be_true
+    end
+  end
 
   describe 'say' do
     it 'should send Say command to connection' do
@@ -67,6 +100,21 @@ describe Connfu::Dsl do
       catch :waiting do
         subject.transfer(transfer_to, :timeout => timeout_in_seconds)
       end
+    end
+  end
+
+  describe "transfer using join" do
+    it 'should send NestedJoin command to connection' do
+      dial_to = 'sip:dial-to@example.com'
+      dial_from = 'sip:dial-from@example.com'
+      Connfu.connection.should_receive(:send_command).with(Connfu::Commands::NestedJoin.new(
+        :dial_to => dial_to,
+        :dial_from => dial_from,
+        :from => 'client-address',
+        :to => 'server-address',
+        :call_id => 'call-id'
+      ))
+      subject.transfer_using_join(dial_from, dial_to)
     end
   end
 

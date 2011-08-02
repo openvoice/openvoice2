@@ -13,6 +13,7 @@ class Connfu::Connection
     iq = command.to_iq
     logger.debug iq
     blather_client.write iq
+    iq.attributes['id'].to_s
   end
 
   def method_missing(method, *args, &block)

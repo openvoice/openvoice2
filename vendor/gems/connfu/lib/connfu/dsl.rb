@@ -6,7 +6,7 @@ module Connfu
       base.send(:include, Connfu::Logging)
       base.extend Connfu::Dsl::ClassMethods
       base.class_eval do
-        attr_reader :server_address, :client_address
+        attr_reader :server_address, :client_address, :call_id
       end
     end
 
@@ -36,6 +36,8 @@ module Connfu
             call_behaviour = CallBehaviour.new
             yield call_behaviour
             define_method(:call_behaviour) { call_behaviour }
+          else
+            raise "Unrecognised context: #{context}"
         end
 
       end
@@ -101,6 +103,19 @@ module Connfu
         end
       end
 
+      def transfer_using_join(dial_from, dial_to)
+        command_options = {
+          :to => server_address,
+          :from => client_address,
+          :dial_to => dial_to,
+          :dial_from => dial_from,
+          :call_id => call_id
+        }
+        send_command Connfu::Commands::NestedJoin.new(command_options)
+        wait_for Connfu::Event::Hangup
+        @finished = true
+      end
+
       def recordings
         @recordings ||= []
       end
@@ -135,7 +150,10 @@ module Connfu
         else
           case event
             when Connfu::Event::Offer
-              start(event)
+              start do
+                run event
+                hangup unless finished?
+              end
             when Connfu::Event::Ringing
               run_any_call_behaviour_for(:ringing)
             when Connfu::Event::Answered
@@ -143,13 +161,46 @@ module Connfu
             when Connfu::Event::Hangup
               run_any_call_behaviour_for(:hangup)
               @finished = true
-            when Connfu::Event::RecordingErrorComplete
-              recordings << event.uri
+            when Connfu::Event::Joined
+              # ignore for now
+            else
+              raise "Unrecognized event: #{event}"
           end
         end
       end
 
+      def can_handle_event?(event)
+        event_matches_call_id?(event) || event_matches_last_command_id?(event)
+      end
+
+      def waiting_for?(event)
+        can_handle_event?(event) && @waiting_for && @waiting_for.detect do |e|
+          e === event
+        end
+      end
+
+      def send_command(command)
+        return if @finished
+        @last_command_id = Connfu.connection.send_command command
+        logger.debug "Sent command: #{command}"
+        result = wait_for Connfu::Event::Result, Connfu::Event::Error
+        logger.debug "Result from command #{result}"
+        if result.is_a?(Connfu::Event::Error)
+          raise
+        else
+          result
+        end
+      end
+
       private
+
+      def event_matches_call_id?(event)
+        event.call_id == call_id
+      end
+
+      def event_matches_last_command_id?(event)
+        event.respond_to?(:command_id) && @last_command_id == event.command_id
+      end
 
       def send_start_recording(options = {})
         command_options = { :to => server_address, :from => client_address }
@@ -166,30 +217,12 @@ module Connfu
         wait
       end
 
-      def waiting_for?(event)
-        @waiting_for && @waiting_for.detect do |e|
-          e === event
-        end
-      end
-
-      def send_command(command)
-        return if @finished
-        Connfu.connection.send_command command
-        logger.debug "Sent command: #{command}"
-        result = wait_for Connfu::Event::Result, Connfu::Event::Error
-        logger.debug "Result from command #{result}"
-        if result.is_a?(Connfu::Event::Error)
-          raise
-        else
-          result
-        end
-      end
     end
 
     def initialize(params)
       @server_address = params[:from]
       @client_address = params[:to]
+      @call_id = params[:call_id]
     end
-
   end
 end

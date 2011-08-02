@@ -21,16 +21,26 @@ describe Connfu::Connection do
     end
   end
 
-  it "should write XMPP versions of commands to its underlying connection" do
-    blather_client = stub('blather_client')
-    command = stub('command')
-    xmpp = stub('xmpp')
-    command.stub(:to_iq).and_return(xmpp)
+  describe '#send_command' do
 
-    connection = Connfu::Connection.new(Connfu.config)
-    connection.stub(:blather_client).and_return(blather_client)
-    blather_client.should_receive(:write).with(xmpp)
+    subject { Connfu::Connection.new(Connfu.config) }
 
-    connection.send_command(command)
+    before do
+      @blather_client = stub('blather_client')
+      @command = stub('command')
+      xmpp = stub('xmpp', :attributes => { 'id' => 'some-id' })
+      @command.stub(:to_iq).and_return(xmpp)
+      subject.stub(:blather_client).and_return(@blather_client)
+    end
+
+    it "should write XMPP versions of commands to its underlying connection" do
+      @blather_client.should_receive(:write).with(@command.to_iq)
+      subject.send_command(@command)
+    end
+
+    it "should return id of underlying XMPP command" do
+      @blather_client.stub(:write)
+      subject.send_command(@command).should eql('some-id')
+    end
   end
 end

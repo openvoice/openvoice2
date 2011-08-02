@@ -9,6 +9,7 @@ CONNFU_CONFIG = {
   }
 }
 CONNFU_CONFIG['amazon'] = CONNFU_CONFIG['default'].merge(:connfu_uri => 'jid://usera:1@46.137.85.52')
+CONNFU_CONFIG['linode'] = CONNFU_CONFIG['default'].merge(:connfu_uri => 'jid://usera:1@173.255.241.49')
 
 CONNFU_ENV = ENV['CONNFU_ENV'] || 'default'
 

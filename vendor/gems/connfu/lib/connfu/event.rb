@@ -30,7 +30,7 @@ module Connfu
       def parse_address(raw_address)
         address, scheme, username, host = *raw_address.match(%r{^<([^:]+):([^@]+)@([^>]+)>$})
         {
-          :address => address,
+          :address => address.match(%r{^<([^>]+)>$})[1],
           :scheme => scheme,
           :username => username,
           :host => host
@@ -51,19 +51,21 @@ module Connfu
     end
 
     class Result
-      attr_reader :call_id, :ref_id
+      attr_reader :call_id, :ref_id, :command_id
 
       def initialize(params = {})
         @call_id = params[:call_id]
         @ref_id = params[:ref_id]
+        @command_id = params[:command_id]
       end
     end
 
     class Error
-      attr_reader :call_id
+      attr_reader :call_id, :command_id
 
       def initialize(params = {})
         @call_id = params[:call_id]
+        @command_id = params[:command_id]
       end
     end
 
@@ -90,6 +92,9 @@ module Connfu
         @call_id = params[:call_id]
         @uri = params[:uri]
       end
+    end
+
+    class Joined < Presence
     end
   end
 end

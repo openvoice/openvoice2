@@ -7,8 +7,8 @@ Connfu.start do
     if account = Account.find_by_username(call.to[:username])
       answer
       say 'please wait while we transfer your call'
-      result = transfer *account.endpoints.map(&:address)
-      puts "The call was answered, and has finished" if result.answered?
+      transfer_using_join call.to[:address], account.endpoints.first.address
+      puts "The call was answered, and has finished"
     end
   end
 end

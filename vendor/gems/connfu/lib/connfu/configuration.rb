@@ -2,7 +2,7 @@ class Connfu::Configuration
   attr_accessor :uri, :user, :password, :host
 
   def initialize(options = {})
-    self.uri = options[:uri] || ENV['CONNFU_URI']
+    self.uri = options[:uri] || ENV['CONNFU_JABBER_URI']
   end
 
   def uri=(u)
