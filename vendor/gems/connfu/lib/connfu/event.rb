@@ -85,6 +85,9 @@ module Connfu
     class Hangup < Presence
     end
 
+    class StopComplete < Presence
+    end
+
     class RecordingStopComplete < Presence
       attr_reader :uri
 
@@ -95,6 +98,12 @@ module Connfu
     end
 
     class Joined < Presence
+      attr_reader :joined_call_id
+
+      def initialize(params = {})
+        super(params)
+        @joined_call_id = params[:joined_call_id]
+      end
     end
   end
 end

@@ -21,6 +21,12 @@ describe Connfu::Dsl do
         subject.handle_event(unrecognised_event)
       end.should raise_error
     end
+
+    it "should handle the event for another call id" do
+      event_for_another_call = Connfu::Event::Result.new(:call_id => 'another-call-id', :command_id => 'the-command-id')
+      subject.observe_events_for("another-call-id")
+      subject.can_handle_event?(event_for_another_call).should be_true
+    end
   end
 
   describe 'on' do
