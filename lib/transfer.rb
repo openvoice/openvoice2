@@ -8,6 +8,13 @@ Connfu.start do
       answer
       say 'please wait while we transfer your call'
 
+      # We must do the say before the Join happens. It will end once the join happens.
+      result_iq = send_command Connfu::Commands::Say.new(
+        :from => client_address,
+        :to => server_address,
+        :text => "http://www.phono.com/audio/troporocks.mp3"
+      )
+
       command_options = {
         :to => server_address,
         :from => client_address,
@@ -15,21 +22,14 @@ Connfu.start do
         :dial_from => call.to[:address],
         :call_id => call_id
       }
-      send_command Connfu::Commands::NestedJoin.new(command_options)
 
-      presence_iq = wait_for Connfu::Event::Joined
-      observe_events_for(presence_iq.joined_call_id)
+      result = send_command Connfu::Commands::NestedJoin.new(command_options)
 
-      result_iq = send_command Connfu::Commands::Say.new(
-        :from => client_address,
-        :to => server_address,
-        :text => "http://www.phono.com/audio/troporocks.mp3"
-      )
+      # the call id we are going to JOIN will be returned in the result
+      observe_events_for(result.ref_id)
 
+      # answer event for the joining call will now be handled by this "call".
       wait_for Connfu::Event::Answered
-
-      send_command Connfu::Commands::Stop.new(:to => server_address, :from => client_address, :ref_id => result_iq.ref_id)
-      wait_for Connfu::Event::StopComplete # this could be removed later if we change the DSL to not throw an exception
 
       wait_for Connfu::Event::Hangup
       @finished = true
