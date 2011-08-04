@@ -161,10 +161,8 @@ module Connfu
             when Connfu::Event::Hangup
               run_any_call_behaviour_for(:hangup)
               @finished = true
-            when Connfu::Event::Joined
-              # ignore for now
             else
-              raise "Unrecognized event: #{event}"
+              logger.warn "Unrecognized event: #{event}"
           end
         end
       end

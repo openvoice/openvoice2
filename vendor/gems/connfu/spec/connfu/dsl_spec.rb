@@ -15,11 +15,10 @@ describe Connfu::Dsl do
   }
 
   describe 'handle_event' do
-    it 'should raise an exception if event is not recognized' do
+    it 'should log unhandled event for debugging purposes' do
       unrecognised_event = Class.new(Connfu::Event::Presence).new
-      lambda do
-        subject.handle_event(unrecognised_event)
-      end.should raise_error
+      subject.logger.should_receive(:warn)
+      subject.handle_event(unrecognised_event)
     end
 
     it "should handle the event for another call id" do

@@ -23,6 +23,12 @@ RSpec.configure do |config|
   config.extend ConnfuTestDsl
 end
 
+module Connfu
+  class << self
+    attr_writer :logger
+  end
+end
+Connfu.logger = Logger.new(StringIO.new)
 Connfu.logger.level = Logger::WARN
 
 class MyTestClass
