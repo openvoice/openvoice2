@@ -9,7 +9,8 @@ module Jobs
     end
 
     def self.perform(caller, recipient)
-      connfu_user = "sip:connfu@127.0.0.1"
+      username = "connfu"
+      connfu_user = "sip:#{username}@#{Connfu.config.host}"
 
       dial :to => caller, :from => connfu_user do |c|
         c.on_answer do
