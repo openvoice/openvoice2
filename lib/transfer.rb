@@ -1,4 +1,6 @@
+require 'jobs'
 require 'connfu'
+require 'connfu/queue/resque'
 
 Connfu.config.uri = ENV['CONNFU_JABBER_URI']
 
