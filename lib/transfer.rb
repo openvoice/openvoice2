@@ -1,6 +1,7 @@
 require 'jobs'
 require 'connfu'
-require 'connfu/queue/resque'
+
+require File.expand_path('../../config/initializers/queue', __FILE__)
 
 Connfu.config.uri = ENV['CONNFU_JABBER_URI']
 

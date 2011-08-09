@@ -1,6 +1,5 @@
 require "jobs"
 require "connfu"
-require "connfu/queue/resque"
 
 class DialsController < ApplicationController
   def new
