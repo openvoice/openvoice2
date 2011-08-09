@@ -5,8 +5,8 @@ describe Connfu::Commands::NestedJoin do
   describe "generating XMPP iq" do
     subject do
       Connfu::Commands::NestedJoin.new(
-        :to => 'server-address',
-        :from => 'client-address',
+        :call_jid => 'call-jid',
+        :client_jid => 'client-jid',
         :call_id => 'call-id',
         :dial_to => 'dial-to',
         :dial_from => 'dial-from').to_iq
@@ -22,11 +22,11 @@ describe Connfu::Commands::NestedJoin do
     end
 
     it "should send the attribute 'to' in the iq" do
-      subject.xpath("/iq").first.attributes["to"].value.should eq "server-address"
+      subject.xpath("/iq").first.attributes["to"].value.should eq "call-jid"
     end
 
     it "should send the attribute 'from' in the iq" do
-      subject.xpath("/iq").first.attributes["from"].value.should eq "client-address"
+      subject.xpath("/iq").first.attributes["from"].value.should eq "client-jid"
     end
 
     it "should contain the dial 'to' and 'from' in the dial iq element" do

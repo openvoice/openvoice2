@@ -26,7 +26,7 @@ module Connfu
     private
 
     def build_handler(event)
-      @handler_class.new(:from => event.presence_from, :to => event.presence_to, :call_id => event.call_id)
+      @handler_class.new(:call_jid => event.presence_from, :client_jid => event.presence_to, :call_id => event.call_id)
     end
 
     def handler_for(event)

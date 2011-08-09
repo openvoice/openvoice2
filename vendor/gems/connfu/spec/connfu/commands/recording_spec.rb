@@ -5,7 +5,7 @@ describe Connfu::Commands::Recording do
   describe "generating XMPP iq for a Start command" do
     subject do
       Connfu::Commands::Recording::Start.new(
-        :to => 'server-address', :from => 'client-address'
+        :call_jid => 'call-jid', :client_jid => 'client-jid'
       ).to_iq
     end
 
@@ -18,11 +18,11 @@ describe Connfu::Commands::Recording do
     end
 
     it "should contain the 'to' address in the iq" do
-      subject.xpath("/iq").first.attributes["to"].value.should eq "server-address"
+      subject.xpath("/iq").first.attributes["to"].value.should eq "call-jid"
     end
 
     it "should contain the 'from' address in the iq" do
-      subject.xpath("/iq").first.attributes["from"].value.should eq "client-address"
+      subject.xpath("/iq").first.attributes["from"].value.should eq "client-jid"
     end
 
     it 'should have correct iq attributes for recording type' do
@@ -35,7 +35,7 @@ describe Connfu::Commands::Recording do
     describe "with optional max length parameter" do
       subject do
         Connfu::Commands::Recording::Start.new(
-          :to => 'server-address', :from => 'client-address', :max_length => 25000
+          :call_jid => 'call-jid', :client_jid => 'client-jid', :max_length => 25000
         ).to_iq
       end
 
@@ -48,7 +48,7 @@ describe Connfu::Commands::Recording do
     describe "with optional beep parameter" do
       subject do
         Connfu::Commands::Recording::Start.new(
-          :to => 'server-address', :from => 'client-address', :beep => false
+          :call_jid => 'call-jid', :client_jid => 'client-jid', :beep => false
         ).to_iq
       end
 
@@ -61,7 +61,7 @@ describe Connfu::Commands::Recording do
     describe "with recording format passed as :wav" do
       subject do
         Connfu::Commands::Recording::Start.new(
-          :to => 'server-address', :from => 'client-address', :format => :wav
+          :call_jid => 'call-jid', :client_jid => 'client-jid', :format => :wav
         ).to_iq
       end
 
@@ -74,7 +74,7 @@ describe Connfu::Commands::Recording do
     describe "with recording format passed as :gsm" do
       subject do
         Connfu::Commands::Recording::Start.new(
-          :to => 'server-address', :from => 'client-address', :format => :gsm
+          :call_jid => 'call-jid', :client_jid => 'client-jid', :format => :gsm
         ).to_iq
       end
 
@@ -87,7 +87,7 @@ describe Connfu::Commands::Recording do
     describe "with recording format passed as :raw" do
       subject do
         Connfu::Commands::Recording::Start.new(
-          :to => 'server-address', :from => 'client-address', :format => :raw
+          :call_jid => 'call-jid', :client_jid => 'client-jid', :format => :raw
         ).to_iq
       end
 
@@ -100,7 +100,7 @@ describe Connfu::Commands::Recording do
     describe "with recording format passed as :mp3" do
       subject do
         Connfu::Commands::Recording::Start.new(
-          :to => 'server-address', :from => 'client-address', :format => :mp3
+          :call_jid => 'call-jid', :client_jid => 'client-jid', :format => :mp3
         ).to_iq
       end
 
@@ -114,7 +114,7 @@ describe Connfu::Commands::Recording do
       it 'should raise exception' do
         lambda {
           Connfu::Commands::Recording::Start.new(
-            :to => 'server-address', :from => 'client-address', :format => :unknown_format
+            :call_jid => 'call-jid', :client_jid => 'client-jid', :format => :unknown_format
           ).to_iq
         }.should raise_error(Connfu::Commands::Recording::InvalidEncoding, "Format unknown_format not supported")
       end
@@ -123,7 +123,7 @@ describe Connfu::Commands::Recording do
     describe "with recording format and supported format codec" do
       subject do
         Connfu::Commands::Recording::Start.new(
-          :to => 'server-address', :from => 'client-address', :format => :wav, :codec => :mulaw_pcm_64k
+          :call_jid => 'call-jid', :client_jid => 'client-jid', :format => :wav, :codec => :mulaw_pcm_64k
         ).to_iq
       end
 
@@ -137,7 +137,7 @@ describe Connfu::Commands::Recording do
       it 'should raise exception' do
         lambda {
           Connfu::Commands::Recording::Start.new(
-            :to => 'server-address', :from => 'client-address', :format => :wav, :codec => :unknowncodec
+            :call_jid => 'call-jid', :client_jid => 'client-jid', :format => :wav, :codec => :unknowncodec
           ).to_iq
         }.should raise_error(Connfu::Commands::Recording::InvalidEncoding, "Codec unknowncodec not supported for wav format")
       end
@@ -147,7 +147,7 @@ describe Connfu::Commands::Recording do
       it 'should raise exception' do
         lambda {
           Connfu::Commands::Recording::Start.new(
-            :to => 'server-address', :from => 'client-address', :codec => :mulaw_pcm_64k
+            :call_jid => 'call-jid', :client_jid => 'client-jid', :codec => :mulaw_pcm_64k
           ).to_iq
         }.should raise_error(Connfu::Commands::Recording::InvalidEncoding, "Please supply :format when specifying :codec")
       end
@@ -157,7 +157,7 @@ describe Connfu::Commands::Recording do
 
   describe "generating XMPP iq for a Stop command" do
     subject do
-      Connfu::Commands::Recording::Stop.new(:to => 'server-address', :from => 'client-address', :ref_id => 'abc123').to_iq
+      Connfu::Commands::Recording::Stop.new(:call_jid => 'call-jid', :client_jid => 'client-jid', :ref_id => 'abc123').to_iq
     end
 
     it "should generate a stop record iq" do
@@ -169,11 +169,11 @@ describe Connfu::Commands::Recording do
     end
 
     it "should contain the 'to' address with the ref_id in the iq" do
-      subject.xpath("/iq").first.attributes["to"].value.should eq "server-address/abc123"
+      subject.xpath("/iq").first.attributes["to"].value.should eq "call-jid/abc123"
     end
 
     it "should contain the 'from' address in the iq" do
-      subject.xpath("/iq").first.attributes["from"].value.should eq "client-address"
+      subject.xpath("/iq").first.attributes["from"].value.should eq "client-jid"
     end
 
     it 'should not set any other iq attributes' do

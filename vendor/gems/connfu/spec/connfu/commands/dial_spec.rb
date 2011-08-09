@@ -12,7 +12,9 @@ describe Connfu::Commands::Dial do
       subject do
         Connfu::Commands::Dial.new(
           :to => 'zlu@iptel.org',
-          :from => 'admin@openvoice.org'
+          :from => 'admin@openvoice.org',
+          :client_jid => 'client-jid',
+          :rayo_host => 'rayo-host'
         ).to_iq
       end
 
@@ -21,11 +23,11 @@ describe Connfu::Commands::Dial do
       end
 
       it "should contain the 'to' address in the iq" do
-        subject.xpath("/iq").first.attributes["to"].value.should eq 'openvoice.org'
+        subject.xpath("/iq").first.attributes["to"].value.should eq 'rayo-host'
       end
 
       it "should contain the 'from' address in the iq" do
-        subject.xpath("/iq").first.attributes["from"].value.should eq 'zlu@openvoice.org/1'
+        subject.xpath("/iq").first.attributes["from"].value.should eq 'client-jid'
       end
 
       describe 'dial node' do

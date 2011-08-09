@@ -22,7 +22,9 @@ describe "Dialing a single number from within the DSL" do
 
   it "should send dial command with the supplied options" do
     job = Connfu::Queue.reserve(Connfu::Jobs::Dial.queue)
-    Connfu.connection.should_receive(:send_command).with(Connfu::Commands::Dial.new(:to => 'sip-to', :from => 'sip-from'))
+    client_jid = Connfu.connection.jid.to_s
+    rayo_host = Connfu.connection.jid.domain
+    Connfu.connection.should_receive(:send_command).with(Connfu::Commands::Dial.new(:to => 'sip-to', :from => 'sip-from', :client_jid => client_jid, :rayo_host => rayo_host))
     job.perform
   end
 end
@@ -78,7 +80,7 @@ describe "Handling any outgoing call" do
     incoming :outgoing_call_ringing_presence, @call_id
     incoming :outgoing_call_answered_presence, @call_id
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Say.new(:text => 'something', :to => "#{@call_id}@#{PRISM_HOST}", :from => "#{PRISM_JID}/voxeo")
+    Connfu.connection.commands.last.should == Connfu::Commands::Say.new(:text => 'something', :call_jid => "#{@call_id}@#{PRISM_HOST}", :client_jid => "#{PRISM_JID}/voxeo")
   end
 
   it 'should only invoke the second say once the first has completed' do
@@ -87,7 +89,7 @@ describe "Handling any outgoing call" do
     incoming :result_iq, @call_id
     incoming :say_complete_success, @call_id
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Say.new(:text => 'another thing', :to => "#{@call_id}@#{PRISM_HOST}", :from => "#{PRISM_JID}/voxeo")
+    Connfu.connection.commands.last.should == Connfu::Commands::Say.new(:text => 'another thing', :call_jid => "#{@call_id}@#{PRISM_HOST}", :client_jid => "#{PRISM_JID}/voxeo")
   end
 
   it 'should run the hangup behaviour when the call is hung up' do

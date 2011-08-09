@@ -11,18 +11,18 @@ describe "two simultaneous offers" do
   end
 
   before :each do
-    @first_server_address = "foo@server.whatever"
-    @second_server_address = "bar@server.whatever"
+    @first_call_jid = "foo@server.whatever"
+    @second_call_jid = "bar@server.whatever"
     @foo_address = "foo@clientfoo.com"
     @bar_address = "bar@clientbar.com"
   end
 
   it "should handle each call independently" do
-    incoming :offer_presence, @first_server_address, @foo_address
+    incoming :offer_presence, @first_call_jid, @foo_address
     incoming :result_iq, "foo"
     incoming :result_iq, "foo"
 
-    incoming :offer_presence, @second_server_address, @bar_address
+    incoming :offer_presence, @second_call_jid, @bar_address
     incoming :result_iq, "bar"
     incoming :result_iq, "bar"
 
@@ -30,7 +30,7 @@ describe "two simultaneous offers" do
     Connfu.connection.commands = []
     incoming :say_complete_success, "foo"
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Say.new(:text => 'this is the second say', :to => @first_server_address, :from => @foo_address)
+    Connfu.connection.commands.last.should == Connfu::Commands::Say.new(:text => 'this is the second say', :call_jid => @first_call_jid, :client_jid => @foo_address)
   end
 
 end

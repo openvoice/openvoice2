@@ -49,13 +49,17 @@ describe Connfu::Rayo::Parser do
 
     context 'a recording result iq' do
       before do
-        @node = create_presence(recording_result_iq('call-id', 'ref-id'))
+        @node = create_iq(recording_result_iq('call-id', 'ref-id'))
         @event = Connfu::Rayo::Parser.parse_event_from(@node)
       end
 
       it "should create a result event that contains the id from ref node" do
         @event.should be_instance_of Connfu::Event::Result
         @event.ref_id.should == 'ref-id'
+      end
+
+      it "should determine the command id of the originating event" do
+        @event.command_id.should eq @node.attributes['id'].value
       end
     end
 
@@ -76,23 +80,31 @@ describe Connfu::Rayo::Parser do
 
     context "a normal result iq" do
       before do
-        @node = create_presence(result_iq)
+        @node = create_iq(result_iq)
         @event = Connfu::Rayo::Parser.parse_event_from(@node)
       end
 
       it "should create a result event" do
         @event.should be_instance_of Connfu::Event::Result
       end
+
+      it "should determine the command id of the originating event" do
+        @event.command_id.should eq @node.attributes['id'].value
+      end
     end
 
     context "an error iq" do
       before do
-        @node = create_presence(error_iq)
+        @node = create_iq(error_iq)
         @event = Connfu::Rayo::Parser.parse_event_from(@node)
       end
 
       it "should create an error event" do
         @event.should be_instance_of Connfu::Event::Error
+      end
+
+      it "should determine the command id of the originating event" do
+        @event.command_id.should eq @node.attributes['id'].value
       end
     end
 
@@ -177,7 +189,7 @@ describe Connfu::Rayo::Parser do
 
     context "an outgoing call ringing presence" do
       before do
-        @node = create_presence(outgoing_call_ringing_presence("call-id"))
+        @node = create_presence(outgoing_call_ringing_presence("call-id", "client-jid"))
         @event = Connfu::Rayo::Parser.parse_event_from(@node)
       end
 
@@ -185,8 +197,16 @@ describe Connfu::Rayo::Parser do
         @event.should be_instance_of Connfu::Event::Ringing
       end
 
-      it "should determine the call_id value of a Ringing event" do
+      it "should determine the call_id value" do
         @event.call_id.should eq "call-id"
+      end
+
+      it "should determine the presence_to value" do
+        @event.presence_to.should eq "client-jid"
+      end
+
+      it "should determine the presence_from value" do
+        @event.presence_from.should eq "call-id@#{PRISM_HOST}"
       end
     end
 

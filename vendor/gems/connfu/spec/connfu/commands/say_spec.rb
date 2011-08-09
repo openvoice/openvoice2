@@ -4,7 +4,7 @@ describe Connfu::Commands::Say do
 
   describe "generating XMPP iq" do
     subject do
-      Connfu::Commands::Say.new(:to => 'server-address', :from => 'client-address', :text => "Hello").to_iq
+      Connfu::Commands::Say.new(:call_jid => 'call-jid', :client_jid => 'client-jid', :text => "Hello").to_iq
     end
 
     it "should generate say iq" do
@@ -16,11 +16,11 @@ describe Connfu::Commands::Say do
     end
 
     it "should send the attribute 'to' in the iq" do
-      subject.xpath("/iq").first.attributes["to"].value.should eq "server-address"
+      subject.xpath("/iq").first.attributes["to"].value.should eq "call-jid"
     end
 
     it "should send the attribute 'from' in the iq" do
-      subject.xpath("/iq").first.attributes["from"].value.should eq "client-address"
+      subject.xpath("/iq").first.attributes["from"].value.should eq "client-jid"
     end
 
     it "should include the text to be spoken" do
@@ -31,7 +31,7 @@ describe Connfu::Commands::Say do
   describe "generating XMPP iq with a url" do
     subject do
       @url = "http://www.phono.com/audio/troporocks.mp3"
-      Connfu::Commands::Say.new(:to => 'server-address', :from => 'client-address', :text => @url).to_iq
+      Connfu::Commands::Say.new(:to => 'call-jid', :client_jid => 'client-jid', :text => @url).to_iq
     end
 
     it "should contain the 'audio' node with the correct src" do

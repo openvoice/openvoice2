@@ -19,14 +19,18 @@ module Connfu
   class << self
     attr_accessor :event_processor
     attr_accessor :connection
+    attr_accessor :io_log
   end
 
   def self.handle_stanza(stanza)
+    io_log.received stanza if io_log
     event = Connfu::Rayo::Parser.parse_event_from(stanza)
     event_processor.handle_event(event)
   end
 
   def self.start(handler_class = nil, &block)
+    logger.info "Tropo build: #{tropo_build}"
+    io_log.info "Tropo build: #{tropo_build}" if io_log
     handler_class ||= build_handler_class(&block)
     self.event_processor = EventProcessor.new(handler_class)
     EM.run do
@@ -45,6 +49,16 @@ module Connfu
 
   def self.logger
     @logger ||= Logger.new(STDOUT)
+  end
+
+  def self.tropo_build
+    possible_prism_locations = ['~/Applications/prism', '/Applications/prism', '/opt/voxeo/prism'].map { |p| File.expand_path(p) }
+    prism_home = possible_prism_locations.find { |p| File.directory?(p) }
+    if prism_home && File.exist?(File.join(prism_home, "apps/tropo-build.txt"))
+      File.read(File.join(prism_home, "apps/tropo-build.txt"))
+    else
+      "unknown"
+    end
   end
 
   private

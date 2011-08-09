@@ -9,13 +9,13 @@ describe "a call reject" do
   end
 
   before :each do
-    @server_address = "34209dfiasdoaf@server.whatever"
-    @client_address = "usera@127.0.0.whatever/voxeo"
+    @call_jid = "34209dfiasdoaf@server.whatever"
+    @client_jid = "usera@127.0.0.whatever/voxeo"
   end
 
   it "should send the reject command" do
-    incoming :offer_presence, @server_address, @client_address
+    incoming :offer_presence, @call_jid, @client_jid
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Reject.new(:to => @server_address, :from => @client_address)
+    Connfu.connection.commands.last.should == Connfu::Commands::Reject.new(:call_jid => @call_jid, :client_jid => @client_jid)
   end
 end

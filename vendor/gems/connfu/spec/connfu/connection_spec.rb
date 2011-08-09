@@ -25,9 +25,13 @@ describe Connfu::Connection do
 
     subject { Connfu::Connection.new(Connfu.config) }
 
+    class Connfu::Commands::Generic
+      include Connfu::Commands::Base
+    end
+
     before do
       @blather_client = stub('blather_client')
-      @command = stub('command')
+      @command = Connfu::Commands::Generic.new({})
       xmpp = stub('xmpp', :attributes => { 'id' => 'some-id' })
       @command.stub(:to_iq).and_return(xmpp)
       subject.stub(:blather_client).and_return(@blather_client)

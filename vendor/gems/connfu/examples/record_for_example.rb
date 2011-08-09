@@ -1,9 +1,7 @@
 #!/usr/bin/env ruby
 require File.expand_path('../environment', __FILE__)
 
-class RecordForExample
-  include Connfu::Dsl
-
+Connfu.start do
   on :offer do |call|
     answer
     record_for 5
@@ -11,5 +9,3 @@ class RecordForExample
     p recordings
   end
 end
-
-Connfu.start RecordForExample

@@ -15,7 +15,7 @@ describe "handling a call offer" do
       hash_including(:from => "James Adam <sip:james@127.0.0.1>")
     )
 
-    incoming :offer_presence, @server_address, @client_address, :from => "James Adam <sip:james@127.0.0.1>"
+    incoming :offer_presence, @call_jid, @client_jid, :from => "James Adam <sip:james@127.0.0.1>"
   end
 
   it "exposes who the call is being routed to" do
@@ -30,7 +30,7 @@ describe "handling a call offer" do
       hash_including(:to => parsed_hash)
     )
 
-    incoming :offer_presence, @server_address, @client_address, :to => "<sip:usera@127.0.0.1>"
+    incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:usera@127.0.0.1>"
   end
 
   it "implicitly hangs up once handling is complete" do
@@ -38,7 +38,7 @@ describe "handling a call offer" do
     Connfu.event_processor.stub(:build_handler).and_return(handler_instance)
     handler_instance.should_receive(:do_something_with).ordered
     handler_instance.should_receive(:hangup).ordered
-    incoming :offer_presence, @server_address, @client_address
+    incoming :offer_presence, @call_jid, @client_jid
   end
 end
 
@@ -52,14 +52,14 @@ describe "offer which is hungup by the DSL" do
 
   before :each do
     @call_id = '34209dfiasdoaf'
-    @server_address = "#{@call_id}@server.whatever"
-    @client_address = "usera@127.0.0.whatever/voxeo"
+    @call_jid = "#{@call_id}@server.whatever"
+    @client_jid = "usera@127.0.0.whatever/voxeo"
   end
 
   it "should not issue another hangup after it has been called in the DSL" do
     handler_instance = Connfu.event_processor.handler_class.new({})
     Connfu.event_processor.stub(:build_handler).and_return(handler_instance)
-    incoming :offer_presence, @server_address, @client_address
+    incoming :offer_presence, @call_jid, @client_jid
     incoming :result_iq, @call_id # from the answer command
     handler_instance.should_receive(:hangup).never
     incoming :result_iq, @call_id # from the hangup within DSL

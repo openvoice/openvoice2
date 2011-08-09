@@ -4,7 +4,7 @@ describe Connfu::Commands::Hangup do
 
   describe "generating XMPP iq" do
     subject do
-      Connfu::Commands::Hangup.new(:to => 'server-address', :from => 'client-address').to_iq
+      Connfu::Commands::Hangup.new(:call_jid => 'call-jid', :client_jid => 'client-jid').to_iq
     end
 
     it "should generate hangup iq" do
@@ -16,11 +16,11 @@ describe Connfu::Commands::Hangup do
     end
 
     it "should contain the 'to' address in the iq" do
-      subject.xpath("/iq").first.attributes["to"].value.should eq "server-address"
+      subject.xpath("/iq").first.attributes["to"].value.should eq "call-jid"
     end
 
     it "should contain the 'from' address in the iq" do
-      subject.xpath("/iq").first.attributes["from"].value.should eq "client-address"
+      subject.xpath("/iq").first.attributes["from"].value.should eq "client-jid"
     end
   end
 end

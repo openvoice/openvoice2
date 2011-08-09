@@ -11,24 +11,24 @@ describe "transfer using join" do
 
   before do
     @call_id = "call-id"
-    @server_address = "#{@call_id}@server.whatever"
-    @client_address = "usera@127.0.0.whatever/voxeo"
+    @call_jid = "#{@call_id}@server.whatever"
+    @client_jid = "usera@127.0.0.whatever/voxeo"
   end
 
   it "should send a nested join when on incoming offer" do
-    incoming :offer_presence, @server_address, @client_address
+    incoming :offer_presence, @call_jid, @client_jid
 
     Connfu.connection.commands.last.should == Connfu::Commands::NestedJoin.new(
       :dial_to => 'dial-to',
       :dial_from => 'dial-from',
-      :to => @server_address,
-      :from => @client_address,
+      :call_jid => @call_jid,
+      :client_jid => @client_jid,
       :call_id => @call_id
     )
   end
 
   it "should wait until a hangup is received" do
-    incoming :offer_presence, @server_address, @client_address
+    incoming :offer_presence, @call_jid, @client_jid
     incoming :result_iq, @call_id
     incoming :joined_presence, @call_id, "a-new-call-id"
     incoming :joined_presence, "a-new-call-id", @call_id
@@ -37,7 +37,7 @@ describe "transfer using join" do
   end
 
   it "should continue execution when hangup is received, but mark call as finished" do
-    incoming :offer_presence, @server_address, @client_address
+    incoming :offer_presence, @call_jid, @client_jid
     incoming :result_iq, @call_id
     incoming :joined_presence, @call_id, "a-new-call-id"
     incoming :joined_presence, "a-new-call-id", @call_id

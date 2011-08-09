@@ -1,9 +1,7 @@
 #!/usr/bin/env ruby
 require File.expand_path('../environment', __FILE__)
 
-class ThinkOfANumber
-  include Connfu
-
+Connfu.start do
   on :offer do |call|
     number = rand(10)
     say "I'm thinking of a number between 1 and 10"
@@ -13,5 +11,3 @@ class ThinkOfANumber
     say "Congratulations"
   end
 end
-
-Connfu.start

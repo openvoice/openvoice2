@@ -1,18 +1,10 @@
 #!/usr/bin/env ruby
 require File.expand_path('../environment', __FILE__)
 
-require 'connfu/queue/resque'
-Resque.redis = CONNFU_CONFIG[CONNFU_ENV][:redis_url]
+require_one_recipient!
 
-class DialViaResqueQueueExample
-  include Connfu::Dsl
-
-  def update_status(status)
-    File.open("/tmp/status.log", "a") { |f| f.puts "Status change: #{status}" }
-  end
-
-  dial :to => 'sip:zlu@213.192.59.75', :from => "sip:usera@127.0.0.1"
-  dial :to => 'sip:openvoice@213.192.59.75', :from => "sip:usera@127.0.0.1"
+Connfu.start do
+  dial :to => "sip:#{DIAL_TO}", :from => "sip:usera@127.0.0.1"
 
   on :outgoing_call do |c|
     c.on_ringing do
@@ -30,5 +22,3 @@ class DialViaResqueQueueExample
     end
   end
 end
-
-Connfu.start DialViaResqueQueueExample

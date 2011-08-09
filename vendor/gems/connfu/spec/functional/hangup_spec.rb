@@ -10,18 +10,18 @@ describe "hangup a call" do
 
   before :each do
     @call_id = '34209dfiasdoaf'
-    @server_address = "#{@call_id}@server.whatever"
-    @client_address = "usera@127.0.0.whatever/voxeo"
+    @call_jid = "#{@call_id}@server.whatever"
+    @client_jid = "usera@127.0.0.whatever/voxeo"
   end
 
   it "should send the hangup command" do
-    incoming :offer_presence, @server_address, @client_address
+    incoming :offer_presence, @call_jid, @client_jid
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Hangup.new(:to => @server_address, :from => @client_address)
+    Connfu.connection.commands.last.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
   end
 
   it "should handle the hangup event that will come back from the server" do
-    incoming :offer_presence, @server_address, @client_address
+    incoming :offer_presence, @call_jid, @client_jid
     incoming :hangup_presence, @call_id
   end
 end
@@ -37,16 +37,16 @@ describe "defining behaviour after a hangup" do
 
   before :each do
     @call_id = '34209dfiasdoaf'
-    @server_address = "#{@call_id}@server.whatever"
-    @client_address = "usera@127.0.0.whatever/voxeo"
+    @call_jid = "#{@call_id}@server.whatever"
+    @client_jid = "usera@127.0.0.whatever/voxeo"
   end
 
   it "should not send any commands after the hangup" do
-    incoming :offer_presence, @server_address, @client_address
+    incoming :offer_presence, @call_jid, @client_jid
     incoming :result_iq, @call_id # from the answer command
     incoming :result_iq, @call_id # from the hangup command
     incoming :hangup_presence, @call_id
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Hangup.new(:to => @server_address, :from => @client_address)
+    Connfu.connection.commands.last.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
   end
 end

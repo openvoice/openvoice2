@@ -13,7 +13,8 @@ class Connfu::Connection
     iq = command.to_iq
     logger.debug iq
     blather_client.write iq
-    iq.attributes['id'].to_s
+    Connfu.io_log.sent iq if Connfu.io_log
+    command.id
   end
 
   def method_missing(method, *args, &block)
@@ -33,6 +34,7 @@ class Connfu::Connection
       connection.register_handler(:ready) do |stanza|
         logger.debug "Established @connection to Connfu Server with JID: #{config.uri}"
         logger.debug "Queue implementation: #{Connfu::Queue.implementation.inspect}"
+        throw :pass
       end
     end
   end

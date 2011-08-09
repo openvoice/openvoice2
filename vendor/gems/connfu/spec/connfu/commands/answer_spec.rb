@@ -3,7 +3,7 @@ require "spec_helper"
 describe Connfu::Commands::Answer do
   describe "generating XMPP iq" do
     subject do
-      Connfu::Commands::Answer.new(:to => 'server-address', :from => 'client-address').to_iq
+      Connfu::Commands::Answer.new(:call_jid => 'call-jid', :client_jid => 'client-jid').to_iq
     end
 
     it "should generate answer iq from Answer command" do
@@ -15,11 +15,11 @@ describe Connfu::Commands::Answer do
     end
 
     it "should send the command 'to' the server" do
-      subject.xpath("/iq").first.attributes["to"].value.should eq "server-address"
+      subject.xpath("/iq").first.attributes["to"].value.should eq "call-jid"
     end
 
     it "should send the command 'from' the client" do
-      subject.xpath("/iq").first.attributes["from"].value.should eq "client-address"
+      subject.xpath("/iq").first.attributes["from"].value.should eq "client-jid"
     end
   end
 end

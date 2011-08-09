@@ -5,7 +5,7 @@ describe Connfu::Commands::Transfer do
   describe "generating XMPP iq" do
     subject do
       @transfer_to = ['sip:1324@connfu.com']
-      Connfu::Commands::Transfer.new(:to => 'server-address', :from => 'client-address', :transfer_to => @transfer_to).to_iq
+      Connfu::Commands::Transfer.new(:call_jid => 'call-jid', :client_jid => 'client-jid', :transfer_to => @transfer_to).to_iq
     end
 
     it "should generate transfer iq" do
@@ -17,11 +17,11 @@ describe Connfu::Commands::Transfer do
     end
 
     it "should contain the 'to' address in the iq" do
-      subject.xpath("/iq").first.attributes["to"].value.should eq "server-address"
+      subject.xpath("/iq").first.attributes["to"].value.should eq "call-jid"
     end
 
     it "should contain the 'from' address in the iq" do
-      subject.xpath("/iq").first.attributes["from"].value.should eq "client-address"
+      subject.xpath("/iq").first.attributes["from"].value.should eq "client-jid"
     end
 
     it 'should not contain a timeout attribute' do
@@ -32,7 +32,7 @@ describe Connfu::Commands::Transfer do
     context 'with a timeout parameter' do
       subject do
         @transfer_to = ['sip:1324@connfu.com']
-        Connfu::Commands::Transfer.new(:to => 'server-address', :from => 'client-address', :transfer_to => @transfer_to, :timeout => 5000).to_iq
+        Connfu::Commands::Transfer.new(:call_jid => 'call-jid', :client_jid => 'client-jid', :transfer_to => @transfer_to, :timeout => 5000).to_iq
       end
 
       it 'should contain a timeout attribute when it is passed in as an option' do
@@ -52,7 +52,7 @@ describe Connfu::Commands::Transfer do
     context 'when transfer to multiple end-points' do
       subject do
         @transfer_to = ['sip:1324@connfu.com', 'sip:3432@connfu.com']
-        Connfu::Commands::Transfer.new(:to => 'server-address', :from => 'client-address', :transfer_to => @transfer_to).to_iq
+        Connfu::Commands::Transfer.new(:call_jid => 'call-jid', :client_jid => 'client-jid', :transfer_to => @transfer_to).to_iq
       end
 
       it "should contain correct number of 'transfer_to' nodes" do

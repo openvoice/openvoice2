@@ -14,12 +14,12 @@ module Connfu
           Connfu::Event::SayComplete.new(:call_id => call_id)
         elsif node.type == :result
           if (ref = node.xpath('x:ref', 'x' => rayo('1')).first)
-            Connfu::Event::Result.new(:call_id => call_id, :ref_id => ref.attributes['id'].value)
+            Connfu::Event::Result.new(:call_id => call_id, :ref_id => ref.attributes['id'].value, :command_id => node.attributes['id'].value)
           else
-            Connfu::Event::Result.new(:call_id => call_id)
+            Connfu::Event::Result.new(:call_id => call_id, :command_id => node.attributes['id'].value)
           end
         elsif node.type == :error
-          Connfu::Event::Error.new(:call_id => call_id)
+          Connfu::Event::Error.new(:call_id => call_id, :command_id => node.attributes['id'].value)
         elsif node.xpath('//x:ringing', 'x' => rayo('1')).any?
           Connfu::Event::Ringing.new(:call_id => call_id, :to => from, :from => to)
         elsif node.xpath('//x:answered', 'x' => rayo('1')).any?

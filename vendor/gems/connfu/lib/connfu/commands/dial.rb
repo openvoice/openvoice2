@@ -8,8 +8,8 @@ module Connfu
       end
 
       def to_iq
-        oc_iq = Blather::Stanza::Iq.new(:set, Connfu.connection.jid.domain)
-        oc_iq.from = Connfu.connection.jid.to_s
+        oc_iq = Blather::Stanza::Iq.new(:set, @params[:rayo_host])
+        oc_iq.from = client_jid
         Nokogiri::XML::Builder.with(oc_iq) do |xml|
           xml.dial_(:to => @params[:to], :from => @params[:from], "xmlns" => rayo("1")) do
             headers.each do |key, val|
@@ -18,7 +18,6 @@ module Connfu
           end
         end
 
-        logger.debug oc_iq
         oc_iq
       end
     end

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require File.expand_path('../environment', __FILE__)
 
-require_one_recipient!
+require_two_recipients!
 
 Connfu.start do
   on :offer do |call|
@@ -11,13 +11,15 @@ Connfu.start do
     command_options = {
       :call_jid => call_jid,
       :client_jid => client_jid,
-      :dial_to => "sip:#{DIAL_TO}",
       :dial_from => call.to[:address],
       :call_id => call_id
     }
-    result = send_command Connfu::Commands::NestedJoin.new(command_options)
-
+    result = send_command Connfu::Commands::NestedJoin.new(command_options.merge(:dial_to => "sip:#{RECIPIENTS.first}"))
     observe_events_for(result.ref_id)
+
+    result2 = send_command Connfu::Commands::NestedJoin.new(command_options.merge(:dial_to => "sip:#{RECIPIENTS.last}"))
+    observe_events_for(result2.ref_id)
+
     logger.debug "Monitoring events for #{observed_call_ids.inspect}"
 
     wait_for Connfu::Event::Answered

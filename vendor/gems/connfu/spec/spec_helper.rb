@@ -81,6 +81,7 @@ class TestConnection
 
   def send_command(command)
     @commands << command
+    command.id
   end
 
   def jid
@@ -88,12 +89,12 @@ class TestConnection
   end
 end
 
-def result_iq(call_id='4a3fe31a-0c2a-4a9a-ae98-f5b8afb55708')
-  "<iq type='result' id='blather0008' from='#{call_id}@#{PRISM_HOST}' to='#{PRISM_JID}/voxeo'/>"
+def result_iq(call_id='4a3fe31a-0c2a-4a9a-ae98-f5b8afb55708', id='blather0008')
+  "<iq type='result' id='#{id}' from='#{call_id}@#{PRISM_HOST}' to='#{PRISM_JID}/voxeo'/>"
 end
 
-def error_iq(call_id='4a3fe31a-0c2a-4a9a-ae98-f5b8afb55708')
-  %{<iq type='error' id='blather000c' from='#{call_id}@#{PRISM_HOST}' to='#{PRISM_JID}/voxeo'>
+def error_iq(call_id='4a3fe31a-0c2a-4a9a-ae98-f5b8afb55708', id='blather000c')
+  %{<iq type='error' id='#{id}' from='#{call_id}@#{PRISM_HOST}' to='#{PRISM_JID}/voxeo'>
     <transfer xmlns='#{tropo('transfer:1')}'>
       <to>bollocks</to>
     </transfer>
@@ -213,8 +214,14 @@ def stop_presence(call_id="a27d73c5-6f5c-4a41-bfb9-6ea21b198602", id="23399310-4
   </presence>}
 end
 
-def outgoing_call_ringing_presence(call_id="ebe45dbf-2a8b-4f1c-9aa0-1f1b39d1e821")
-  %{<presence from="#{call_id}@#{PRISM_HOST}" to="#{PRISM_JID}/voxeo">
+def outgoing_call_result_iq(call_id="abc123", xmpp_id="blather_001")
+  %{<iq type="result" id="#{xmpp_id}" from="#{PRISM_HOST}" to="#{PRISM_JID}/voxeo">
+    <ref xmlns="urn:xmpp:rayo:1" id="#{call_id}"/>
+  </iq>}
+end
+
+def outgoing_call_ringing_presence(call_id="ebe45dbf-2a8b-4f1c-9aa0-1f1b39d1e821", client_jid="#{PRISM_JID}/voxeo")
+  %{<presence from="#{call_id}@#{PRISM_HOST}" to="#{client_jid}">
     <ringing xmlns="#{rayo('1')}"/>
   </presence>}
 end
