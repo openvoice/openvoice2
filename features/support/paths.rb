@@ -13,10 +13,9 @@ module NavigationHelpers
     when /^the login page$/
       new_session_path
     when /^my account page$/
-      account_path(Account.find_by_email(my.email))
+      account_path(my.account)
     when /^my latest call page for "(.*)"/
-      account = Account.find_by_email(my.email)
-      endpoint = account.endpoints.find_by_address($1)
+      endpoint = my.account.endpoints.find_by_address($1)
       endpoint_call_path(endpoint, endpoint.calls.last)
 
     # Add more mappings here.

@@ -1,9 +1,9 @@
 module ActorSupport
   class Actor
-    attr_accessor :email, :password
+    attr_writer :email, :password
 
-    def account=(account)
-      @email, @password = account.email, account.password
+    def account
+      Account.find_by_email(email)
     end
 
     def email

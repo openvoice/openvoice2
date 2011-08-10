@@ -1,5 +1,5 @@
 Given /^I have an account created$/ do
-  my.account = Factory(:account)
+  Factory(:account, :email => my.email, :password => my.password)
 end
 
 Given /^that I am logged in$/ do
