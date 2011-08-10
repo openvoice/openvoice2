@@ -42,6 +42,15 @@ When /^I enter my email and password$/ do
   When 'I fill in "Password" with "' + my.password + '"'
 end
 
+When /^I click make a call from endpoint "([^"]*)"$/ do |address|
+  endpoint = Endpoint.find_by_address(address)
+  When %{I click make a call within "##{dom_id(endpoint)}"}
+end
+
+When /^I click make a call$/ do
+  When 'I click "Make a Call"'
+end
+
 Then /^I should be logged in$/ do
   Then 'I should see "'+ my.email + '"'
 end

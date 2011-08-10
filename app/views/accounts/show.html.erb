@@ -6,6 +6,9 @@
 
 <ul id="endpoints">
 <% current_account.endpoints.each do |endpoint| %>
-  <li class='endpoint'><%= endpoint.address %></li>
+  <%= content_tag_for :li, endpoint do %>
+    <strong><%= endpoint.address %></strong>
+    <%= link_to 'Make a Call', new_endpoint_call_path(endpoint) %>
+  <% end %>
 <% end %>
 </ul>

@@ -1,0 +1,11 @@
+<h2>Call Somebody</h2>
+
+<p><%= flash[:notice] %></p>
+
+<%= form_for [@endpoint, @call] do |call| %>
+    <p>
+      <%= call.label :recipient_address, 'To' %>
+      <%= call.text_field :recipient_address %>
+    </p>
+    <p><%= call.submit "Call" %></p>
+<% end %>

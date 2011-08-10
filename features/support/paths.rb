@@ -12,6 +12,10 @@ module NavigationHelpers
       '/'
     when /^my account page$/
       account_path(Account.find_by_email(my.email))
+    when /^my latest call page for "(.*)"/
+      account = Account.find_by_email(my.email)
+      endpoint = account.endpoints.find_by_address($1)
+      endpoint_call_path(endpoint, endpoint.calls.last)
 
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:

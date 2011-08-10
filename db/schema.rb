@@ -10,12 +10,19 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110726135356) do
+ActiveRecord::Schema.define(:version => 20110810104347) do
 
   create_table "accounts", :force => true do |t|
     t.string "email",           :null => false
     t.string "password_digest", :null => false
     t.string "username"
+  end
+
+  create_table "calls", :force => true do |t|
+    t.string   "recipient_address"
+    t.integer  "endpoint_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "endpoints", :force => true do |t|
