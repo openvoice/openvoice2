@@ -1,7 +1,32 @@
 require 'spec_helper'
 
 describe EndpointsController do
-  describe "(when logged in)" do
+  describe "when not logged in" do
+    before do
+      @endpoint = Factory(:endpoint, :account => Factory(:account))
+    end
+
+    describe "GET to new" do
+      before do
+        get :new
+      end
+      it "should redirect to login page" do
+        response.should redirect_to(new_session_path)
+      end
+    end
+
+    describe "POST to create" do
+      before do
+        post :create, :endpoint => Factory.attributes_for(:endpoint)
+      end
+      it "should redirect to login page" do
+        response.should redirect_to(new_session_path)
+      end
+    end
+  end
+
+
+  describe "when logged in" do
     before do
       @account = Factory(:account)
       login(@account)
