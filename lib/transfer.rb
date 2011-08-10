@@ -1,10 +1,6 @@
 require 'jobs'
 require 'connfu'
 
-require File.expand_path('../../config/initializers/queue', __FILE__)
-
-Connfu.config.uri = ENV['CONNFU_JABBER_URI']
-
 Connfu.start do
   on :offer do |call|
     if account = Account.find_by_username(call.to[:username])
