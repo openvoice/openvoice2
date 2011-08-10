@@ -16,3 +16,5 @@ RSpec.configure do |config|
 
   config.use_transactional_fixtures = true
 end
+
+require Rails.root.join("vendor/gems/connfu/spec/spec_helper.rb")
