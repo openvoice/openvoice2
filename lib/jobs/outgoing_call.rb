@@ -22,8 +22,7 @@ module Jobs
             :call_id => call_id
           }
           sleep 1
-          result = send_command Connfu::Commands::NestedJoin.new(command_options)
-          observe_events_for(result.ref_id)
+          send_command Connfu::Commands::NestedJoin.new(command_options)
         end
       end
     end
