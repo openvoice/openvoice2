@@ -13,3 +13,4 @@ Scenario: Successfully login with an account
 
   When I visit the homepage
   Then I should not see "Login"
+  And I should be on my account page

@@ -10,6 +10,8 @@ module NavigationHelpers
 
     when /^the home\s?page$/
       '/'
+    when /^the login page$/
+      new_session_path
     when /^my account page$/
       account_path(Account.find_by_email(my.email))
     when /^my latest call page for "(.*)"/
