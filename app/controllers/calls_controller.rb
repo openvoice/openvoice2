@@ -2,6 +2,7 @@ require "jobs"
 require "connfu"
 
 class CallsController < ApplicationController
+  before_filter :authenticate
   before_filter :load_endpoint
 
   def new

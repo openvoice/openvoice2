@@ -16,3 +16,6 @@ end
 Factory.define(:endpoint) do |f|
   f.address "sip:user@example.com"
 end
+
+Factory.define(:call) do |f|
+end
