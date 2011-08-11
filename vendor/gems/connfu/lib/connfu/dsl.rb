@@ -103,8 +103,8 @@ module Connfu
         send_command Connfu::Commands::Reject.new(:call_jid => call_jid, :client_jid => client_jid)
       end
 
-      def hangup
-        send_command Connfu::Commands::Hangup.new(:call_jid => call_jid, :client_jid => client_jid)
+      def hangup(jid=call_jid)
+        send_command Connfu::Commands::Hangup.new(:call_jid => jid, :client_jid => client_jid)
         wait_for Connfu::Event::Hangup
         @finished = true
       end

@@ -113,6 +113,11 @@ describe Connfu::Dsl do
       Connfu.connection.should_receive(:send_command).with(Connfu::Commands::Hangup.new(:client_jid => 'client-jid', :call_jid => 'call-jid'))
       subject.hangup
     end
+    
+    it 'should send a Hangup command wih the specified call jid' do
+      Connfu.connection.should_receive(:send_command).with(Connfu::Commands::Hangup.new(:client_jid => 'client-jid', :call_jid => 'custom-call-jid'))
+      subject.hangup 'custom-call-jid'
+    end
   end
 
   describe 'reject' do
