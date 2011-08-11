@@ -4,6 +4,7 @@ describe Connfu do
   before do
     @uri = 'jid://foo:password@bar.com'
     Connfu.config.uri = @uri
+    Connfu.connection = TestConnection.new
   end
 
   describe "#start" do
@@ -13,13 +14,17 @@ describe Connfu do
     end
 
     it "should process the dial queue every second" do
-      EM.should_receive(:add_periodic_timer).with(1, an_instance_of(Connfu::Queue::Worker)).and_raise(StandardError)
-      lambda { Connfu.start(MyTestClass) }.should raise_error(StandardError)
+      EM.should_receive(:add_periodic_timer).with(1, an_instance_of(Connfu::Queue::Worker))
+      Connfu.start(MyTestClass)
+    end
+
+    it "should call the on_ready method of the handler class" do
+      MyTestClass.should_receive(:on_ready)
+      Connfu.start(MyTestClass)
     end
 
     describe "called with a class" do
       it "sets the event processor to one based on the handler class" do
-        EM.stub(:run)
         Connfu.start(MyTestClass)
         Connfu.event_processor.should_not be_nil
         Connfu.event_processor.handler_class.should eql(MyTestClass)
@@ -28,7 +33,6 @@ describe Connfu do
 
     describe "called with a block" do
       it "sets the event processor to one based on a class built with the block" do
-        EM.stub(:run)
         Connfu.start do
           attr_reader :smoke_signal
         end

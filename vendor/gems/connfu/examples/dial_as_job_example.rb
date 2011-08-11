@@ -25,7 +25,6 @@ class DialAsJobExample
           :dial_from => connfu_user,
           :call_id => call_id
         }
-        sleep 1
         result = send_command Connfu::Commands::NestedJoin.new(command_options)
         observe_events_for(result.ref_id)
       end

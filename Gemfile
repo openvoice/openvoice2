@@ -24,12 +24,13 @@ gem 'connfu', :path => './vendor/gems/connfu'
 gem 'minitest', '2.3.1'
 gem 'nokogiri', '1.5.0'
 gem 'niceogiri', '0.0.4'
-gem 'blather', '0.5.3', :git => 'git://github.com/zlu/blather.git'
+gem 'blather', '0.5.3'
 gem 'resque', '1.17.1'
 
 group :development do
   gem 'rspec-rails'
   gem 'foreman'
+  gem 'piston'
 end
 
 group :test do

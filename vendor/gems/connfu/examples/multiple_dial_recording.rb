@@ -4,13 +4,16 @@ require File.expand_path('../environment', __FILE__)
 require_two_recipients!
 
 Connfu.start do
-  dial :to => "sip:#{RECIPIENTS.first}", :from => "sip:usera@127.0.0.1"
-  dial :to => "sip:#{RECIPIENTS.last}", :from => "sip:usera@127.0.0.1"
-
-  on :outgoing_call do |c|
-    c.on_answer do
-      sleep 2
-      record_for(5)
+  def self.do_dial(options)
+    dial(options) do |c|
+      c.on_answer do
+        record_for(5)
+      end
     end
+  end
+
+  on :ready do
+    do_dial :to => "sip:#{RECIPIENTS.first}", :from => "sip:usera@127.0.0.1"
+    do_dial :to => "sip:#{RECIPIENTS.last}", :from => "sip:usera@127.0.0.1"
   end
 end

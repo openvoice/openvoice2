@@ -32,7 +32,7 @@ Connfu.logger = Logger.new(StringIO.new)
 Connfu.logger.level = Logger::WARN
 
 class MyTestClass
-  include Connfu
+  include Connfu::Dsl
 end
 
 PRISM_USER = "usera"
@@ -77,6 +77,7 @@ class TestConnection
 
   def initialize
     @commands = []
+    @handlers = {}
   end
 
   def send_command(command)
@@ -86,6 +87,20 @@ class TestConnection
 
   def jid
     Blather::JID.new('zlu', 'openvoice.org', '1')
+  end
+
+  def register_handler(type, &block)
+    @handlers[type] ||= []
+    @handlers[type] << block
+  end
+
+  def run
+    @handlers[:ready].each { |h| h.call }
+    EM.stop # break out of the loop
+  end
+
+  def wait_because_of_tropo_bug_133
+    # no-op when testing
   end
 end
 
@@ -188,6 +203,12 @@ end
 def joined_presence(call_id="9d27a2d3-9134-48ef-957e-5f5e72686d79", new_call_id="1034a58a-4ffd-479c-843e-92b84ab8826a")
   %{<presence from="#{call_id}@#{PRISM_HOST}" to="#{PRISM_JID}/voxeo">
     <joined xmlns="urn:xmpp:rayo:1" call-id="#{new_call_id}"/>
+  </presence>}
+end
+
+def unjoined_presence(call_id='8c27e8c6-76c1-4cc6-a818-18075f07a511', other_call_id='56258fa4-db93-46a6-a507-0a22313e709a')
+  %{<presence from="#{call_id}@#{PRISM_HOST}" to="#{PRISM_JID}/voxeo">
+    <unjoined xmlns="urn:xmpp:rayo:1" call-id="#{other_call_id}"/>
   </presence>}
 end
 

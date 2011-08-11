@@ -32,7 +32,7 @@ module Connfu
     logger.info "Tropo build: #{tropo_build}"
     io_log.info "Tropo build: #{tropo_build}" if io_log
     handler_class ||= build_handler_class(&block)
-    self.event_processor = EventProcessor.new(handler_class)
+    install_handler(handler_class)
     EM.run do
       EventMachine::add_periodic_timer(1, Queue::Worker.new(Jobs::Dial.queue))
       connection.run
@@ -68,5 +68,10 @@ module Connfu
       include Connfu::Dsl
       instance_eval(&block)
     end
+  end
+
+  def self.install_handler(handler_class)
+    self.event_processor = EventProcessor.new(handler_class)
+    self.connection.register_handler(:ready) { handler_class.on_ready }
   end
 end

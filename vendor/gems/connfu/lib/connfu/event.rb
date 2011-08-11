@@ -105,5 +105,14 @@ module Connfu
         @joined_call_id = params[:joined_call_id]
       end
     end
+    
+    class Unjoined < Presence
+      attr_reader :unjoined_call_id
+      
+      def initialize(params = {})
+        super(params)
+        @unjoined_call_id = params[:unjoined_call_id]
+      end
+    end
   end
 end

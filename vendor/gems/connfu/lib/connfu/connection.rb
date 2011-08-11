@@ -17,6 +17,10 @@ class Connfu::Connection
     command.id
   end
 
+  def wait_because_of_tropo_bug_133
+    sleep 1 # This is necessary, see https://github.com/tropo/tropo2/issues/133
+  end
+
   def method_missing(method, *args, &block)
     blather_client.send(method, *args, &block)
   end

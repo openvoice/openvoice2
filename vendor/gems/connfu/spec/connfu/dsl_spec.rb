@@ -60,6 +60,12 @@ describe Connfu::Dsl do
       subject.observe_events_for("another-call-id")
       subject.can_handle_event?(event_for_another_call).should be_true
     end
+    
+    it "should store the call id of the event that has fired" do
+      event = Connfu::Event::Result.new(:call_id => 'call-id')
+      subject.handle_event(event)
+      subject.last_event_call_id.should == 'call-id'
+    end
   end
 
   describe 'on' do
@@ -121,6 +127,29 @@ describe Connfu::Dsl do
       redirect_to = 'sip:1652@connfu.com'
       Connfu.connection.should_receive(:send_command).with(Connfu::Commands::Redirect.new(:redirect_to => redirect_to, :client_jid => 'client-jid', :call_jid => 'call-jid'))
       subject.redirect(redirect_to)
+    end
+  end
+
+  describe 'dial' do
+    it 'should send Dial command to connection' do
+      Connfu.connection.should_receive(:send_command).with(Connfu::Commands::Dial.new(
+        :to => "you",
+        :from => "me",
+        :client_jid => Connfu.connection.jid.to_s,
+        :rayo_host => Connfu.connection.jid.domain
+      )).and_return("command-id")
+      subject.stub(:wait_for).and_return(stub(:ref_id => "call-id"))
+      subject.dial(:to => "you", :from => "me")
+    end
+
+    it 'should start listening to events for the dialled call' do
+      subject.stub(:send_command).and_return(stub(:ref_id => "call-id"))
+      subject.dial(:to => "you", :from => "me")
+
+      stanza = create_presence(outgoing_call_ringing_presence("call-id"))
+      ringing = Connfu::Rayo::Parser.parse_event_from(stanza)
+
+      subject.can_handle_event?(ringing).should be_true
     end
   end
 

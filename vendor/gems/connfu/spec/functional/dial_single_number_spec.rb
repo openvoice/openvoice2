@@ -41,7 +41,10 @@ describe 'Dialing a single number from within the DSL passing custom headers' do
 
   it "should pass the supplied headers to the command" do
     job = Connfu::Queue.reserve(Connfu::Jobs::Dial.queue)
-    job.args.first['headers'].should == { 'foo' => 'bar' }
+    client_jid = Connfu.connection.jid.to_s
+    rayo_host = Connfu.connection.jid.domain
+    Connfu.connection.should_receive(:send_command).with(Connfu::Commands::Dial.new(:to => 'sip-to', :from => 'sip-from', :client_jid => client_jid, :rayo_host => rayo_host, :headers => {'foo' => 'bar'}))
+    job.perform
   end
 end
 

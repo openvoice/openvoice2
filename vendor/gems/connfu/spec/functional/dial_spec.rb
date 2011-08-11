@@ -20,6 +20,12 @@ describe "Dialing" do
     Connfu.connection.commands.last.should == Connfu::Commands::Dial.new(:to => "recipient", :from => "caller", :client_jid => Connfu.connection.jid.to_s, :rayo_host => Connfu.connection.jid.domain)
   end
 
+  it "should pass any headers to the dial command" do
+    Dialer.dial :to => "to", :from => "from", :headers => {"foo" => "bar"} do |call|
+    end
+    Connfu.connection.commands.last.should == Connfu::Commands::Dial.new(:to => "to", :from => "from", :client_jid => Connfu.connection.jid.to_s, :rayo_host => Connfu.connection.jid.domain, :headers => {"foo" => "bar"})
+  end
+
   it "should not run the start behaviour before the call has begun" do
     Dialer.any_instance.should_not_receive(:start_happened)
 
