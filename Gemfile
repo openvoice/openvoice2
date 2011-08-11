@@ -30,7 +30,6 @@ gem 'resque', '1.17.1'
 group :development do
   gem 'rspec-rails'
   gem 'foreman'
-  gem 'piston'
 end
 
 group :test do
