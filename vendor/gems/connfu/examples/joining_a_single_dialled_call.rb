@@ -8,9 +8,10 @@ Connfu.start do
     answer
     say 'please wait'
 
-    dial :to => "sip:#{DIAL_TO}", :from => call.to[:address]
+    result = dial :to => "sip:#{DIAL_TO}", :from => call.to[:address]
 
     wait_for Connfu::Event::Answered
+    wait_because_of_tropo_bug_133
 
     send_command Connfu::Commands::Join.new(:client_jid => client_jid, :call_jid => call_jid, :call_id => result.ref_id)
 

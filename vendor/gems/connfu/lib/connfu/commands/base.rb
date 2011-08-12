@@ -33,7 +33,7 @@ module Connfu
       end
 
       def to_iq
-        build_iq
+        @iq ||= build_iq
       end
 
       protected
@@ -43,7 +43,7 @@ module Connfu
       end
 
       def build_iq(attributes = {}, &block)
-        @iq ||= Connfu::Rayo::IqBuilder.build_iq(recipient_jid, client_jid, command, attributes, &block)
+        Connfu::Rayo::IqBuilder.build_iq(recipient_jid, client_jid, command, attributes, &block)
       end
     end
   end

@@ -32,6 +32,21 @@ describe "handling a call offer" do
 
     incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:usera@127.0.0.1>"
   end
+  
+  it "should deal with a call to a raw sip address" do
+    parsed_hash = {
+      :address => "sip:usera@127.0.0.1",
+      :scheme => "sip",
+      :username => "usera",
+      :host => "127.0.0.1"
+    }
+
+    dsl_instance.should_receive(:do_something_with).with(
+      hash_including(:to => parsed_hash)
+    )
+
+    incoming :offer_presence, @call_jid, @client_jid, :to => "sip:usera@127.0.0.1"
+  end
 
   it "implicitly hangs up once handling is complete" do
     handler_instance = Connfu.event_processor.handler_class.new({})

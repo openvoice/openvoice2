@@ -3,7 +3,7 @@ module Connfu
     class Join
       include Base
 
-      def to_iq
+      def build_iq
         oc_iq = Blather::Stanza::Iq.new(:set, call_jid)
         oc_iq.from = client_jid
         Nokogiri::XML::Builder.with(oc_iq) do |xml|

@@ -12,9 +12,9 @@ module Connfu
         @params[:digits]
       end
 
-      def to_iq
+      def build_iq
         attributes = { "xmlns" => tropo('ask:1'), "mode" => "dtmf", "terminator" => "#" }
-        build_iq(attributes) do |xml|
+        super(attributes) do |xml|
           xml.prompt do |p|
             p.text prompt
           end

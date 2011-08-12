@@ -156,6 +156,13 @@ describe Connfu::Dsl do
 
       subject.can_handle_event?(ringing).should be_true
     end
+
+    it 'should return the event for other commands' do
+      result_event = stub(:ref_id => "call-id")
+      subject.stub(:send_command).and_return(result_event)
+      return_value = subject.dial(:to => "you", :from => "me")
+      return_value.should == result_event
+    end
   end
 
   describe 'transfer' do

@@ -37,6 +37,7 @@ module Connfu
         options.delete(:headers) if options[:headers].nil?
         result = send_command Connfu::Commands::Dial.new(options)
         observe_events_for(result.ref_id)
+        result
       end
 
       def redirect(redirect_to)

@@ -157,6 +157,10 @@ module Connfu
       observed_call_ids << call_id
     end
 
+    def wait_because_of_tropo_bug_133
+      Connfu.connection.wait_because_of_tropo_bug_133
+    end
+
     private
 
     def event_matches_call_id?(event)
@@ -188,10 +192,6 @@ module Connfu
     def wait_for(*events)
       @waiting_for = events
       wait
-    end
-
-    def wait_because_of_tropo_bug_133
-      Connfu.connection.wait_because_of_tropo_bug_133
     end
   end
 end

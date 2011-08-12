@@ -28,9 +28,9 @@ module Connfu
       end
 
       def parse_address(raw_address)
-        address, scheme, username, host = *raw_address.match(%r{^<([^:]+):([^@]+)@([^>]+)>$})
+        address, scheme, username, host = *raw_address.match(%r{^<?([^:]+):([^@]+)@([^>]+)>?$})
         {
-          :address => address.match(%r{^<([^>]+)>$})[1],
+          :address => address.match(%r{^<?([^>]+)>?$})[1],
           :scheme => scheme,
           :username => username,
           :host => host

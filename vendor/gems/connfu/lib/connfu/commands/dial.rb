@@ -6,12 +6,12 @@ module Connfu
       def headers
         @params[:headers] || {}
       end
-      
+
       def from
         @params[:from]
       end
 
-      def to_iq
+      def build_iq
         oc_iq = Blather::Stanza::Iq.new(:set, @params[:rayo_host])
         oc_iq.from = client_jid
         Nokogiri::XML::Builder.with(oc_iq) do |xml|
