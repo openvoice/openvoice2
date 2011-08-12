@@ -13,7 +13,7 @@ class CallsController < ApplicationController
   def create
     @call = @endpoint.calls.build(params[:call])
     if @call.save
-      Connfu::Queue.enqueue(Jobs::OutgoingCall, @endpoint.address, @call.recipient_address)
+      Connfu::Queue.enqueue(Jobs::OutgoingCall, @endpoint.address, @call.recipient_address, current_account.number)
       redirect_to endpoint_call_path(@endpoint, @call)
     else
       render :new

@@ -8,18 +8,15 @@ module Jobs
       Connfu::Jobs::Dial.queue
     end
 
-    def self.perform(caller, recipient)
-      username = "connfu"
-      connfu_user = "sip:#{username}@#{Connfu.config.host}"
-
-      dial :to => caller, :from => connfu_user do |c|
+    def self.perform(caller, recipient, openvoice_number)
+      dial :to => caller, :from => openvoice_number do |c|
         c.on_answer do
           if call_id == last_event_call_id
             command_options = {
               :call_jid => call_jid,
               :client_jid => client_jid,
               :dial_to => recipient,
-              :dial_from => connfu_user,
+              :dial_from => openvoice_number,
               :call_id => call_id
             }
             sleep 1
