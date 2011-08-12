@@ -1,1 +1,1 @@
-OpenVoice2 is an OpenSource GoogleVoice clone based written in Connfu DSL
+OpenVoice2 is an OpenSource GoogleVoice clone written in Connfu DSL
