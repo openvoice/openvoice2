@@ -142,6 +142,35 @@ describe "Dialing" do
     Dialer.stash.should == "call-id"
   end
 
+  context "when no behaviour is specified" do
+    before do
+      Dialer.dial :to => "someone-remote", :from => "my-number"
+    end
+
+    it 'should not crash when receiving a ringing event' do
+      lambda {
+        incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+        incoming :outgoing_call_ringing_presence, "call-id"
+      }.should_not raise_error
+    end
+
+    it 'should not crash when receiving an answered event' do
+      lambda {
+        incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+        incoming :outgoing_call_ringing_presence, "call-id"
+        incoming :outgoing_call_answered_presence, "call-id"
+      }.should_not raise_error
+    end
+
+    it 'should not crash when receiving a hangup event' do
+      lambda {
+        incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+        incoming :outgoing_call_ringing_presence, "call-id"
+        incoming :hangup_presence, "call-id"
+      }.should_not raise_error
+    end
+  end
+
   context "behaviour blocks" do
     before do
       Dialer.dial :to => "to", :from => "from" do |c|

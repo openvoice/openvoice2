@@ -12,9 +12,7 @@ class DialAndHangupOnRingingExample
     hangup
   end
 
-  dial :to => 'sip:usera@127.0.0.1', :from => "sip:userb@127.0.0.1"
-
-  on :outgoing_call do |c|
+  dial :to => 'sip:usera@127.0.0.1', :from => "sip:userb@127.0.0.1" do |c|
     c.on_answer do
       $success = true
     end

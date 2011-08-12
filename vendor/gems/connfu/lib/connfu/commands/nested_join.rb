@@ -6,9 +6,17 @@ module Connfu
       def command
         "dial"
       end
+      
+      def dial_to
+        @params[:dial_to]
+      end
+      
+      def dial_from
+        @params[:dial_from]
+      end
 
       def to_iq
-        build_iq(:to => @params[:dial_to], :from => @params[:dial_from], "xmlns" => rayo('1')) do |xml|
+        build_iq(:to => dial_to, :from => dial_from, "xmlns" => rayo('1')) do |xml|
           xml.join_("xmlns" => rayo('join:1'), :direction => "duplex", :media => "bridge", :"call-id" => @params[:call_id])
         end
       end
