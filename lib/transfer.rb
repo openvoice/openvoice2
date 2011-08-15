@@ -9,14 +9,14 @@ Connfu.start do
 
       # We must do the say before the Join happens. It will end once the join happens.
       result_iq = send_command Connfu::Commands::Say.new(
-        :from => client_address,
-        :to => server_address,
+        :call_jid => call_jid,
+        :client_jid => client_jid,
         :text => "http://www.phono.com/audio/troporocks.mp3"
       )
 
       command_options = {
-        :to => server_address,
-        :from => client_address,
+        :call_jid =>call_jid,
+        :client_jid =>client_jid,
         :dial_to => account.endpoints.first.address,
         :dial_from => call.to[:address],
         :call_id => call_id
