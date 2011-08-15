@@ -1,5 +1,5 @@
 OpenVoice2::Application.routes.draw do
-  resources :endpoints, :only => [:new, :create] do
+  resources :endpoints, :only => [:new, :create, :destroy] do
     resources :calls, :only => [:new, :create, :show]
   end
 

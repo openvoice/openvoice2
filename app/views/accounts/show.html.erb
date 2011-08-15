@@ -9,6 +9,7 @@
   <%= content_tag_for :li, endpoint do %>
     <strong><%= endpoint.address %></strong>
     <%= link_to 'Make a Call', new_endpoint_call_path(endpoint) %>
+    <%= button_to 'Delete', endpoint, :method => 'delete' %>
   <% end %>
 <% end %>
 </ul>

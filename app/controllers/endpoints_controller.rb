@@ -16,4 +16,14 @@ class EndpointsController < ApplicationController
     end
   end
 
+  def destroy
+    @endpoint = Endpoint.find_by_id(params[:id])
+    if @endpoint
+      @endpoint.destroy
+      flash[:notice] = "Endpoint successfully removed"
+    else
+      flash[:error] = "No endpoint could be found"
+    end
+    redirect_to current_account
+  end
 end
