@@ -17,15 +17,16 @@ Connfu.start do
       command_options = {
         :call_jid =>call_jid,
         :client_jid =>client_jid,
-        :dial_to => account.endpoints.first.address,
         :dial_from => call.to[:address],
         :call_id => call_id
       }
 
-      result = send_command Connfu::Commands::NestedJoin.new(command_options)
+      account.endpoints.each do |endpoint|
+        result = send_command Connfu::Commands::NestedJoin.new(command_options.merge(:dial_to => endpoint.address))
 
-      # the call id we are going to JOIN will be returned in the result
-      observe_events_for(result.ref_id)
+        # the call id we are going to JOIN will be returned in the result
+        observe_events_for(result.ref_id)
+      end
 
       # answer event for the joining call will now be handled by this "call".
       wait_for Connfu::Event::Answered
