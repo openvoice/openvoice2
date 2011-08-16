@@ -1,7 +1,8 @@
 require 'jobs'
 require 'connfu'
 
-Connfu.start do
+class Transfer
+  include Connfu::Dsl
   on :offer do |call|
     if account = Account.find_by_username(call.to[:username])
       answer
@@ -11,8 +12,7 @@ Connfu.start do
       result_iq = send_command Connfu::Commands::Say.new(
                                    :call_jid => call_jid,
                                    :client_jid => client_jid,
-                                   :text => "http://www.phono.com/audio/troporocks.mp3"
-                               )
+                                   :text => "http://www.phono.com/audio/troporocks.mp3")
 
       command_options = {
           :call_jid =>call_jid,
@@ -29,10 +29,9 @@ Connfu.start do
         observe_events_for(result.ref_id)
         call_ids << result.ref_id
       end
-
       # answer event for the joining call will now be handled by this "call".
       answered_call = wait_for Connfu::Event::Answered
-
+      #
       (call_ids-[answered_call.call_id]).each do |hangup_call_id|
         hangup "#{hangup_call_id}@#{Connfu.connection.jid.domain}"
       end
@@ -43,3 +42,5 @@ Connfu.start do
     end
   end
 end
+
+
