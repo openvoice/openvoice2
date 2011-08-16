@@ -38,5 +38,5 @@ group :test do
   gem 'database_cleaner'
   gem 'factory_girl_rails'
   gem 'launchy', '0.3.7' # fixed at an earlier version to avoid deprecation warnings
-  gem 'resque_unit'
+  gem 'resque_spec'
 end

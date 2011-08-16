@@ -35,25 +35,32 @@ describe CallsController do
       end
     end
   end
-  
+
   describe "when logged in" do
     before do
+      ResqueSpec.reset!
+
       @account = Factory(:account)
       @controller.stubs(:current_account).returns(@account)
       @endpoint = Factory(:endpoint, :account => @account)
     end
-    
+
     describe "POST to create" do
-      it "should queue the outgoing call" do
-        Connfu::Queue.expects(:enqueue).with(Jobs::OutgoingCall, @endpoint.address, 'recipient-address', @account.number)
-        
+      it "should create the call and queue the outgoing call" do
+        Connfu::Queue.implementation = ::Resque
         post :create, :endpoint_id => @endpoint.id, :call => {:recipient_address => 'recipient-address'}
+
+        @endpoint.calls.count.should eq 1
+        @endpoint.calls.last.recipient_address.should eq "recipient-address"
+
+        Jobs::OutgoingCall.should have_queued(@endpoint.calls.last.id)
       end
+
       it "should redirect to the new call" do
         Connfu::Queue.stubs(:enqueue)
-        
+
         post :create, :endpoint_id => @endpoint.id, :call => {:recipient_address => 'recipient-address'}
-        
+
         assert_redirected_to endpoint_call_path(@endpoint, @endpoint.calls.last)
       end
     end
