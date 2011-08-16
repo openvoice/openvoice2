@@ -25,13 +25,6 @@ module Jobs
             observe_events_for(@joined_call_id)
           end
         end
-        c.on_hangup do
-          if call_id == last_event_call_id
-            hangup "#{@joined_call_id}@#{Connfu.connection.jid.domain}"
-          else
-            hangup
-          end
-        end
       end
     end
   end
