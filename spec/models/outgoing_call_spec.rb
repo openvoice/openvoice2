@@ -7,7 +7,6 @@ describe Jobs::OutgoingCall do
   end
   
   describe "Initiating call between two endpoints" do
-    
     before do
       Jobs::OutgoingCall.perform("caller", "recipient", "openvoice-number")
     end
@@ -77,8 +76,6 @@ describe Jobs::OutgoingCall do
           end
         end
       end
-      
     end
-    
   end
 end
