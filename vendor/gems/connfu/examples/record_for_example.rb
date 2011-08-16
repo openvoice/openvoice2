@@ -5,7 +5,9 @@ Connfu.start do
   on :offer do |call|
     answer
     record_for 5
+    record_for 10
     hangup
+
     p recordings
   end
 end

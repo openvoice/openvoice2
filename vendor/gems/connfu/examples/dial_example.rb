@@ -5,7 +5,7 @@ require_one_recipient!
 
 Connfu.start do
   on :ready do
-    dial :to => "sip:#{DIAL_TO}", :from => "sip:usera@127.0.0.1" do |c|
+    dial :to => "sip:#{DIAL_TO}", :from => "sip:#{Connfu.config.user}@#{Connfu.config.host}" do |c|
       c.on_ringing do
         update_status "The phone is ringing!"
       end

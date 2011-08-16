@@ -11,6 +11,10 @@ module Connfu
         @params[:from]
       end
 
+      def to
+        @params[:to]
+      end
+
       def build_iq
         oc_iq = Blather::Stanza::Iq.new(:set, @params[:rayo_host])
         oc_iq.from = client_jid

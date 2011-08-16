@@ -22,7 +22,7 @@ Connfu.io_log = Connfu::Logging::IOLogger.new(logfile)
 
 def update_status(status)
   logfile = File.expand_path('../../log/example_status.log', __FILE__)
-  File.open(logfile, "a") { |f| f.puts "Status change: #{status}" }
+  File.open(logfile, "a") { |f| f.puts "#{Time.now}: #{status}" }
 end
 
 DIAL_TO = ENV['DIAL_TO']

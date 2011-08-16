@@ -8,9 +8,9 @@ Connfu.start do
     caller = "sip:#{RECIPIENTS.first}"
     recipient = "sip:#{RECIPIENTS.last}"
 
-    connfu_jid = "sip:usera@#{Connfu.connection.jid.domain}"
+    connfu_user = "sip:#{Connfu.config.user}@#{Connfu.config.host}"
 
-    dial :to => caller, :from => connfu_jid do |c|
+    dial :to => caller, :from => connfu_user do |c|
       c.on_ringing do
         puts "OK, ringing"
       end
@@ -22,7 +22,7 @@ Connfu.start do
             :call_jid => call_jid,
             :client_jid => client_jid,
             :dial_to => recipient,
-            :dial_from => connfu_jid,
+            :dial_from => connfu_user,
             :call_id => call_id
           }
           result = send_command Connfu::Commands::NestedJoin.new(command_options)
@@ -33,7 +33,7 @@ Connfu.start do
 
       c.on_hangup do
         if call_id == last_event_call_id
-          hangup "#{@joined_call_id}@#{Connfu.connection.jid.domain}"
+          hangup "#{@joined_call_id}@#{Connfu.config.host}"
         else
           hangup
         end

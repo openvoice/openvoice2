@@ -39,9 +39,9 @@ describe Connfu::Commands::Recording do
         ).to_iq
       end
 
-      it 'should have max length set correctly' do
+      it 'should have max duration set correctly' do
         node = subject.xpath("//x:record", "x" => rayo('record:1')).first
-        node.attributes['max-length'].value.should eq '25000'
+        node.attributes['max-duration'].value.should eq '25000'
       end
     end
 

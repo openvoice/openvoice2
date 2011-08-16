@@ -32,7 +32,7 @@ module Connfu
 
         def to_iq
           attributes = { "xmlns" => rayo("record:1"), "start-beep" => "true" }
-          attributes["max-length"] = @params[:max_length] if @params[:max_length]
+          attributes["max-duration"] = @params[:max_length] if @params[:max_length]
           attributes["start-beep"] = @params[:beep] if @params.has_key?(:beep)
           attributes.merge!(valid_encoding_attributes)
 

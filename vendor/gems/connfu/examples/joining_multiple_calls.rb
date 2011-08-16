@@ -12,6 +12,7 @@ Connfu.start do
     dial :from => call.to[:address], :to => "sip:#{RECIPIENTS.last}"
 
     answered_result = wait_for Connfu::Event::Answered
+    wait_because_of_tropo_bug_133
 
     send_command Connfu::Commands::Join.new(:client_jid => client_jid, :call_jid => call_jid, :call_id => answered_result.call_id)
     

@@ -13,7 +13,7 @@ Connfu.start do
   end
 
   on :ready do
-    do_dial :to => "sip:#{RECIPIENTS.first}", :from => "sip:usera@127.0.0.1"
-    do_dial :to => "sip:#{RECIPIENTS.last}", :from => "sip:usera@127.0.0.1"
+    do_dial :to => "sip:#{RECIPIENTS.first}", :from => "sip:#{Connfu.config.user}@#{Connfu.config.host}"
+    do_dial :to => "sip:#{RECIPIENTS.last}", :from => "sip:#{Connfu.config.user}@#{Connfu.config.host}"
   end
 end

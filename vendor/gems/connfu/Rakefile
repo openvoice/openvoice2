@@ -3,23 +3,17 @@ Bundler::GemHelper.install_tasks
 
 require 'bundler/setup'
 
-task :default => [:unit, :functional, :integration]
+types = [:connfu, :functional, :integration]
+task :default => types
 
 require 'rspec/core/rake_task'
-RSpec::Core::RakeTask.new(:unit) do |spec|
-  spec.skip_bundler = true
-  spec.pattern = 'spec/connfu/**/*_spec.rb'
-  spec.rspec_opts = '--color'
-end
-RSpec::Core::RakeTask.new(:functional) do |spec|
-  spec.skip_bundler = true
-  spec.pattern = 'spec/functional/**/*_spec.rb'
-  spec.rspec_opts = '--color'
-end
-RSpec::Core::RakeTask.new(:integration) do |spec|
-  spec.skip_bundler = true
-  spec.pattern = 'spec/integration/**/*_spec.rb'
-  spec.rspec_opts = '--color'
+types.each do |type|
+  RSpec::Core::RakeTask.new(type) do |spec|
+    spec.skip_bundler = true
+    spec.pattern = "spec/#{type}/**/*_spec.rb"
+    spec.pattern = [spec.pattern, 'spec/connfu_spec.rb'] if type == :connfu
+    spec.rspec_opts = '--color'
+  end
 end
 
 possible_prism_locations = ['~/Applications/prism', '/Applications/prism', '/opt/voxeo/prism'].map { |p| File.expand_path(p) }
