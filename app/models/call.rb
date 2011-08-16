@@ -13,4 +13,8 @@ class Call < ActiveRecord::Base
     self['state'].to_sym
   end
 
+  def display_state
+    state.to_s.humanize
+  end
+
 end

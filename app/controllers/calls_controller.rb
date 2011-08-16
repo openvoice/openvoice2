@@ -5,6 +5,9 @@ class CallsController < ApplicationController
   before_filter :authenticate
   before_filter :load_endpoint
 
+  respond_to :html
+  respond_to :json, :only => [:show]
+
   def new
     @endpoint = current_account.endpoints.find(params[:endpoint_id])
     @call = @endpoint.calls.build
@@ -21,7 +24,10 @@ class CallsController < ApplicationController
   end
 
   def show
-
+    @call = @endpoint.calls.find(params[:id])
+    respond_with @call do |format|
+      format.json { render :text => @call.to_json(:methods => :display_state) }
+    end
   end
 
   protected

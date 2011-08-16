@@ -45,6 +45,20 @@ describe CallsController do
       @endpoint = Factory(:endpoint, :account => @account)
     end
 
+    describe "Javascript GET request to show" do
+      before do
+        @call = Factory(:call, :endpoint => @endpoint)
+        get :show, :id => @call.id, :endpoint_id => @endpoint.id, :format => :json
+      end
+
+      it "should respond with Javascript representation" do
+        response.headers["Content-Type"].should eq "application/json; charset=utf-8"
+        json_call = JSON.parse(response.body)
+        json_call.should_not be_nil
+        json_call["recipient_address"].should eq @call.recipient_address
+      end
+    end
+
     describe "POST to create" do
       it "should create the call and queue the outgoing call" do
         Connfu::Queue.implementation = ::Resque

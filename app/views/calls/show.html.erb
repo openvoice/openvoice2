@@ -1,0 +1,12 @@
+<h2>Call to <%= @call.recipient_address %> from <%= @call.endpoint.address %></h2>
+
+<p>
+  Call state:
+  <span id="call-state">
+    <% if @call.state.blank? %>
+      Starting...
+    <% else %>
+      <%= @call.display_state %>
+    <% end %>
+  </span>
+</p>
