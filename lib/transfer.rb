@@ -44,7 +44,7 @@ class Transfer
 
       wait_for Connfu::Event::Hangup
       @finished = true
-      puts "The call was answered, and has finished"
+      logger.debug "The call was answered, and has finished"
     end
   end
 end
