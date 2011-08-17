@@ -17,7 +17,7 @@ describe "hangup a call" do
   it "should send the hangup command" do
     incoming :offer_presence, @call_jid, @client_jid
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
+    last_command.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
   end
 
   it "should handle the hangup event that will come back from the server" do
@@ -47,6 +47,6 @@ describe "defining behaviour after a hangup" do
     incoming :result_iq, @call_id # from the hangup command
     incoming :hangup_presence, @call_id
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
+    last_command.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
   end
 end

@@ -18,6 +18,6 @@ describe "a call redirect" do
   it "should send the redirect command" do
     incoming :offer_presence, @call_jid, @client_jid
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Redirect.new(:redirect_to => @redirect_to, :call_jid => @call_jid, :client_jid => @client_jid)
+    last_command.should == Connfu::Commands::Redirect.new(:redirect_to => @redirect_to, :call_jid => @call_jid, :client_jid => @client_jid)
   end
 end

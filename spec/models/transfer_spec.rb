@@ -30,21 +30,21 @@ describe 'transfer' do
     end
 
     it 'should answer' do
-      Connfu.connection.commands.last.should == Connfu::Commands::Answer.new(:call_jid => @call_jid, :client_jid => @client_jid)
+      last_command.should == Connfu::Commands::Answer.new(:call_jid => @call_jid, :client_jid => @client_jid)
     end
 
     it 'should then say "please wait while we transfer your call" to the caller' do
-      incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+      incoming :result_iq, @call_id, last_command.id
 
-      Connfu.connection.commands.last.should == Connfu::Commands::Say.new(:text => "please wait while we transfer your call", :call_jid => @call_jid, :client_jid => @client_jid)
+      last_command.should == Connfu::Commands::Say.new(:text => "please wait while we transfer your call", :call_jid => @call_jid, :client_jid => @client_jid)
     end
 
     it 'should then play music to the caller' do
-      incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-      incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+      incoming :result_iq, @call_id, last_command.id
+      incoming :result_iq, @call_id, last_command.id
       incoming :say_complete_success, @call_id
 
-      Connfu.connection.commands.last.should == Connfu::Commands::Say.new(:text => "http://www.phono.com/audio/troporocks.mp3", :call_jid => @call_jid, :client_jid => @client_jid)
+      last_command.should == Connfu::Commands::Say.new(:text => "http://www.phono.com/audio/troporocks.mp3", :call_jid => @call_jid, :client_jid => @client_jid)
     end
 
     context 'with one endpoint' do
@@ -55,12 +55,12 @@ describe 'transfer' do
       end
 
       it 'should immediately ring the endpoint without waiting for the music to finish' do
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :result_iq, @call_id, last_command.id
         incoming :say_complete_success, @call_id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
 
-        Connfu.connection.commands.last.should == Connfu::Commands::NestedJoin.new(
+        last_command.should == Connfu::Commands::NestedJoin.new(
           :dial_to => @endpoint_one.address,
           :call_jid => @call_jid,
           :client_jid => @client_jid,
@@ -70,32 +70,32 @@ describe 'transfer' do
       end
 
       it 'should wait for the leg to be answered' do
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :result_iq, @call_id, last_command.id
         incoming :say_complete_success, @call_id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :outgoing_call_result_iq, @joined_call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :outgoing_call_result_iq, @joined_call_id, last_command.id
 
         Connfu.should_not be_finished
       end
 
       it 'should wait for one of the parties to hang up' do
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :result_iq, @call_id, last_command.id
         incoming :say_complete_success, @call_id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :outgoing_call_result_iq, @joined_call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :outgoing_call_result_iq, @joined_call_id, last_command.id
         incoming :outgoing_call_answered_presence, @joined_call_id
 
         Connfu.should_not be_finished
       end
 
       it 'should finish when one of the parties hangs up' do
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :result_iq, @call_id, last_command.id
         incoming :say_complete_success, @call_id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :outgoing_call_result_iq, @joined_call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :outgoing_call_result_iq, @joined_call_id, last_command.id
         incoming :outgoing_call_answered_presence, @joined_call_id
         incoming :hangup_presence, @call_id
 
@@ -113,12 +113,12 @@ describe 'transfer' do
       end
 
       it 'should immediately ring both endpoints without waiting for the music to finish' do
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :result_iq, @call_id, last_command.id
         incoming :say_complete_success, @call_id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
 
-        Connfu.connection.commands.last.should == Connfu::Commands::NestedJoin.new(
+        last_command.should == Connfu::Commands::NestedJoin.new(
           :dial_to => @endpoint_one.address,
           :call_jid => @call_jid,
           :client_jid => @client_jid,
@@ -126,9 +126,9 @@ describe 'transfer' do
           :call_id => @call_id
         )
 
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
 
-        Connfu.connection.commands.last.should == Connfu::Commands::NestedJoin.new(
+        last_command.should == Connfu::Commands::NestedJoin.new(
           :dial_to => @endpoint_two.address,
           :call_jid => @call_jid,
           :client_jid => @client_jid,
@@ -138,51 +138,51 @@ describe 'transfer' do
       end
 
       it 'should wait for one of the legs to be answered' do
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :result_iq, @call_id, last_command.id
         incoming :say_complete_success, @call_id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :outgoing_call_result_iq, @joined_call_id, Connfu.connection.commands.last.id
-        incoming :outgoing_call_result_iq, @unanswered_joined_call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :outgoing_call_result_iq, @joined_call_id, last_command.id
+        incoming :outgoing_call_result_iq, @unanswered_joined_call_id, last_command.id
 
-        Connfu.connection.commands.last.should_not be_instance_of(Connfu::Commands::Hangup)
+        last_command.should_not be_instance_of(Connfu::Commands::Hangup)
       end
 
       it 'should hang up the unanswered leg when the other leg is answered' do
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :result_iq, @call_id, last_command.id
         incoming :say_complete_success, @call_id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :outgoing_call_result_iq, @joined_call_id, Connfu.connection.commands.last.id
-        incoming :outgoing_call_result_iq, @unanswered_joined_call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :outgoing_call_result_iq, @joined_call_id, last_command.id
+        incoming :outgoing_call_result_iq, @unanswered_joined_call_id, last_command.id
         incoming :outgoing_call_answered_presence, @joined_call_id
 
-        Connfu.connection.commands.last.should == Connfu::Commands::Hangup.new(:call_jid => @unanswered_joined_call_jid, :client_jid => @client_jid)
+        last_command.should == Connfu::Commands::Hangup.new(:call_jid => @unanswered_joined_call_jid, :client_jid => @client_jid)
       end
 
       it 'should wait for one of the parties to hang up' do
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :result_iq, @call_id, last_command.id
         incoming :say_complete_success, @call_id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :outgoing_call_result_iq, @joined_call_id, Connfu.connection.commands.last.id
-        incoming :outgoing_call_result_iq, @unanswered_joined_call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :outgoing_call_result_iq, @joined_call_id, last_command.id
+        incoming :outgoing_call_result_iq, @unanswered_joined_call_id, last_command.id
         incoming :outgoing_call_answered_presence, @joined_call_id
-        incoming :result_iq, @unanswered_joined_call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @unanswered_joined_call_id, last_command.id
         incoming :hangup_presence, @unanswered_joined_call_id
 
         Connfu.should_not be_finished
       end
 
       it 'should finish when one of the parties hangs up' do
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :result_iq, @call_id, last_command.id
         incoming :say_complete_success, @call_id
-        incoming :result_iq, @call_id, Connfu.connection.commands.last.id
-        incoming :outgoing_call_result_iq, @joined_call_id, Connfu.connection.commands.last.id
-        incoming :outgoing_call_result_iq, @unanswered_joined_call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :outgoing_call_result_iq, @joined_call_id, last_command.id
+        incoming :outgoing_call_result_iq, @unanswered_joined_call_id, last_command.id
         incoming :outgoing_call_answered_presence, @joined_call_id
-        incoming :result_iq, @unanswered_joined_call_id, Connfu.connection.commands.last.id
+        incoming :result_iq, @unanswered_joined_call_id, last_command.id
         incoming :hangup_presence, @unanswered_joined_call_id
         incoming :hangup_presence, @call_id
 

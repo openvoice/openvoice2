@@ -18,7 +18,7 @@ describe "ask a caller for 4 digits" do
   it "should send an ask command" do
     incoming :offer_presence, @call_jid, @client_jid
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Ask.new(
+    last_command.should == Connfu::Commands::Ask.new(
       :call_jid => @call_jid,
       :client_jid => @client_jid,
       :prompt => "please enter a 4 digit pin",
@@ -31,7 +31,7 @@ describe "ask a caller for 4 digits" do
     incoming :result_iq, @call_id
     incoming :ask_complete_success, @call_id, "1234"
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Say.new(
+    last_command.should == Connfu::Commands::Say.new(
       :text => 'you entered 1234', :call_jid => @call_jid, :client_jid => @client_jid
     )
   end

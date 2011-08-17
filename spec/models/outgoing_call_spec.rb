@@ -18,20 +18,20 @@ describe Jobs::OutgoingCall do
     end
     
     it 'should issue a dial command' do
-      Connfu.connection.commands.last.class.should == Connfu::Commands::Dial
+      last_command.class.should == Connfu::Commands::Dial
     end
     
     it 'should dial from the openvoice2 username' do
-      Connfu.connection.commands.last.from.should == "sip:my-openvoice-username@#{Connfu.config.host}"
+      last_command.from.should == "sip:my-openvoice-username@#{Connfu.config.host}"
     end
     
     it "should dial to the caller endpoint address" do
-      Connfu.connection.commands.last.to.should == "sip:caller@example.com"
+      last_command.to.should == "sip:caller@example.com"
     end
     
     describe "when caller is ringing" do
       before do
-        incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+        incoming :outgoing_call_result_iq, "call-id", last_command.id
         incoming :outgoing_call_ringing_presence, "call-id"
       end
       
@@ -45,16 +45,16 @@ describe Jobs::OutgoingCall do
         end
 
         it 'should issue a nested join command' do
-          Connfu.connection.commands.last.class.should == Connfu::Commands::NestedJoin
-          Connfu.connection.commands.last.call_jid.should == "call-id@#{PRISM_HOST}"
+          last_command.class.should == Connfu::Commands::NestedJoin
+          last_command.call_jid.should == "call-id@#{PRISM_HOST}"
         end
 
         it 'should dial the recipient' do
-          Connfu.connection.commands.last.dial_to.should == "sip:recipient@example.com"
+          last_command.dial_to.should == "sip:recipient@example.com"
         end
 
         it 'should dial from the openvoice2 username' do
-          Connfu.connection.commands.last.dial_from.should == "sip:my-openvoice-username@#{Connfu.config.host}"
+          last_command.dial_from.should == "sip:my-openvoice-username@#{Connfu.config.host}"
         end
         
         it 'should set the Call state to caller answered' do
@@ -63,7 +63,7 @@ describe Jobs::OutgoingCall do
         
         describe "when recipient is ringing" do
           before do
-            incoming :outgoing_call_result_iq, "joined-call-id", Connfu.connection.commands.last.id
+            incoming :outgoing_call_result_iq, "joined-call-id", last_command.id
             incoming :outgoing_call_ringing_presence, "joined-call-id"
           end
           
@@ -88,8 +88,8 @@ describe Jobs::OutgoingCall do
               end
 
               it "should hang up the caller" do
-                Connfu.connection.commands.last.class.should == Connfu::Commands::Hangup
-                Connfu.connection.commands.last.call_jid.should == 'call-id@127.0.0.1'
+                last_command.class.should == Connfu::Commands::Hangup
+                last_command.call_jid.should == 'call-id@127.0.0.1'
               end
             end
 
@@ -101,8 +101,8 @@ describe Jobs::OutgoingCall do
               end
 
               it "should hang up the callee" do
-                Connfu.connection.commands.last.class.should == Connfu::Commands::Hangup
-                Connfu.connection.commands.last.call_jid.should == 'joined-call-id@openvoice.org'
+                last_command.class.should == Connfu::Commands::Hangup
+                last_command.call_jid.should == 'joined-call-id@openvoice.org'
               end
             end
 

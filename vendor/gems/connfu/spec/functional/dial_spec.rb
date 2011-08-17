@@ -17,13 +17,13 @@ describe "Dialing" do
   it "should send a dial command" do
     Dialer.dial :to => "recipient", :from => "caller" do |call|
     end
-    Connfu.connection.commands.last.should == Connfu::Commands::Dial.new(:to => "recipient", :from => "caller", :client_jid => Connfu.connection.jid.to_s, :rayo_host => Connfu.connection.jid.domain)
+    last_command.should == Connfu::Commands::Dial.new(:to => "recipient", :from => "caller", :client_jid => Connfu.connection.jid.to_s, :rayo_host => Connfu.connection.jid.domain)
   end
 
   it "should pass any headers to the dial command" do
     Dialer.dial :to => "to", :from => "from", :headers => {"foo" => "bar"} do |call|
     end
-    Connfu.connection.commands.last.should == Connfu::Commands::Dial.new(:to => "to", :from => "from", :client_jid => Connfu.connection.jid.to_s, :rayo_host => Connfu.connection.jid.domain, :headers => {"foo" => "bar"})
+    last_command.should == Connfu::Commands::Dial.new(:to => "to", :from => "from", :client_jid => Connfu.connection.jid.to_s, :rayo_host => Connfu.connection.jid.domain, :headers => {"foo" => "bar"})
   end
 
   it "should not run the start behaviour before the call has begun" do
@@ -41,7 +41,7 @@ describe "Dialing" do
       c.on_start { start_happened }
     end
 
-    incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+    incoming :outgoing_call_result_iq, "call-id", last_command.id
   end
 
   it 'should not run the ringing behaviour before the call starts ringing' do
@@ -51,7 +51,7 @@ describe "Dialing" do
       c.on_ringing { ringing_happened }
     end
 
-    incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+    incoming :outgoing_call_result_iq, "call-id", last_command.id
   end
 
   it 'should run the ringing behaviour when the call starts ringing' do
@@ -61,7 +61,7 @@ describe "Dialing" do
       c.on_ringing { ringing_happened }
     end
 
-    incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+    incoming :outgoing_call_result_iq, "call-id", last_command.id
     incoming :outgoing_call_ringing_presence, "call-id"
   end
 
@@ -72,7 +72,7 @@ describe "Dialing" do
       c.on_answer { answer_happened }
     end
 
-    incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+    incoming :outgoing_call_result_iq, "call-id", last_command.id
     incoming :outgoing_call_ringing_presence, "call-id"
   end
 
@@ -83,7 +83,7 @@ describe "Dialing" do
       c.on_answer { answer_happened }
     end
 
-    incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+    incoming :outgoing_call_result_iq, "call-id", last_command.id
     incoming :outgoing_call_ringing_presence, "call-id"
     incoming :outgoing_call_answered_presence, "call-id"
   end
@@ -95,7 +95,7 @@ describe "Dialing" do
       c.on_hangup { hangup_happened }
     end
 
-    incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+    incoming :outgoing_call_result_iq, "call-id", last_command.id
     incoming :outgoing_call_ringing_presence, "call-id"
     incoming :outgoing_call_answered_presence, "call-id"
   end
@@ -107,7 +107,7 @@ describe "Dialing" do
       c.on_hangup { hangup_happened }
     end
 
-    incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+    incoming :outgoing_call_result_iq, "call-id", last_command.id
     incoming :outgoing_call_ringing_presence, "call-id"
     incoming :outgoing_call_answered_presence, "call-id"
     incoming :hangup_presence, "call-id"
@@ -126,7 +126,7 @@ describe "Dialing" do
       c.on_hangup  { hangup_happened }
     end
 
-    incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+    incoming :outgoing_call_result_iq, "call-id", last_command.id
     incoming :outgoing_call_ringing_presence, "call-id"
     incoming :outgoing_call_answered_presence, "call-id"
     incoming :hangup_presence, "call-id"
@@ -137,7 +137,7 @@ describe "Dialing" do
       c.on_start { Dialer.stash = call_id }
     end
 
-    incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+    incoming :outgoing_call_result_iq, "call-id", last_command.id
 
     Dialer.stash.should == "call-id"
   end
@@ -149,14 +149,14 @@ describe "Dialing" do
 
     it 'should not crash when receiving a ringing event' do
       lambda {
-        incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+        incoming :outgoing_call_result_iq, "call-id", last_command.id
         incoming :outgoing_call_ringing_presence, "call-id"
       }.should_not raise_error
     end
 
     it 'should not crash when receiving an answered event' do
       lambda {
-        incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+        incoming :outgoing_call_result_iq, "call-id", last_command.id
         incoming :outgoing_call_ringing_presence, "call-id"
         incoming :outgoing_call_answered_presence, "call-id"
       }.should_not raise_error
@@ -164,7 +164,7 @@ describe "Dialing" do
 
     it 'should not crash when receiving a hangup event' do
       lambda {
-        incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+        incoming :outgoing_call_result_iq, "call-id", last_command.id
         incoming :outgoing_call_ringing_presence, "call-id"
         incoming :hangup_presence, "call-id"
       }.should_not raise_error
@@ -182,11 +182,11 @@ describe "Dialing" do
     end
 
     it "should allow running commands" do
-      incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+      incoming :outgoing_call_result_iq, "call-id", last_command.id
       incoming :outgoing_call_ringing_presence, "call-id", "client-jid"
       incoming :outgoing_call_answered_presence, "call-id"
 
-      say_command = Connfu.connection.commands.last
+      say_command = last_command
       say_command.should be_instance_of Connfu::Commands::Say
       say_command.text.should == "hello"
       say_command.call_jid.should == "call-id@#{PRISM_HOST}"
@@ -194,24 +194,24 @@ describe "Dialing" do
     end
 
     it "should not execute next command until the previous is completed" do
-      incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+      incoming :outgoing_call_result_iq, "call-id", last_command.id
       incoming :outgoing_call_ringing_presence, "call-id"
       incoming :outgoing_call_answered_presence, "call-id"
       incoming :result_iq, "call-id"
 
-      Connfu.connection.commands.last.should be_instance_of Connfu::Commands::Say
-      Connfu.connection.commands.last.text.should == "hello"
+      last_command.should be_instance_of Connfu::Commands::Say
+      last_command.text.should == "hello"
     end
 
     it "should continue executing next command when the previous has completed" do
-      incoming :outgoing_call_result_iq, "call-id", Connfu.connection.commands.last.id
+      incoming :outgoing_call_result_iq, "call-id", last_command.id
       incoming :outgoing_call_ringing_presence, "call-id"
       incoming :outgoing_call_answered_presence, "call-id"
       incoming :result_iq, "call-id"
       incoming :say_complete_success, "call-id"
 
-      Connfu.connection.commands.last.should be_instance_of Connfu::Commands::Say
-      Connfu.connection.commands.last.text.should == "is it me you're looking for?"
+      last_command.should be_instance_of Connfu::Commands::Say
+      last_command.text.should == "is it me you're looking for?"
     end
   end
 end
@@ -235,14 +235,14 @@ describe "dialing with instance-specific call behaviour" do
 
   it "should retain the specific behaviour for each dial statement" do
     DiallerWithInstanceSpecificBehaviour.execute "first behaviour"
-    first_dial_command_id = Connfu.connection.commands.last.id
+    first_dial_command_id = last_command.id
     DiallerWithInstanceSpecificBehaviour.execute "second behaviour"
 
     incoming :outgoing_call_result_iq, "call-1", first_dial_command_id
     incoming :outgoing_call_ringing_presence, "call-1"
     incoming :outgoing_call_answered_presence, "call-1"
 
-    Connfu.connection.commands.last.should be_instance_of Connfu::Commands::Say
-    Connfu.connection.commands.last.text.should == "first behaviour"
+    last_command.should be_instance_of Connfu::Commands::Say
+    last_command.text.should == "first behaviour"
   end
 end

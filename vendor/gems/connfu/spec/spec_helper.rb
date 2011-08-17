@@ -105,6 +105,10 @@ class TestConnection
   end
 end
 
+def last_command
+  Connfu.connection.commands.last
+end
+
 def result_iq(call_id='4a3fe31a-0c2a-4a9a-ae98-f5b8afb55708', id='blather0008')
   "<iq type='result' id='#{id}' from='#{call_id}@#{PRISM_HOST}' to='#{PRISM_JID}/voxeo'/>"
 end

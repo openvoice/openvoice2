@@ -18,7 +18,7 @@ describe "answering a call" do
   it "should send an answer command" do
     incoming :offer_presence, @call_jid, @client_jid
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Answer.new(:call_jid => @call_jid, :client_jid => @client_jid)
+    last_command.should == Connfu::Commands::Answer.new(:call_jid => @call_jid, :client_jid => @client_jid)
   end
 
   it "should continue to execute once the result of the answer is received" do

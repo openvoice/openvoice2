@@ -30,7 +30,7 @@ describe "two simultaneous offers" do
     Connfu.connection.commands = []
     incoming :say_complete_success, "foo"
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Say.new(:text => 'this is the second say', :call_jid => @first_call_jid, :client_jid => @foo_address)
+    last_command.should == Connfu::Commands::Say.new(:text => 'this is the second say', :call_jid => @first_call_jid, :client_jid => @foo_address)
   end
 
 end

@@ -24,14 +24,14 @@ describe "Recording a call" do
     it "should send first record start command" do
       incoming :offer_presence, @call_jid, @client_jid
 
-      Connfu.connection.commands.last.should == Connfu::Commands::Recording::Start.new(:call_jid => @call_jid, :client_jid => @client_jid)
+      last_command.should == Connfu::Commands::Recording::Start.new(:call_jid => @call_jid, :client_jid => @client_jid)
     end
 
     it "should send the stop recording command with the recording ID when start recording has been sent" do
       incoming :offer_presence, @call_jid, @client_jid
       incoming :recording_result_iq, @call_id, @recording_ref_id
 
-      Connfu.connection.commands.last.should == Connfu::Commands::Recording::Stop.new(:call_jid => @call_jid, :client_jid => @client_jid, :ref_id => @recording_ref_id)
+      last_command.should == Connfu::Commands::Recording::Stop.new(:call_jid => @call_jid, :client_jid => @client_jid, :ref_id => @recording_ref_id)
     end
 
     it "should be able to access the recording URI once the recording is complete" do
@@ -51,7 +51,7 @@ describe "Recording a call" do
       incoming :result_iq, @call_id
       incoming :recording_stop_presence, @call_id, @recording_ref_id, @recording_path
 
-      Connfu.connection.commands.last.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
+      last_command.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
     end
   end
 

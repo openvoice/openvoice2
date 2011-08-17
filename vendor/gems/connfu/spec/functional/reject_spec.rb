@@ -16,6 +16,6 @@ describe "a call reject" do
   it "should send the reject command" do
     incoming :offer_presence, @call_jid, @client_jid
 
-    Connfu.connection.commands.last.should == Connfu::Commands::Reject.new(:call_jid => @call_jid, :client_jid => @client_jid)
+    last_command.should == Connfu::Commands::Reject.new(:call_jid => @call_jid, :client_jid => @client_jid)
   end
 end
