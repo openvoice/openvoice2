@@ -31,9 +31,15 @@ class Transfer
       end
       # answer event for the joining call will now be handled by this "call".
       answered_call = wait_for Connfu::Event::Answered
-      #
+
       (call_ids-[answered_call.call_id]).each do |hangup_call_id|
-        hangup "#{hangup_call_id}@#{Connfu.connection.jid.domain}"
+        # hangup "#{hangup_call_id}@#{Connfu.connection.jid.domain}"
+        hangup_call_jid = "#{hangup_call_id}@#{Connfu.connection.jid.domain}"
+        send_command Connfu::Commands::Hangup.new(
+          :call_jid => hangup_call_jid,
+          :client_jid => client_jid
+        )
+        wait_for Connfu::Event::Hangup
       end
 
       wait_for Connfu::Event::Hangup
@@ -42,5 +48,3 @@ class Transfer
     end
   end
 end
-
-
