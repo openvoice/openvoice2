@@ -41,10 +41,10 @@ PRISM_JID = "#{PRISM_USER}@#{PRISM_HOST}"
 PRISM_PASSWORD = "1"
 PRISM_URI = "jid://#{PRISM_USER}:#{PRISM_PASSWORD}@#{PRISM_HOST}"
 
-def setup_connfu(handler_class)
+def setup_connfu(handler_class, domain='openvoice.org')
   Connfu.config.uri = PRISM_URI
   Connfu.event_processor = Connfu::EventProcessor.new(handler_class)
-  Connfu.connection = TestConnection.new
+  Connfu.connection = TestConnection.new(domain)
 end
 
 def incoming(type, *args)
@@ -75,9 +75,10 @@ end
 class TestConnection
   attr_accessor :commands
 
-  def initialize
+  def initialize(domain='openvoice.org')
     @commands = []
     @handlers = {}
+    @domain = domain
   end
 
   def send_command(command)
@@ -86,7 +87,7 @@ class TestConnection
   end
 
   def jid
-    Blather::JID.new('zlu', 'openvoice.org', '1')
+    Blather::JID.new('zlu', @domain, '1')
   end
 
   def register_handler(type, &block)
