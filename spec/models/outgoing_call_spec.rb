@@ -79,7 +79,34 @@ describe Jobs::OutgoingCall do
             it 'should not issue the nested join again' do
               Connfu.connection.commands.select{|c| c.class == Connfu::Commands::NestedJoin }.length.should == 1
             end
-            
+
+            describe "and the callee hangs up" do
+              before do
+                incoming :unjoined_presence, "call-id", "joined-call-id"
+                incoming :unjoined_presence, "joined-call-id", "call-id"
+                incoming :hangup_presence, "joined-call-id"
+              end
+
+              it "should hang up the caller" do
+                Connfu.connection.commands.last.class.should == Connfu::Commands::Hangup
+                Connfu.connection.commands.last.call_jid.should == 'call-id@127.0.0.1'
+              end
+            end
+
+            describe "and the caller hangs up" do
+              before do
+                incoming :unjoined_presence, "call-id", "joined-call-id"
+                incoming :unjoined_presence, "joined-call-id", "call-id"
+                incoming :hangup_presence, "call-id"
+              end
+
+              it "should hang up the callee" do
+                Connfu.connection.commands.last.class.should == Connfu::Commands::Hangup
+                Connfu.connection.commands.last.call_jid.should == 'joined-call-id@openvoice.org'
+              end
+            end
+
+
             it "should set the state to recipient answered" do
               @call.reload.state.should eq :recipient_answered
             end
