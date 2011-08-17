@@ -1,4 +1,4 @@
 require 'connfu'
-require 'transfer'
+require 'incoming_call'
 
-Connfu.start(Transfer)
+Connfu.start(IncomingCall)

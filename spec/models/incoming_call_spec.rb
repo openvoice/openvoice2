@@ -1,11 +1,11 @@
 require 'spec_helper'
-require 'transfer'
+require 'incoming_call'
 
-describe 'transfer' do
+describe IncomingCall do
 
   before do
     @domain = 'server.whatever'
-    setup_connfu(Transfer, @domain)
+    setup_connfu(IncomingCall, @domain)
 
     @call_id = "34209dfiasdoaf"
     @call_jid = "#{@call_id}@#{@domain}"
