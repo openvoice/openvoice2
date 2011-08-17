@@ -76,7 +76,7 @@ describe 'transfer' do
         incoming :result_iq, @call_id, Connfu.connection.commands.last.id
         incoming :outgoing_call_result_iq, @joined_call_id, Connfu.connection.commands.last.id
 
-        Connfu.event_processor.handlers.all?(&:finished?).should be_false
+        Connfu.should_not be_finished
       end
 
       it 'should wait for one of the parties to hang up' do
@@ -87,7 +87,7 @@ describe 'transfer' do
         incoming :outgoing_call_result_iq, @joined_call_id, Connfu.connection.commands.last.id
         incoming :outgoing_call_answered_presence, @joined_call_id
 
-        Connfu.event_processor.handlers.all?(&:finished?).should be_false
+        Connfu.should_not be_finished
       end
 
       it 'should finish when one of the parties hangs up' do
@@ -99,7 +99,7 @@ describe 'transfer' do
         incoming :outgoing_call_answered_presence, @joined_call_id
         incoming :hangup_presence, @call_id
 
-        Connfu.event_processor.handlers.all?(&:finished?).should be_true
+        Connfu.should be_finished
       end
     end
 
@@ -171,7 +171,7 @@ describe 'transfer' do
         incoming :result_iq, @unanswered_joined_call_id, Connfu.connection.commands.last.id
         incoming :hangup_presence, @unanswered_joined_call_id
 
-        Connfu.event_processor.handlers.all?(&:finished?).should be_false
+        Connfu.should_not be_finished
       end
 
       it 'should finish when one of the parties hangs up' do
@@ -186,7 +186,7 @@ describe 'transfer' do
         incoming :hangup_presence, @unanswered_joined_call_id
         incoming :hangup_presence, @call_id
 
-        Connfu.event_processor.handlers.all?(&:finished?).should be_true
+        Connfu.should be_finished
       end
     end
   end
