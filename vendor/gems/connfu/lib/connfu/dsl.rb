@@ -35,6 +35,11 @@ module Connfu
         @on_hangup = block if block_given?
         @on_hangup
       end
+
+      def on_reject(&block)
+        @on_reject = block if block_given?
+        @on_reject
+      end
     end
 
     def on_offer(event=nil)
@@ -120,6 +125,8 @@ module Connfu
             self.client_jid = event.presence_to
             self.call_jid = event.presence_from
             run_any_call_behaviour_for(:ringing)
+          when Connfu::Event::Rejected
+            run_any_call_behaviour_for(:reject)
           when Connfu::Event::Answered
             wait_because_of_tropo_bug_133
             run_any_call_behaviour_for(:answer)

@@ -11,8 +11,17 @@ module Jobs
     def self.perform(call_record_id)
       call = Call.find_by_id(call_record_id)
       caller, recipient, openvoice_number = call.endpoint.address, call.recipient_address, call.openvoice_number
+      @rejected = false
 
       dial :to => caller, :from => openvoice_number do |c|
+        c.on_reject do
+          call.update_state!(:call_rejected)
+          if call_id != last_event_call_id
+            hangup "#{call_id}@#{Connfu.connection.jid.domain}"
+            @rejected = true
+          end
+          @finished = true
+        end
         c.on_ringing do
           case last_event_call_id
             when call_id
@@ -41,11 +50,13 @@ module Jobs
           end
         end
         c.on_hangup do
-          call.update_state!(:call_ended)
-          if call_id == last_event_call_id
-            hangup "#{@joined_call_id}@#{Connfu.connection.jid.domain}"
-          else
-            hangup
+          unless @rejected
+            call.update_state!(:call_ended)
+            if call_id == last_event_call_id
+              hangup "#{@joined_call_id}@#{Connfu.connection.jid.domain}"
+            else
+              hangup
+            end
           end
         end
       end

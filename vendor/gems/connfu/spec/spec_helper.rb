@@ -148,12 +148,6 @@ def offer_presence(from="4a3fe31a-0c2a-4a9a-ae98-f5b8afb55708@#{PRISM_HOST}", to
   </presence>"
 end
 
-def answer_iq(call_id="9c011b43-b9be-4322-9adf-3d18e3af2f1b")
-  %{<iq type="set" to="#{call_id}@#{PRISM_HOST}" id="blather000a" from="#{PRISM_JID}/voxeo">
-    <answer xmlns=#{rayo('1')}/>
-  </iq>}
-end
-
 def say_complete_success(call_id='7bc6c7d5-1428-421d-bb40-22f58cdcd2ec')
   "<presence from='#{call_id}@#{PRISM_HOST}/a1b45d70-6df2-4460-b172-4bd077e8966d' to='#{PRISM_JID}/voxeo'>
     <complete xmlns='#{rayo('ext:1')}'>

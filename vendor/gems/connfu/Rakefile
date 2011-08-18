@@ -3,8 +3,7 @@ Bundler::GemHelper.install_tasks
 
 require 'bundler/setup'
 
-# types = [:connfu, :functional, :integration]
-types = [:connfu, :functional]
+types = [:connfu, :functional, :integration]
 task :default => types
 
 require 'rspec/core/rake_task'

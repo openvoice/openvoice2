@@ -4,10 +4,6 @@ describe "Dialing" do
   class Dialer
     include Connfu::Dsl
     class << self; attr_accessor :stash; end
-    def start_happened;   end
-    def ringing_happened; end
-    def answer_happened;  end
-    def hangup_happened;  end
   end
 
   before do
@@ -63,6 +59,18 @@ describe "Dialing" do
 
     incoming :outgoing_call_result_iq, "call-id", last_command.id
     incoming :outgoing_call_ringing_presence, "call-id"
+  end
+
+  it 'should run the reject behaviour when the call is rejected' do
+    Dialer.any_instance.should_receive(:reject_happened)
+
+    Dialer.dial :to => "to", :from => "from" do |c|
+      c.on_reject { reject_happened }
+    end
+
+    incoming :outgoing_call_result_iq, "call-id", last_command.id
+    incoming :outgoing_call_ringing_presence, "call-id"
+    incoming :reject_presence, "call-id"
   end
 
   it 'should not run the answer behaviour before the call is answered' do
