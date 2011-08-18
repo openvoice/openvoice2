@@ -1,7 +1,7 @@
 Given /^I am calling "([^"]*)" from "([^"]*)"$/ do |recipient, caller|
   Given %{I have an endpoint "#{caller}"}
   When %{I click make a call from endpoint "#{caller}"}
-  And %{I fill in "To" with "#{recipient}"}
+  And %{I fill in "Number to call" with "#{recipient}"}
   And %{I press "Call"}
 end
 

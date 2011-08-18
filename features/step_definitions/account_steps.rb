@@ -5,7 +5,6 @@ end
 Given /^that I am logged in$/ do
   Given "I have an account created"
   When "I visit the home page"
-  And "I click Login"
   And "I enter my email and password"
   And "I press the login button"
 end

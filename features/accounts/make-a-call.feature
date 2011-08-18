@@ -6,7 +6,7 @@ Scenario: Calling a number
   And I have an endpoint "sip:endpoint@example.com"
 
   When I click make a call from endpoint "sip:endpoint@example.com"
-  And I fill in "To" with "sip:recipient@example.com"
+  And I fill in "Number to call" with "sip:recipient@example.com"
   And I press "Call"
 
   Then a call should be initiated from "sip:endpoint@example.com" to "sip:recipient@example.com"

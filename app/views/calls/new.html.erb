@@ -1,11 +1,16 @@
-<h2>Call Somebody</h2>
+<% content_for :subtitle do %>
+  Call someone from <%= @endpoint.address %>
+<% end %>
 
-<p><%= flash[:notice] %></p>
-
-<%= form_for [@endpoint, @call] do |call| %>
+<section class="wrapper ptop">
+  <%= form_for [@endpoint, @call] do |call| %>
     <p>
-      <%= call.label :recipient_address, 'To' %>
+      <%= call.label :recipient_address, 'Number to call' %>
       <%= call.text_field :recipient_address %>
     </p>
-    <p><%= call.submit "Call" %></p>
-<% end %>
+    <p>
+      <%= call.submit "Call" %>
+      or <%= link_to 'go back', account_path(current_account) %>
+    </p>
+  <% end %>
+</section>

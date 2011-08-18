@@ -1,25 +1,42 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>OpenVoice2</title>
-  <%#= stylesheet_link_tag    "application" %>
-  <%= javascript_include_tag "application" %>
-  <%= csrf_meta_tags %>
-</head>
-<body>
-<h1>Openvoice</h1>
+<!--[if lt IE 9]><html class="ie"><![endif]-->
+<!--[if gte IE 9]><!--><html><!--<![endif]-->
+  <head>
+    <title>OpenVoice2</title>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <%= csrf_meta_tags %>
 
-<% if logged_in? %>
-<p><%= current_account.email %></p>
-<p><%= button_to "Logout", session_path(current_account), :method => "delete" %>
-<% else %>
-<p><%= link_to "Sign Up", new_account_path %></p>
-<p><%= link_to "Login", new_session_path %></p>
-<% end %>
+    <%= stylesheet_link_tag "application" %>
 
-<%= render :partial => "shared/notices" %>
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body lang="en">
 
-<%= yield %>
+    <header>
+      <% if logged_in? %>
+        <div id="session-info" class="clearfix">
+          <p>Logged in as <strong><%= current_account.email %></strong></p>
+          <%= button_to "Logout", session_path(current_account), :method => "delete" %>
+        </div>
+      <% end %>
+      <div class="wrapper">
+        <h1>Open Voice</h1>
+        <% if logged_in? %>
+        <h3 id="ov-number">Your number is <span id="number"><%= current_account.number %></span></h3>
+        <% end %>
+        <h2 id="subtitle"><%= yield :subtitle %></h2>
+        <%= render :partial => "shared/notices" %>
+      </div>
+    </header>
 
-</body>
+    <article id="content">
+      <%= yield %>
+    </article>
+
+    <%= javascript_include_tag "application" %>
+  </body>
 </html>

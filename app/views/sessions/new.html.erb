@@ -1,16 +1,17 @@
-<h2>Login</h2>
-
-<%= form_tag sessions_path do |form| %>
-
-  <P>
-    <%= label_tag :email %><br/>
-    <%= text_field_tag :email %>
-  </P>
-
-  <P>
-    <%= label_tag :password %><br/>
-    <%= password_field_tag :password %>
-  </P>
-
-  <P><%= submit_tag "Login" %></P>
-<% end %>
+<section class="wrapper">
+  <h3>
+    Login
+    <span>or <%= link_to "Sign Up", new_account_path %></span>
+  </h3>
+  <%= form_tag sessions_path do |form| %>
+    <p>
+      <%= label_tag :email %>
+      <%= text_field_tag :email %>
+    </p>
+    <p>
+      <%= label_tag :password %>
+      <%= password_field_tag :password %>
+    </p>
+    <p><%= submit_tag "Login" %></p>
+  <% end %>
+</section>

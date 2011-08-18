@@ -1,26 +1,22 @@
-<h2>Sign Up</h2>
-
-<%= form_for @account do |form| %>
-
-  <P>
-    <%= form.label :email %><br/>
-    <%= form.text_field :email %>
-  </P>
-
-  <p>
-    <%= form.label :username %><br/>
-    <%= form.text_field :username %>
-  </p>
-
-  <P>
-    <%= form.label :password %><br/>
-    <%= form.password_field :password %>
-  </P>
-
-  <p>
-    <%= form.label :password_confirmation %><br/>
-    <%= form.password_field :password_confirmation %>
-  </p>
-
-  <P><%= form.submit "Sign Up" %></P>
-<% end %>
+<section class="wrapper">
+  <h3>Sign Up <span>or <%= link_to "Login", new_session_path %></span></h3>
+  <%= form_for @account do |form| %>
+    <p>
+      <%= form.label :email %>
+      <%= form.text_field :email %>
+    </p>
+    <p>
+      <%= form.label :username %>
+      <%= form.text_field :username %>
+    </p>
+    <p>
+      <%= form.label :password %>
+      <%= form.password_field :password %>
+    </p>
+    <p>
+      <%= form.label :password_confirmation %>
+      <%= form.password_field :password_confirmation %>
+    </p>
+    <p><%= form.submit "Sign Up" %></p>
+  <% end %>
+</section>

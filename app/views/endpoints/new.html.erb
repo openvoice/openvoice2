@@ -1,9 +1,16 @@
-<h2>Add a new endpoint</h2>
-
-<%= form_for @endpoint do |endpoint| %>
-  <p>
-    <%= endpoint.label :address %>
-    <%= endpoint.text_field :address %>
-  </p>
-  <p><%= endpoint.submit "Add" %></p>
+<% content_for :subtitle do %>
+  Add a new endpoint
 <% end %>
+
+<section class="wrapper ptop">
+  <%= form_for @endpoint do |endpoint| %>
+    <p>
+      <%= endpoint.label :address, "Address (eg. sip:joe@example.com)" %>
+      <%= endpoint.text_field :address %>
+    </p>
+    <p>
+      <%= endpoint.submit "Add" %>
+      or <%= link_to 'go back', account_path(current_account) %>
+    </p>
+  <% end %>
+</section>
