@@ -29,26 +29,36 @@ class IncomingCall
         observe_events_for(result.ref_id)
         call_ids << result.ref_id
       end
-      # answer event for the joining call will now be handled by this "call".
-      answered_call = wait_for Connfu::Event::Answered
 
-      (call_ids-[answered_call.call_id]).each do |hangup_call_id|
-        # hangup "#{hangup_call_id}@#{Connfu.connection.jid.domain}"
-        hangup_call_jid = "#{hangup_call_id}@#{Connfu.connection.jid.domain}"
-        send_command Connfu::Commands::Hangup.new(
-          :call_jid => hangup_call_jid,
-          :client_jid => client_jid
-        )
-        wait_for Connfu::Event::Hangup
+      # wait until all are rejected or one is answered
+      while (event = wait_for Connfu::Event::Answered, Connfu::Event::Rejected)
+        if event.instance_of?(Connfu::Event::Rejected)
+          call_ids -= [event.call_id]
+          break if call_ids.empty?
+          next
+        elsif event.instance_of?(Connfu::Event::Answered)
+          break
+        end
       end
 
-      result = wait_for Connfu::Event::Hangup
-      if result.call_id == call_id # caller hangs up, hang up openvoice user
-        send_command Connfu::Commands::Hangup.new(
-          :call_jid => "#{answered_call.call_id}@#{Connfu.connection.jid.domain}",
-          :client_jid => client_jid
-        )
-        @finished = true
+      if event.instance_of?(Connfu::Event::Answered)
+        (call_ids-[event.call_id]).each do |hangup_call_id|
+          hangup_call_jid = "#{hangup_call_id}@#{Connfu.connection.jid.domain}"
+          send_command Connfu::Commands::Hangup.new(
+            :call_jid => hangup_call_jid,
+            :client_jid => client_jid
+          )
+          wait_for Connfu::Event::Hangup
+        end
+
+        result = wait_for Connfu::Event::Hangup
+        if result.call_id == call_id # caller hangs up, hang up openvoice user
+          send_command Connfu::Commands::Hangup.new(
+            :call_jid => "#{event.call_id}@#{Connfu.connection.jid.domain}",
+            :client_jid => client_jid
+          )
+          @finished = true
+        end
       end
 
       logger.debug "The call was answered, and has finished"

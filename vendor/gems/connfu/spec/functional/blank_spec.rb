@@ -10,7 +10,7 @@ describe "Empty DSL Class" do
     @client_jid = "usera@127.0.0.whatever/voxeo"
   end
 
-  it "should not raise an error on offer event recieved" do
+  it "should not raise an error on offer event received" do
     lambda {
       incoming :offer_presence, @call_jid, @client_jid
     }.should_not raise_error

@@ -24,8 +24,10 @@ module Connfu
           Connfu::Event::Ringing.new(:call_id => call_id, :to => from, :from => to)
         elsif node.xpath('//x:answered', 'x' => rayo('1')).any?
           Connfu::Event::Answered.new(:call_id => call_id)
-        elsif node.xpath("//x:hangup", 'x' => rayo('1')).any?
+        elsif node.xpath("//x:hangup", 'x' => rayo('1')).any? || node.xpath("//x:hangup", 'x' => rayo('ext:complete:1')).any?
           Connfu::Event::Hangup.new(:call_id => call_id)
+        elsif node.xpath("//x:reject", 'x' => rayo('1')).any?
+          Connfu::Event::Rejected.new(:call_id => call_id)
         elsif node.xpath('//x:stop', 'x' => rayo('ext:complete:1')).first
           if recording_element = node.xpath('//x:recording', 'x' => rayo('record:complete:1')).first
             Connfu::Event::RecordingStopComplete.new(:call_id => call_id, :uri => recording_element.attributes['uri'].value)

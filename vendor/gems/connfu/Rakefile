@@ -3,7 +3,8 @@ Bundler::GemHelper.install_tasks
 
 require 'bundler/setup'
 
-types = [:connfu, :functional, :integration]
+# types = [:connfu, :functional, :integration]
+types = [:connfu, :functional]
 task :default => types
 
 require 'rspec/core/rake_task'
@@ -18,6 +19,7 @@ end
 
 possible_prism_locations = ['~/Applications/prism', '/Applications/prism', '/opt/voxeo/prism'].map { |p| File.expand_path(p) }
 prism_home = possible_prism_locations.find { |p| File.directory?(p) }
+tropo_build_path = "#{prism_home}/apps/tropo-build.txt"
 
 namespace :tropo do
   desc "Updates tropo to the latest version and restarts prism"
@@ -38,8 +40,8 @@ namespace :tropo do
     puts "* Updating tropo2"
     tropo_war = Dir["#{download_dir}/archive/tropo-war/target/tropo-*.war"][0]
     build_number = File.basename(tropo_war, ".war").split("_").last
-    File.open("#{prism_home}/apps/tropo-build.txt", "w") { |f| f.write build_number }
-    system "cd #{download_dir} && mv archive/tropo-war/target/tropo-*.war #{prism_home}/apps/tropo2.war"
+    File.open(tropo_build_path, "w") { |f| f.write build_number }
+    system "cd #{download_dir} && rm -rf #{prism_home}/apps/tropo2 && mv archive/tropo-war/target/tropo-*.war #{prism_home}/apps/tropo2.war"
 
     puts "* Cleaning up"
     system "cd #{download_dir} && rm archive.zip"
@@ -48,6 +50,33 @@ namespace :tropo do
     puts "* Restarting Prism server ..."
     Rake::Task["prism:restart"].invoke
     puts "* Prism server restarted."
+    Rake::Task["tropo:version"].invoke
+  end
+
+  desc "Reports the version of Tropo running on local Prism server"
+  task :version => "prism:exists" do
+    require "open-uri"
+    require "json"
+
+    puts
+    begin
+      io = open("http://localhost:8080/tropo2/jmx/read/com.tropo:Type=Info")
+      attributes = JSON.parse(io.read)
+      puts "Tropo build info via JMX :-"
+      attributes['value'].each { |pair| puts "* %s: %s" % pair }
+    rescue
+      puts "No Tropo build info available via JMX."
+    end
+
+    puts
+    begin
+      File.open(tropo_build_path) do |f|
+        tropo_build_number = f.read.sub(%r{^b}, '')
+        puts "Last downloaded Tropo build: %s" % tropo_build_number
+      end
+    rescue
+      puts "No downloaded Tropo builds found."
+    end
   end
 end
 

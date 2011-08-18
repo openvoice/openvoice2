@@ -85,6 +85,9 @@ module Connfu
     class Hangup < Presence
     end
 
+    class Rejected < Presence
+    end
+
     class StopComplete < Presence
     end
 

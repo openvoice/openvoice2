@@ -79,6 +79,17 @@ describe IncomingCall do
         Connfu.should_not be_finished
       end
 
+      it 'should hangup the caller if the openvoice endpoint rejects the call' do
+        incoming :result_iq, @call_id, last_command.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :say_complete_success, @call_id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :outgoing_call_result_iq, @joined_call_id, last_command.id
+        incoming :reject_presence, @joined_call_id
+
+        last_command.should == Connfu::Commands::Hangup.new(:call_jid => "#{@call_id}@#{@domain}", :client_jid => @client_jid)
+      end
+
       it 'should wait for one of the parties to hang up' do
         incoming :result_iq, @call_id, last_command.id
         incoming :result_iq, @call_id, last_command.id
@@ -192,6 +203,40 @@ describe IncomingCall do
         incoming :result_iq, @unanswered_joined_call_id, last_command.id
         incoming :hangup_presence, @unanswered_joined_call_id
 
+        Connfu.should_not be_finished
+      end
+
+      it 'should hangup the caller when both openvoice endpoints reject the call' do
+        incoming :result_iq, @call_id, last_command.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :say_complete_success, @call_id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :outgoing_call_result_iq, @joined_call_id, last_command.id
+        incoming :outgoing_call_result_iq, @unanswered_joined_call_id, last_command.id
+        incoming :reject_presence, @joined_call_id
+        incoming :reject_presence, @unanswered_joined_call_id
+
+        incoming :result_iq, @call_id
+        incoming :hangup_presence, @call_id
+
+        last_command.should == Connfu::Commands::Hangup.new(:call_jid => "#{@call_id}@#{@domain}", :client_jid => @client_jid)
+        Connfu.should be_finished
+      end
+
+      it 'should allow one to reject and another openvoice number to answer' do
+        incoming :result_iq, @call_id, last_command.id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :say_complete_success, @call_id
+        incoming :result_iq, @call_id, last_command.id
+        incoming :outgoing_call_result_iq, @joined_call_id, last_command.id
+        incoming :outgoing_call_result_iq, @unanswered_joined_call_id, last_command.id
+
+        incoming :reject_presence, @joined_call_id
+
+        incoming :outgoing_call_answered_presence, @unanswered_joined_call_id
+        incoming :result_iq, @unanswered_joined_call_id, last_command.id
+
+        last_command.should_not be_instance_of(Connfu::Commands::Hangup)
         Connfu.should_not be_finished
       end
 
