@@ -42,8 +42,15 @@ class IncomingCall
         wait_for Connfu::Event::Hangup
       end
 
-      wait_for Connfu::Event::Hangup
-      @finished = true
+      result = wait_for Connfu::Event::Hangup
+      if result.call_id == call_id # caller hangs up, hang up openvoice user
+        send_command Connfu::Commands::Hangup.new(
+          :call_jid => "#{answered_call.call_id}@#{Connfu.connection.jid.domain}",
+          :client_jid => client_jid
+        )
+        @finished = true
+      end
+
       logger.debug "The call was answered, and has finished"
     end
   end
