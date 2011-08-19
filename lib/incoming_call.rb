@@ -13,21 +13,9 @@ class IncomingCall
                                    :call_jid => call_jid,
                                    :client_jid => client_jid,
                                    :text => "http://www.phono.com/audio/troporocks.mp3")
-
-      command_options = {
-          :call_jid =>call_jid,
-          :client_jid =>client_jid,
-          :dial_from => call.to[:address],
-          :call_id => call_id
-      }
-
       call_ids = []
       account.endpoints.each do |endpoint|
-        result = send_command Connfu::Commands::NestedJoin.new(command_options.merge(:dial_to => endpoint.address))
-
-        # the call id we are going to JOIN will be returned in the result
-        observe_events_for(result.ref_id)
-        call_ids << result.ref_id
+        call_ids << dial_join({:dial_from => call.to[:address], :dial_to => endpoint.address})
       end
 
       # wait until all are rejected or one is answered
