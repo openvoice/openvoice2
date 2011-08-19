@@ -6,7 +6,7 @@ describe "Empty DSL Class" do
   end
 
   before :each do
-    @call_jid = "123@server.whatever"
+    @call_jid = "call-id@server.whatever"
     @client_jid = "usera@127.0.0.whatever/voxeo"
   end
 

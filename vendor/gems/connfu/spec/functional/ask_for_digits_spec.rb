@@ -10,8 +10,7 @@ describe "ask a caller for 4 digits" do
   end
 
   before :each do
-    @call_id = "34209dfiasdoaf"
-    @call_jid = "#{@call_id}@server.whatever"
+    @call_jid = "call-id@server.whatever"
     @client_jid = "usera@127.0.0.whatever/voxeo"
   end
 
@@ -28,8 +27,8 @@ describe "ask a caller for 4 digits" do
 
   it "should continue when ask was successful" do
     incoming :offer_presence, @call_jid, @client_jid
-    incoming :result_iq, @call_id
-    incoming :ask_complete_success, @call_id, "1234"
+    incoming :result_iq, @call_jid
+    incoming :ask_success_presence, @call_jid, "1234"
 
     last_command.should == Connfu::Commands::Say.new(
       :text => 'you entered 1234', :call_jid => @call_jid, :client_jid => @client_jid

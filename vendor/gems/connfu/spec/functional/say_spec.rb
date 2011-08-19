@@ -10,7 +10,7 @@ describe "say something on a call" do
   end
 
   before :each do
-    @call_id = "34209dfiasdoaf"
+    @call_id = "call-id"
     @call_jid = "#{@call_id}@server.whatever"
     @client_jid = "usera@127.0.0.whatever/voxeo"
   end
@@ -23,15 +23,15 @@ describe "say something on a call" do
 
   it "should not send the second say command if the first command's success hasn't been received" do
     incoming :offer_presence, @call_jid, @client_jid
-    incoming :result_iq, @call_id
+    incoming :result_iq, @call_jid, @call_id
 
     last_command.should == Connfu::Commands::Say.new(:text => 'hello, this is connfu', :call_jid => @call_jid, :client_jid => @client_jid)
   end
 
   it "should send the second say command once the first say command has completed" do
     incoming :offer_presence, @call_jid, @client_jid
-    incoming :result_iq, @call_id
-    incoming :say_complete_success, @call_id
+    incoming :result_iq, @call_jid
+    incoming :say_success_presence, @call_jid
 
     last_command.should == Connfu::Commands::Say.new(:text => 'http://www.phono.com/audio/troporocks.mp3', :call_jid => @call_jid, :client_jid => @client_jid)
   end

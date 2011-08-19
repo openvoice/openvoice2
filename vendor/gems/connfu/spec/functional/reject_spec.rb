@@ -9,7 +9,7 @@ describe "a call reject" do
   end
 
   before :each do
-    @call_jid = "34209dfiasdoaf@server.whatever"
+    @call_jid = "call-id@server.whatever"
     @client_jid = "usera@127.0.0.whatever/voxeo"
   end
 

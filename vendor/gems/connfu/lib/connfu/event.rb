@@ -91,6 +91,9 @@ module Connfu
     class Timeout < Presence
     end
 
+    class Busy < Presence
+    end
+
     class StopComplete < Presence
     end
 

@@ -109,12 +109,12 @@ def last_command
   Connfu.connection.commands.last
 end
 
-def result_iq(call_id='4a3fe31a-0c2a-4a9a-ae98-f5b8afb55708', id='blather0008')
-  "<iq type='result' id='#{id}' from='#{call_id}@#{PRISM_HOST}' to='#{PRISM_JID}/voxeo'/>"
+def result_iq(call_jid="call-id@#{PRISM_HOST}", id='blather0008')
+  "<iq type='result' id='#{id}' from='#{call_jid}' to='#{PRISM_JID}/voxeo'/>"
 end
 
-def error_iq(call_id='4a3fe31a-0c2a-4a9a-ae98-f5b8afb55708', id='blather000c')
-  %{<iq type='error' id='#{id}' from='#{call_id}@#{PRISM_HOST}' to='#{PRISM_JID}/voxeo'>
+def error_iq(call_jid="call-id@#{PRISM_HOST}", id='blather000c')
+  %{<iq type='error' id='#{id}' from='#{call_jid}' to='#{PRISM_JID}/voxeo'>
     <transfer xmlns='#{tropo('transfer:1')}'>
       <to>bollocks</to>
     </transfer>
@@ -125,12 +125,12 @@ def error_iq(call_id='4a3fe31a-0c2a-4a9a-ae98-f5b8afb55708', id='blather000c')
   </iq>}
 end
 
-def offer_presence(from="4a3fe31a-0c2a-4a9a-ae98-f5b8afb55708@#{PRISM_HOST}", to="#{PRISM_JID}/voxeo", options={})
+def offer_presence(call_jid="call-id@#{PRISM_HOST}", client_jid="#{PRISM_JID}/voxeo", options={})
   offer_options = {
     :from => "<sip:16508983130@#{PRISM_HOST}>;tag=34ccaa4d",
     :to => "<sip:#{PRISM_JID}:5060>"
   }.merge(options)
-  "<presence from='#{from}' to='#{to}'>
+  "<presence from='#{call_jid}' to='#{client_jid}'>
     <offer xmlns='#{rayo('1')}' to='sip:#{PRISM_JID}:5060' from='sip:16508983130@#{PRISM_HOST}'>
       <header name='Max-Forwards' value='70'/>
       <header name='Content-Length' value='422'/>
@@ -148,16 +148,16 @@ def offer_presence(from="4a3fe31a-0c2a-4a9a-ae98-f5b8afb55708@#{PRISM_HOST}", to
   </presence>"
 end
 
-def say_complete_success(call_id='7bc6c7d5-1428-421d-bb40-22f58cdcd2ec')
-  "<presence from='#{call_id}@#{PRISM_HOST}/a1b45d70-6df2-4460-b172-4bd077e8966d' to='#{PRISM_JID}/voxeo'>
+def say_success_presence(call_jid="call-id@#{PRISM_HOST}/component-id")
+  "<presence from='#{call_jid}' to='#{PRISM_JID}/voxeo'>
     <complete xmlns='#{rayo('ext:1')}'>
       <success xmlns='#{tropo('say:complete:1')}'/>
     </complete>
   </presence>"
 end
 
-def ask_complete_success(call_id="9f00061", catpured_input="1234")
-  "<presence to='16577@app.ozone.net/1' from='#{call_id}@call.ozone.net/fgh4590'>
+def ask_success_presence(call_jid="call-id@#{PRISM_HOST}/component-id", catpured_input="1234")
+  "<presence to='16577@app.ozone.net/1' from='#{call_jid}'>
     <complete xmlns='#{rayo('ext:1')}'>
       <success mode='speech' confidence='0.45' xmlns='#{tropo('ask:complete:1')}'>
         <interpretation>#{catpured_input}</interpretation>
@@ -167,58 +167,58 @@ def ask_complete_success(call_id="9f00061", catpured_input="1234")
   </presence>"
 end
 
-def transfer_timeout_presence(call_id='9f00061')
-  %{<presence to='16577@app.ozone.net/1' from='#{call_id}@call.ozone.net/fgh4590'>
+def transfer_timeout_presence(call_jid="call-id@#{PRISM_HOST}/component-id")
+  %{<presence to='16577@app.ozone.net/1' from='#{call_jid}'>
     <complete xmlns='#{rayo('ext:1')}'>
       <timeout xmlns='#{tropo('transfer:complete:1')}' />
     </complete>
   </presence>}
 end
 
-def transfer_success_presence(call_id='9f00061')
-  %{<presence to='16577@app.ozone.net/1' from='#{call_id}@call.ozone.net/fgh4590'>
+def transfer_success_presence(call_jid="call-id@#{PRISM_HOST}/component-id")
+  %{<presence to='16577@app.ozone.net/1' from='#{call_jid}'>
     <complete xmlns='#{rayo('ext:1')}'>
       <success xmlns='#{tropo('transfer:complete:1')}' />
     </complete>
   </presence>}
 end
 
-def transfer_busy_presence(call_id="c82737e4-f70c-466d-b839-924f69be57bd")
-  %{<presence from="#{call_id}@#{PRISM_HOST}/7d858f27-e961-4aa2-ae9f-ecaffd4c841e" to="#{PRISM_JID}/voxeo">
+def transfer_busy_presence(call_jid="call-id@#{PRISM_HOST}/component-id")
+  %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
     <complete xmlns="#{rayo('ext:1')}">
       <busy xmlns="#{tropo('transfer:complete:1')}"/>
     </complete>
   </presence>}
 end
 
-def transfer_rejected_presence(call_id="c82737e4-f70c-466d-b839-924f69be57bd")
-  %{<presence from="#{call_id}@#{PRISM_HOST}/7d858f27-e961-4aa2-ae9f-ecaffd4c841e" to="#{PRISM_JID}/voxeo">
+def transfer_rejected_presence(call_jid="call-id@#{PRISM_HOST}/component-id")
+  %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
     <complete xmlns="#{rayo('ext:1')}">
       <reject xmlns="#{tropo('transfer:complete:1')}"/>
     </complete>
   </presence>}
 end
 
-def joined_presence(call_id="9d27a2d3-9134-48ef-957e-5f5e72686d79", new_call_id="1034a58a-4ffd-479c-843e-92b84ab8826a")
-  %{<presence from="#{call_id}@#{PRISM_HOST}" to="#{PRISM_JID}/voxeo">
-    <joined xmlns="urn:xmpp:rayo:1" call-id="#{new_call_id}"/>
+def joined_presence(call_jid="call-id-1@#{PRISM_HOST}", new_call_id="call-id-2")
+  %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
+    <joined xmlns="#{rayo('1')}" call-id="#{new_call_id}"/>
   </presence>}
 end
 
-def unjoined_presence(call_id='8c27e8c6-76c1-4cc6-a818-18075f07a511', other_call_id='56258fa4-db93-46a6-a507-0a22313e709a')
-  %{<presence from="#{call_id}@#{PRISM_HOST}" to="#{PRISM_JID}/voxeo">
-    <unjoined xmlns="urn:xmpp:rayo:1" call-id="#{other_call_id}"/>
+def unjoined_presence(call_jid="call-id-1@#{PRISM_HOST}", other_call_id='call-id-2')
+  %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
+    <unjoined xmlns="#{rayo('1')}" call-id="#{other_call_id}"/>
   </presence>}
 end
 
-def recording_result_iq(call_id="a0565638-90f8-416e-b26f-636f1aa684d0", id="f3c1b8c4-bb4f-4f7c-a063-87ee9bac0980")
-  %{<iq type="result" id="blather000a" from="#{call_id}@#{PRISM_HOST}" to="#{PRISM_JID}/voxeo">
-    <ref xmlns="#{rayo('1')}" id="#{id}"/>
+def recording_result_iq(call_jid="call-id@#{PRISM_HOST}", component_id="component-id")
+  %{<iq type="result" id="blather000a" from="#{call_jid}" to="#{PRISM_JID}/voxeo">
+    <ref xmlns="#{rayo('1')}" id="#{component_id}"/>
   </iq>}
 end
 
-def recording_stop_presence(call_id="abc123", id="def456", path="file:///tmp/recording.mp3")
-  %{<presence from="#{call_id}@#{PRISM_HOST}/#{id}" to="#{PRISM_JID}/voxeo">
+def recording_stop_presence(call_jid="call-id@#{PRISM_HOST}/component-id", path="file:///tmp/recording.mp3")
+  %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
     <complete xmlns="#{rayo('ext:1')}">
       <stop xmlns="#{rayo('ext:complete:1')}"/>
       <recording xmlns="#{rayo('record:complete:1')}" uri="#{path}"/>
@@ -226,60 +226,68 @@ def recording_stop_presence(call_id="abc123", id="def456", path="file:///tmp/rec
   </presence>}
 end
 
-def stop_presence(call_id="a27d73c5-6f5c-4a41-bfb9-6ea21b198602", id="23399310-4590-499d-8917-a0642965a096")
-  %{<presence from="#{call_id}@#{PRISM_HOST}/#{id}" to="#{PRISM_JID}/voxeo">
-    <complete xmlns="urn:xmpp:rayo:ext:1">
-      <stop xmlns="urn:xmpp:rayo:ext:complete:1"/>
+def component_stop_presence(call_jid="call-id@#{PRISM_HOST}/component-id")
+  %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
+    <complete xmlns="#{rayo('ext:1')}">
+      <stop xmlns="#{rayo('ext:complete:1')}"/>
     </complete>
   </presence>}
 end
 
-def component_hangup_presence(call_id='call-id')
-  %{<presence from="#{call_id}@#{PRISM_HOST}/3b1d199c-39af-4256-9a49-97293a530ac6" to="#{PRISM_JID}/voxeo">
+def component_hangup_presence(call_jid="call-id@#{PRISM_HOST}/component-id")
+  %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
     <complete xmlns="#{rayo('ext:1')}">
       <hangup xmlns="#{rayo('ext:complete:1')}"/>
     </complete>
   </presence>}
 end
 
-def outgoing_call_result_iq(call_id="abc123", xmpp_id="blather_001")
+def dial_result_iq(call_id="call-id", xmpp_id="blather_001")
   %{<iq type="result" id="#{xmpp_id}" from="#{PRISM_HOST}" to="#{PRISM_JID}/voxeo">
-    <ref xmlns="urn:xmpp:rayo:1" id="#{call_id}"/>
+    <ref xmlns="#{rayo('1')}" id="#{call_id}"/>
   </iq>}
 end
 
-def outgoing_call_ringing_presence(call_id="ebe45dbf-2a8b-4f1c-9aa0-1f1b39d1e821", client_jid="#{PRISM_JID}/voxeo")
-  %{<presence from="#{call_id}@#{PRISM_HOST}" to="#{client_jid}">
+def ringing_presence(call_jid="call-id@#{PRISM_HOST}", client_jid="#{PRISM_JID}/voxeo")
+  %{<presence from="#{call_jid}" to="#{client_jid}">
     <ringing xmlns="#{rayo('1')}"/>
   </presence>}
 end
 
-def outgoing_call_answered_presence(call_id="ebe45dbf-2a8b-4f1c-9aa0-1f1b39d1e821")
-  %{<presence from="#{call_id}@#{PRISM_HOST}" to="#{PRISM_JID}/voxeo">
+def answered_presence(call_jid="call-id@#{PRISM_HOST}")
+  %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
     <answered xmlns="#{rayo('1')}"/>
   </presence>}
 end
 
-def hangup_presence(call_id="abc")
-  %{<presence from="#{call_id}@#{PRISM_HOST}" to="#{PRISM_JID}/voxeo">
+def hangup_presence(call_jid="call-id@#{PRISM_HOST}")
+  %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
     <end xmlns="#{rayo('1')}">
       <hangup/>
     </end>
   </presence>}
 end
 
-def reject_presence(call_id="abc")
-  %{<presence from="#{call_id}@#{PRISM_HOST}" to="#{PRISM_JID}/voxeo">
-    <end xmlns="urn:xmpp:rayo:1">
+def reject_presence(call_jid="call-id@#{PRISM_HOST}")
+  %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
+    <end xmlns="#{rayo('1')}">
       <reject/>
     </end>
   </presence>}
 end
 
-def timeout_presence(call_id="abc")
-  %{<presence from="#{call_id}@#{PRISM_HOST}" to="#{PRISM_JID}/voxeo">
-    <end xmlns="urn:xmpp:rayo:1">
+def timeout_presence(call_jid="call-id@#{PRISM_HOST}")
+  %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
+    <end xmlns="#{rayo('1')}">
       <timeout/>
+    </end>
+  </presence>}
+end
+
+def busy_presence(call_jid="call-id@#{PRISM_HOST}")
+  %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
+    <end xmlns="#{rayo('1')}">
+      <busy/>
     </end>
   </presence>}
 end

@@ -10,8 +10,7 @@ describe "answering a call" do
   end
 
   before :each do
-    @call_id = "34209dfiasdoaf"
-    @call_jid = "#{@call_id}@server.whatever"
+    @call_jid = "call-id@server.whatever"
     @client_jid = "usera@127.0.0.whatever/voxeo"
   end
 
@@ -25,6 +24,6 @@ describe "answering a call" do
     dsl_instance.should_receive(:do_something)
 
     incoming :offer_presence, @call_jid, @client_jid
-    incoming :result_iq, @call_id
+    incoming :result_iq, @call_jid
   end
 end

@@ -8,6 +8,7 @@ describe Jobs::OutgoingCall do
   
   describe "Initiating call between an openvoice endpoint and a recipient" do
     before do
+      @domain = "openvoice.org"
       @call = Factory(:call,
         :endpoint => Factory(:endpoint, :address => "sip:caller@example.com",
           :account => Factory(:account, :username => "my-openvoice-username")
@@ -31,8 +32,10 @@ describe Jobs::OutgoingCall do
     
     describe "when the openvoice endpoint is ringing" do
       before do
-        incoming :outgoing_call_result_iq, "call-id", last_command.id
-        incoming :outgoing_call_ringing_presence, "call-id"
+        @call_id = "call-id"
+        @call_jid = "call-id@#{@domain}"
+        incoming :dial_result_iq, "call-id", last_command.id
+        incoming :ringing_presence, @call_jid
       end
       
       it 'should set the Call state to caller ringing' do
@@ -41,12 +44,12 @@ describe Jobs::OutgoingCall do
       
       describe "when the openvoice endpoint answers" do
         before do
-          incoming :outgoing_call_answered_presence, "call-id"
+          incoming :answered_presence, @call_jid
         end
 
         it 'should issue a nested join command' do
           last_command.class.should == Connfu::Commands::NestedJoin
-          last_command.call_jid.should == "call-id@#{PRISM_HOST}"
+          last_command.call_jid.should == @call_jid
         end
 
         it 'should dial the recipient' do
@@ -63,8 +66,10 @@ describe Jobs::OutgoingCall do
         
         describe "when recipient is ringing" do
           before do
-            incoming :outgoing_call_result_iq, "joined-call-id", last_command.id
-            incoming :outgoing_call_ringing_presence, "joined-call-id"
+            @joined_call_jid = "joined-call-id@#{@domain}"
+            @joined_call_id = "joined-call-id"
+            incoming :dial_result_iq, @joined_call_id, last_command.id
+            incoming :ringing_presence, @joined_call_jid
           end
           
           it "should set the state to recipient ringing" do
@@ -73,7 +78,7 @@ describe Jobs::OutgoingCall do
           
           describe "when recipient answers" do
             before do
-              incoming :outgoing_call_answered_presence, "joined-call-id"
+              incoming :answered_presence, @joined_call_jid
             end
 
             it 'should not issue the nested join again' do
@@ -86,14 +91,14 @@ describe Jobs::OutgoingCall do
 
             describe "and the recipient hangs up" do
               before do
-                incoming :unjoined_presence, "call-id", "joined-call-id"
-                incoming :unjoined_presence, "joined-call-id", "call-id"
-                incoming :hangup_presence, "joined-call-id"
+                incoming :unjoined_presence, @call_jid, @joined_call_id
+                incoming :unjoined_presence, @joined_call_jid, @call_id
+                incoming :hangup_presence, @joined_call_jid
               end
 
               it "should hang up the openvoice endpoint" do
                 last_command.class.should == Connfu::Commands::Hangup
-                last_command.call_jid.should == 'call-id@127.0.0.1'
+                last_command.call_jid.should == @call_jid
               end
 
               it "should set the state to call ended" do
@@ -103,14 +108,14 @@ describe Jobs::OutgoingCall do
 
             describe "and the openvoice endpoint hangs up" do
               before do
-                incoming :unjoined_presence, "call-id", "joined-call-id"
-                incoming :unjoined_presence, "joined-call-id", "call-id"
-                incoming :hangup_presence, "call-id"
+                incoming :unjoined_presence, @call_jid, @joined_call_id
+                incoming :unjoined_presence, @joined_call_jid, @call_id
+                incoming :hangup_presence, @call_jid
               end
 
               it "should hang up the recipient" do
                 last_command.class.should == Connfu::Commands::Hangup
-                last_command.call_jid.should == 'joined-call-id@openvoice.org'
+                last_command.call_jid.should == @joined_call_jid
               end
 
               it "should set the state to call ended" do
@@ -121,7 +126,7 @@ describe Jobs::OutgoingCall do
 
           describe "when recipient rejects the call" do
             before do
-              incoming :reject_presence, "joined-call-id"
+              incoming :reject_presence, @joined_call_jid
             end
 
             it "should set the state to call rejected" do
@@ -130,24 +135,24 @@ describe Jobs::OutgoingCall do
 
             it "should hang up the openvoice user's endpoint" do
               last_command.class.should == Connfu::Commands::Hangup
-              last_command.call_jid.should == 'call-id@openvoice.org'
+              last_command.call_jid.should == @call_jid
             end
 
             describe "and hangup is confirmed" do
               before do
-                incoming :result_iq, "call-id", last_command.id
-                incoming :hangup_presence, "call-id"
+                incoming :result_iq, @call_jid, last_command.id
+                incoming :hangup_presence, @call_jid
               end
 
               it "should not try to hang up the recipient again" do
-                last_command.call_jid.should_not == "joined-call-id@openvoice.org"
+                last_command.call_jid.should_not == @joined_call_jid
               end
             end
           end
 
           describe "when recipient times out" do
             before do
-              incoming :timeout_presence, "joined-call-id"
+              incoming :timeout_presence, @joined_call_jid
             end
 
             it "shold set the state to call timed out" do
@@ -156,17 +161,17 @@ describe Jobs::OutgoingCall do
 
             it "should hang up the openvoice user's endpoint" do
               last_command.class.should == Connfu::Commands::Hangup
-              last_command.call_jid.should == 'call-id@openvoice.org'
+              last_command.call_jid.should == @call_jid
             end
 
             describe "and when the hangup is confirmed" do
               before do
-                incoming :result_iq, "call-id", last_command.id
-                incoming :hangup_presence, "call-id"
+                incoming :result_iq, @call_jid, last_command.id
+                incoming :hangup_presence, @call_jid
               end
 
               it "should not try to hang up the recipient again" do
-                last_command.call_jid.should_not == "joined-call-id@openvoice.org"
+                last_command.call_jid.should_not == @joined_call_jid
               end
             end
           end
@@ -175,7 +180,7 @@ describe Jobs::OutgoingCall do
 
       describe "when the openvoice endpoint rejects the call" do
         before :each do
-          incoming :reject_presence, "call-id"
+          incoming :reject_presence, @call_jid
         end
 
         it "should not send any further hangup commands" do

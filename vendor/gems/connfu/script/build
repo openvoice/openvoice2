@@ -14,6 +14,6 @@ rvm use 1.9.2
 
 echo `bundle config`
 
-echo "Running build script as `whoami`" && mkdir -p .build && bundle install --path .build/gems && PRISM_JID=jid://usera:1@173.255.241.49 bundle exec rake --trace | tee .build/output
+echo "Running build script as `whoami`" && mkdir -p .build && bundle install --path .build/gems && PRISM_JID=jid://usera:1@173.255.243.5 bundle exec rake --trace | tee .build/output
 
 exit $pipestatus[1]

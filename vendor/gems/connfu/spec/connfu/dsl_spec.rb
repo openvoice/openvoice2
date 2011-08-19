@@ -60,7 +60,7 @@ describe Connfu::Dsl do
       subject.observe_events_for("another-call-id")
       subject.can_handle_event?(event_for_another_call).should be_true
     end
-    
+
     it "should store the call id of the event that has fired" do
       event = Connfu::Event::Result.new(:call_id => 'call-id')
       subject.handle_event(event)
@@ -81,7 +81,7 @@ describe Connfu::Dsl do
       Connfu.connection.stub(:send_command).and_return('command-id')
       subject.send_command(Connfu::Commands::Say.new(:text => '', :client_jid => 'client-jid', :call_jid => 'call-jid'))
 
-      iq = create_iq(result_iq('different-call-id', 'command-id'))
+      iq = create_iq(result_iq("different-call-id@#{PRISM_HOST}", 'command-id'))
       result = Connfu::Rayo::Parser.parse_event_from(iq)
 
       subject.can_handle_event?(result).should be_true
@@ -91,7 +91,7 @@ describe Connfu::Dsl do
       Connfu.connection.stub(:send_command).and_return('command-id')
       subject.send_command(Connfu::Commands::Say.new(:text => '', :client_jid => 'client-jid', :call_jid => 'call-jid'))
 
-      iq = create_iq(error_iq('different-call-id', 'command-id'))
+      iq = create_iq(error_iq("different-call-id@#{PRISM_HOST}", 'command-id'))
       error = Connfu::Rayo::Parser.parse_event_from(iq)
 
       subject.can_handle_event?(error).should be_true
@@ -113,7 +113,7 @@ describe Connfu::Dsl do
       Connfu.connection.should_receive(:send_command).with(Connfu::Commands::Hangup.new(:client_jid => 'client-jid', :call_jid => 'call-jid'))
       subject.hangup
     end
-    
+
     it 'should send a Hangup command wih the specified call jid' do
       Connfu.connection.should_receive(:send_command).with(Connfu::Commands::Hangup.new(:client_jid => 'client-jid', :call_jid => 'custom-call-jid'))
       subject.hangup 'custom-call-jid'
@@ -151,7 +151,7 @@ describe Connfu::Dsl do
       subject.stub(:send_command).and_return(stub(:ref_id => "call-id"))
       subject.dial(:to => "you", :from => "me")
 
-      stanza = create_presence(outgoing_call_ringing_presence("call-id"))
+      stanza = create_presence(ringing_presence("call-id@#{PRISM_HOST}"))
       ringing = Connfu::Rayo::Parser.parse_event_from(stanza)
 
       subject.can_handle_event?(ringing).should be_true
