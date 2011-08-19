@@ -73,6 +73,18 @@ describe "Dialing" do
     incoming :reject_presence, "call-id"
   end
 
+  it 'should run the timeout behaviour when the call is timed out' do
+    Dialer.any_instance.should_receive(:timeout_happened)
+
+    Dialer.dial :to => "to", :from => "from" do |c|
+      c.on_timeout { timeout_happened }
+    end
+
+    incoming :outgoing_call_result_iq, "call-id", last_command.id
+    incoming :outgoing_call_ringing_presence, "call-id"
+    incoming :timeout_presence, "call-id"
+  end
+
   it 'should not run the answer behaviour before the call is answered' do
     Dialer.any_instance.should_not_receive(:answer_happened)
 

@@ -294,6 +294,21 @@ describe Connfu::Rayo::Parser do
       end
     end
 
+    context "a presence timeout" do
+      before do
+        node = create_presence(timeout_presence('call-id'))
+        @event = Connfu::Rayo::Parser.parse_event_from(node)
+      end
+
+      it "should create a Timeout event" do
+        @event.should be_instance_of Connfu::Event::Timeout
+      end
+
+      it "should determine the call_id" do
+        @event.call_id.should eq 'call-id'
+      end
+    end
+
     context "a component hangup" do
       before do
         node = create_presence(component_hangup_presence('call-id'))

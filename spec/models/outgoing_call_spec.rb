@@ -144,6 +144,32 @@ describe Jobs::OutgoingCall do
               end
             end
           end
+
+          describe "when recipient times out" do
+            before do
+              incoming :timeout_presence, "joined-call-id"
+            end
+
+            it "shold set the state to call timed out" do
+              @call.reload.state.should eq :call_timed_out
+            end
+
+            it "should hang up the openvoice user's endpoint" do
+              last_command.class.should == Connfu::Commands::Hangup
+              last_command.call_jid.should == 'call-id@openvoice.org'
+            end
+
+            describe "and when the hangup is confirmed" do
+              before do
+                incoming :result_iq, "call-id", last_command.id
+                incoming :hangup_presence, "call-id"
+              end
+
+              it "should not try to hang up the recipient again" do
+                last_command.call_jid.should_not == "joined-call-id@openvoice.org"
+              end
+            end
+          end
         end
       end
 

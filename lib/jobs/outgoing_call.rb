@@ -14,6 +14,10 @@ module Jobs
       @rejected = false
 
       dial :to => caller, :from => openvoice_number do |c|
+        c.on_timeout do
+          call.update_state!(:call_timed_out)
+          hangup "#{call_id}@#{Connfu.connection.jid.domain}"
+        end
         c.on_reject do
           call.update_state!(:call_rejected)
           if call_id != last_event_call_id

@@ -88,6 +88,9 @@ module Connfu
     class Rejected < Presence
     end
 
+    class Timeout < Presence
+    end
+
     class StopComplete < Presence
     end
 

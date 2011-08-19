@@ -40,6 +40,11 @@ module Connfu
         @on_reject = block if block_given?
         @on_reject
       end
+
+      def on_timeout(&block)
+        @on_timeout = block if block_given?
+        @on_timeout
+      end
     end
 
     def on_offer(event=nil)
@@ -127,6 +132,8 @@ module Connfu
             run_any_call_behaviour_for(:ringing)
           when Connfu::Event::Rejected
             run_any_call_behaviour_for(:reject)
+          when Connfu::Event::Timeout
+            run_any_call_behaviour_for(:timeout)
           when Connfu::Event::Answered
             wait_because_of_tropo_bug_133
             run_any_call_behaviour_for(:answer)
