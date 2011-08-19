@@ -1,54 +1,18 @@
 module Connfu
   module Dsl
-    autoload :Methods, "connfu/dsl/methods"
+    autoload :CallCommands, "connfu/dsl/call_commands"
     autoload :Recording, "connfu/dsl/recording"
+    autoload :CallBehaviour, "connfu/dsl/call_behaviour"
 
     def self.included(base)
       base.send(:include, Connfu::Continuation)
-      base.send(:include, Connfu::Dsl::Methods)
+      base.send(:include, Connfu::Dsl::CallCommands)
       base.send(:include, Connfu::Dsl::Recording)
       base.send(:include, Connfu::Logging)
       base.extend Connfu::Dsl::ClassMethods
       base.class_eval do
         attr_reader :call_jid, :client_jid, :call_id
         attr_accessor :call_behaviour, :last_event_call_id
-      end
-    end
-
-    class CallBehaviour
-      def on_start(&block)
-        @on_start = block if block_given?
-        @on_start
-      end
-
-      def on_ringing(&block)
-        @on_ringing = block if block_given?
-        @on_ringing
-      end
-
-      def on_answer(&block)
-        @on_answer = block if block_given?
-        @on_answer
-      end
-
-      def on_hangup(&block)
-        @on_hangup = block if block_given?
-        @on_hangup
-      end
-
-      def on_reject(&block)
-        @on_reject = block if block_given?
-        @on_reject
-      end
-
-      def on_timeout(&block)
-        @on_timeout = block if block_given?
-        @on_timeout
-      end
-
-      def on_busy(&block)
-        @on_busy = block if block_given?
-        @on_busy
       end
     end
 
@@ -167,11 +131,9 @@ module Connfu
       send_command_without_waiting command
       result = wait_for Connfu::Event::Result, Connfu::Event::Error
       logger.debug "Result from command: %p" % result
-      if result.is_a?(Connfu::Event::Error)
-        raise
-      else
-        result
-      end
+      raise if result.is_a?(Connfu::Event::Error)
+
+      result
     end
 
     def observe_events_for(call_id)

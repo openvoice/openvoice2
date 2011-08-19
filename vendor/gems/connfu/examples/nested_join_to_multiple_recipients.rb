@@ -7,18 +7,8 @@ Connfu.start do
   on :offer do |call|
     answer
     say 'please wait while we join'
-
-    command_options = {
-      :call_jid => call_jid,
-      :client_jid => client_jid,
-      :dial_from => call.to[:address],
-      :call_id => call_id
-    }
-    result = send_command Connfu::Commands::NestedJoin.new(command_options.merge(:dial_to => "sip:#{RECIPIENTS.first}"))
-    observe_events_for(result.ref_id)
-
-    result2 = send_command Connfu::Commands::NestedJoin.new(command_options.merge(:dial_to => "sip:#{RECIPIENTS.last}"))
-    observe_events_for(result2.ref_id)
+    dial_join({:dial_from => call.to[:address], :dial_to => "sip:#{RECIPIENTS.first}"})
+    dial_join({:dial_from => call.to[:address], :dial_to => "sip:#{RECIPIENTS.last}"})
 
     logger.debug "Monitoring events for #{observed_call_ids.inspect}"
 

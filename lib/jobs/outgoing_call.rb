@@ -38,17 +38,8 @@ module Jobs
           case last_event_call_id
             when call_id
               call.update_state!(:caller_answered)
-              command_options = {
-                  :call_jid => call_jid,
-                  :client_jid => client_jid,
-                  :dial_to => recipient,
-                  :dial_from => openvoice_number,
-                  :call_id => call_id
-              }
               sleep 1
-              result = send_command Connfu::Commands::NestedJoin.new(command_options)
-              @joined_call_id = result.ref_id
-              observe_events_for(@joined_call_id)
+              @joined_call_id = dial_join({:dial_to => recipient, :dial_from => openvoice_number})
             when @joined_call_id
               call.update_state!(:recipient_answered)
           end

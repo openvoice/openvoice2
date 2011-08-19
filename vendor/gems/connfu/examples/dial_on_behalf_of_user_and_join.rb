@@ -18,16 +18,7 @@ Connfu.start do
       c.on_answer do
         if call_id == last_event_call_id
           puts "OK, now dialing the outbound leg"
-          command_options = {
-            :call_jid => call_jid,
-            :client_jid => client_jid,
-            :dial_to => recipient,
-            :dial_from => connfu_user,
-            :call_id => call_id
-          }
-          result = send_command Connfu::Commands::NestedJoin.new(command_options)
-          @joined_call_id = result.ref_id
-          observe_events_for(@joined_call_id)
+          @joined_call_id = dial_join({:dial_to => recipient, :dial_from => connfu_user})
         end
       end
 
