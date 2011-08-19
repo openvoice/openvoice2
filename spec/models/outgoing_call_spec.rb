@@ -175,6 +175,32 @@ describe Jobs::OutgoingCall do
               end
             end
           end
+
+          describe "when recipient is busy" do
+            before do
+              incoming :busy_presence, @joined_call_jid
+            end
+
+            it "shold set the state to call recipient busy" do
+              @call.reload.state.should eq :recipient_busy
+            end
+
+            it "should hang up the openvoice user's endpoint" do
+              last_command.class.should == Connfu::Commands::Hangup
+              last_command.call_jid.should == @call_jid
+            end
+
+            describe "and when the hangup is confirmed" do
+              before do
+                incoming :result_iq, @call_jid, last_command.id
+                incoming :hangup_presence, @call_jid
+              end
+
+              it "should not try to hang up the recipient again" do
+                last_command.call_jid.should_not == @joined_call_jid
+              end
+            end
+          end
         end
       end
 
@@ -195,7 +221,6 @@ describe Jobs::OutgoingCall do
           Connfu.should be_finished
         end
       end
-
     end
   end
 end

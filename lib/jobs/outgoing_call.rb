@@ -53,6 +53,10 @@ module Jobs
               call.update_state!(:recipient_answered)
           end
         end
+        c.on_busy do
+          call.update_state!(:recipient_busy)
+          hangup "#{call_id}@#{Connfu.connection.jid.domain}"
+        end
         c.on_hangup do
           unless @rejected
             call.update_state!(:call_ended)
