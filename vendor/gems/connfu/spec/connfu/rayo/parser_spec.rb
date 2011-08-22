@@ -79,6 +79,21 @@ describe Connfu::Rayo::Parser do
       end
     end
 
+    context "a recording hangup complete presence" do
+      before do
+        @node = create_presence(recording_hangup_presence("call-id@#{PRISM_HOST}/ref-id", 'file:///tmp/recording.mp3'))
+        @event = Connfu::Rayo::Parser.parse_event_from(@node)
+      end
+
+      it "should be an instance of RecordingHangupComplete" do
+        @event.should be_instance_of Connfu::Event::RecordingHangupComplete
+      end
+
+      it "should create an event that contains the uri of the recording" do
+        @event.uri.should == "file:///tmp/recording.mp3"
+      end
+    end
+
     context "a normal result iq" do
       before do
         @node = create_iq(result_iq)

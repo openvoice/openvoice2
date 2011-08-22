@@ -226,6 +226,15 @@ def recording_stop_presence(call_jid="call-id@#{PRISM_HOST}/component-id", path=
   </presence>}
 end
 
+def recording_hangup_presence(call_jid="call-id@#{PRISM_HOST}/component-id", path="file:///tmp/recording.mp3")
+  %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
+    <complete xmlns="#{rayo('ext:1')}">
+      <hangup xmlns="#{rayo('ext:complete:1')}"/>
+      <recording xmlns="#{rayo('record:complete:1')}" uri="#{path}"/>
+    </complete>
+  </presence>}
+end
+
 def component_stop_presence(call_jid="call-id@#{PRISM_HOST}/component-id")
   %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
     <complete xmlns="#{rayo('ext:1')}">

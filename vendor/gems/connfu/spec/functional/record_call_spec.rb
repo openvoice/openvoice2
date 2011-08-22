@@ -64,12 +64,24 @@ describe "Recording a call" do
       end
     end
 
-    it "should be able to access the recording URI once the recording is complete" do
-      dsl_instance.should_receive(:do_something).with([@recording_path])
+    context "when recording reaches maximum length" do
+      it "should be able to access the recording URI once the recording is complete" do
+        dsl_instance.should_receive(:do_something).with([@recording_path])
 
-      incoming :offer_presence, @call_jid, @client_jid
-      incoming :recording_result_iq, @call_jid, @recording_ref_id
-      incoming :recording_stop_presence, @component_jid, @recording_path
+        incoming :offer_presence, @call_jid, @client_jid
+        incoming :recording_result_iq, @call_jid, @recording_ref_id
+        incoming :recording_stop_presence, @component_jid, @recording_path
+      end
+    end
+
+    context "when recording hangs up before reaching maximum length" do
+      it "should be able to access the recording URI once the recording is complete" do
+        dsl_instance.should_receive(:do_something).with([@recording_path])
+
+        incoming :offer_presence, @call_jid, @client_jid
+        incoming :recording_result_iq, @call_jid, @recording_ref_id
+        incoming :recording_hangup_presence, @component_jid, @recording_path
+      end
     end
   end
 end

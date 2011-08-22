@@ -107,6 +107,15 @@ module Connfu
       end
     end
 
+    class RecordingHangupComplete < Presence
+      attr_reader :uri
+
+      def initialize(params = {})
+        super
+        @uri = params[:uri]
+      end
+    end
+
     class Joined < Presence
       attr_reader :joined_call_id
 

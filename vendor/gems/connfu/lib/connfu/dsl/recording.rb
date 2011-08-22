@@ -11,7 +11,7 @@ module Connfu
 
       def record_for(max_length, options = {})
         send_start_recording(options.merge(:max_length => max_length))
-        event = wait_for(Connfu::Event::RecordingStopComplete)
+        event = wait_for(Connfu::Event::RecordingStopComplete, Connfu::Event::RecordingHangupComplete)
         recordings << event.uri
       end
 

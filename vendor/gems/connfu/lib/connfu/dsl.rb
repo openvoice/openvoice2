@@ -181,8 +181,10 @@ module Connfu
       options = events.last.is_a?(Hash) ? events.pop : {}
       timeout = options[:timeout]
       @waiting_for = events
-      EM.add_timer(timeout) { continue } if timeout
-      wait
+      timer = EM.add_timer(timeout) { continue } if timeout
+      result = wait
+      EM.cancel_timer(timer) if result && timer
+      result
     end
   end
 end

@@ -315,6 +315,20 @@ describe Connfu::Dsl do
         subject.should_receive(:continue)
         subject.send(:wait_for, Connfu::Event::Answered, :timeout => 10)
       end
+
+      it 'should cancel the timer when the pending event is received' do
+        EM.stub!(:add_timer).and_return(:timer_signature)
+        subject.stub!(:wait).and_return(Connfu::Event::Answered.new)
+        EM.should_receive(:cancel_timer).with(:timer_signature)
+        subject.send(:wait_for, Connfu::Event::Answered, :timeout => 10)
+      end
+
+      it 'should not cancel the timer when no event is received' do
+        EM.stub!(:add_timer).and_return(:timer_signature)
+        subject.stub!(:wait).and_return(nil)
+        EM.should_not_receive(:cancel_timer).with(:timer_signature)
+        subject.send(:wait_for, Connfu::Event::Answered, :timeout => 10)
+      end
     end
   end
 end

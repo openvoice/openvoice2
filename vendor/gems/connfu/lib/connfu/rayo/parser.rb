@@ -25,7 +25,11 @@ module Connfu
         elsif node.xpath('//x:answered', 'x' => rayo('1')).any?
           Connfu::Event::Answered.new(:call_id => call_id)
         elsif node.xpath("//x:hangup", 'x' => rayo('1')).any? || node.xpath("//x:hangup", 'x' => rayo('ext:complete:1')).any?
-          Connfu::Event::Hangup.new(:call_id => call_id, :from => to)
+          if recording_element = node.xpath('//x:recording', 'x' => rayo('record:complete:1')).first
+            Connfu::Event::RecordingHangupComplete.new(:call_id => call_id, :uri => recording_element.attributes['uri'].value)
+          else
+            Connfu::Event::Hangup.new(:call_id => call_id, :from => to)
+          end
         elsif node.xpath("//x:reject", 'x' => rayo('1')).any?
           Connfu::Event::Rejected.new(:call_id => call_id)
         elsif node.xpath('//x:timeout', 'x' => rayo('1')).any?
