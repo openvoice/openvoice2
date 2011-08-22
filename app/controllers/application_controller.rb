@@ -1,3 +1,6 @@
+require "jobs"
+require "connfu"
+
 class ApplicationController < ActionController::Base
   protect_from_forgery
   helper_method :logged_in?, :current_account

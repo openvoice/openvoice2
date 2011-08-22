@@ -19,5 +19,9 @@
   <p><%= link_to 'Add a new endpoint', new_endpoint_path %></p>
 </section>
 
-<section class="wrapper">
+<% if current_account.endpoints.present?  %>
+<section class="wrapper" id="record-greeting">
+  <h3>Account greeting</h3>
+  <%= button_to "Record", recordings_path %>
 </section>
+<% end %>

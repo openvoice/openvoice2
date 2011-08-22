@@ -3,6 +3,8 @@ OpenVoice2::Application.routes.draw do
     resources :calls, :only => [:new, :create, :show]
   end
 
+  resources :recordings, :only => [:create]
+
   resources :accounts
   resources :sessions, :only => [:new, :create, :destroy]
 

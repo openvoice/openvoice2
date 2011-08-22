@@ -1,3 +1,4 @@
+.pairs
 .bundle
 .build
 db/*.sqlite3

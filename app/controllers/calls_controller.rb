@@ -1,9 +1,6 @@
-require "jobs"
-require "connfu"
-
 class CallsController < ApplicationController
   before_filter :authenticate
-  before_filter :load_endpoint
+  before_filter :load_endpoint, :except => [:new]
 
   respond_to :html
   respond_to :json, :only => [:show]
