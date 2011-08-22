@@ -20,7 +20,6 @@ Scenario: When caller is ringing
   When I visit my latest call page for "sip:endpoint@example.com"
   Then I should see that the caller is ringing
 
-@wip
 Scenario: When recipient has answered
   Given that I am logged in
   And I am calling "sip:recipient@example.com" from "sip:endpoint@example.com"
