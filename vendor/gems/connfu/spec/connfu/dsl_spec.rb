@@ -295,4 +295,26 @@ describe Connfu::Dsl do
       end
     end
   end
+
+  describe 'wait_for' do
+    describe 'without a timeout' do
+      it 'should not install a timeout' do
+        EM.should_not_receive(:add_timer)
+        subject.send(:wait_for, Connfu::Event::Answered)
+      end
+    end
+
+    describe 'with a timeout' do
+      it 'should timeout after the given number of seconds' do
+        EM.should_receive(:add_timer).with(5)
+        subject.send(:wait_for, Connfu::Event::Answered, :timeout => 5)
+      end
+
+      it 'should continue execution of the script after the timeout' do
+        EM.stub!(:add_timer).and_yield()
+        subject.should_receive(:continue)
+        subject.send(:wait_for, Connfu::Event::Answered, :timeout => 10)
+      end
+    end
+  end
 end

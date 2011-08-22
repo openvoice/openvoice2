@@ -57,6 +57,13 @@ describe Jobs::RecordGreeting do
           )
           last_command.should == expected_command
         end
+
+        it "should assign the greeting to user account" do
+          incoming :recording_result_iq, @call_jid
+          incoming :recording_stop_presence, @call_jid, 'my-super-awesome-greeting-path'
+
+          @account.reload.greeting_path.should == 'my-super-awesome-greeting-path'
+        end
       end
     end
   end

@@ -4,7 +4,8 @@ describe Connfu::Rayo::Parser do
   describe "#parse_event_from" do
     context 'an offer iq' do
       before do
-        @node = create_presence(offer_presence('from-value', 'to-value', :from => "offer-from", :to => "<sip:username@example.com>"))
+        @from_jid = "call-id@#{PRISM_HOST}"
+        @node = create_presence(offer_presence(@from_jid, 'to-value', :from => "offer-from", :to => "<sip:username@example.com>"))
         @event = Connfu::Rayo::Parser.parse_event_from(@node)
       end
 
@@ -13,7 +14,7 @@ describe Connfu::Rayo::Parser do
       end
 
       it "should determine the from value of the presence" do
-        @event.presence_from.should eq 'from-value'
+        @event.presence_from.should eq @from_jid
       end
 
       it "should determine the to value of the presence" do
@@ -21,7 +22,7 @@ describe Connfu::Rayo::Parser do
       end
 
       it "should determine the call_id value of the offer" do
-        @event.call_id.should eq @node.from.node
+        @event.call_id.should eq 'call-id'
       end
 
       it "should determine the from value of the offer" do
@@ -110,7 +111,7 @@ describe Connfu::Rayo::Parser do
 
     context "a say complete iq" do
       before do
-        @node = create_presence(say_success_presence)
+        @node = create_presence(say_success_presence("call-id@#{PRISM_HOST}"))
         @event = Connfu::Rayo::Parser.parse_event_from(@node)
       end
 
@@ -119,13 +120,13 @@ describe Connfu::Rayo::Parser do
       end
 
       it "should determine the call_id value of say complete" do
-        @event.call_id.should eq @node.from.node
+        @event.call_id.should eq "call-id"
       end
     end
 
     context "an ask complete iq" do
       before do
-        @node = create_presence(ask_success_presence)
+        @node = create_presence(ask_success_presence("call-id@#{PRISM_HOST}"))
         @event = Connfu::Rayo::Parser.parse_event_from(@node)
       end
 
@@ -134,7 +135,7 @@ describe Connfu::Rayo::Parser do
       end
 
       it "should determine the call_id value" do
-        @event.call_id.should eq @node.from.node
+        @event.call_id.should eq "call-id"
       end
 
       it "should determine the result digits" do
@@ -144,7 +145,7 @@ describe Connfu::Rayo::Parser do
 
     context "a transfer success presence" do
       before do
-        @node = create_presence(transfer_success_presence)
+        @node = create_presence(transfer_success_presence("call-id@#{PRISM_HOST}"))
         @event = Connfu::Rayo::Parser.parse_event_from(@node)
       end
 
@@ -153,13 +154,13 @@ describe Connfu::Rayo::Parser do
       end
 
       it "should determine the call_id value of the transfer success iq" do
-        @event.call_id.should eq @node.from.node
+        @event.call_id.should eq "call-id"
       end
     end
 
     context "a transfer timeout presence" do
       before do
-        @node = create_presence(transfer_timeout_presence)
+        @node = create_presence(transfer_timeout_presence("call-id@#{PRISM_HOST}"))
         @event = Connfu::Rayo::Parser.parse_event_from(@node)
       end
 
@@ -168,13 +169,13 @@ describe Connfu::Rayo::Parser do
       end
 
       it "should determine the call_id value of the transfer timeout iq" do
-        @event.call_id.should eq @node.from.node
+        @event.call_id.should eq "call-id"
       end
     end
 
     context "a transfer busy presence" do
       before do
-        @node = create_presence(transfer_busy_presence)
+        @node = create_presence(transfer_busy_presence("call-id@#{PRISM_HOST}"))
         @event = Connfu::Rayo::Parser.parse_event_from(@node)
       end
 
@@ -183,7 +184,7 @@ describe Connfu::Rayo::Parser do
       end
 
       it "should determine the call_id value of the transfer busy presence" do
-        @event.call_id.should eq @node.from.node
+        @event.call_id.should eq "call-id"
       end
     end
 

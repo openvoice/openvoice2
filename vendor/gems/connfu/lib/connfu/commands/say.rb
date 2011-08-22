@@ -9,7 +9,7 @@ module Connfu
 
       def to_iq
         build_iq "xmlns" => tropo('say:1') do |xml|
-          unless text.match(/^http:\/\/.*(.mp3|.wav)$/).nil?
+          unless text.match(/^.*(.mp3|.wav)$/).nil?
             xml.audio('src' => text)
           else
             xml.text text

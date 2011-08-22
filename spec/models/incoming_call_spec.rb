@@ -14,7 +14,7 @@ describe IncomingCall do
     @account = Factory(:account, :username =>"known-user")
   end
 
-  context 'when incoming call is for an uknown user' do
+  context 'when incoming call is for an unknown user' do
     before do
       incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:unknown-user@example.com>"
     end
@@ -24,7 +24,7 @@ describe IncomingCall do
     end
   end
 
-  context 'when incoming call is for a known user' do
+  context 'when incoming call is for a known openvoice user' do
     before do
       incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
     end
@@ -33,10 +33,12 @@ describe IncomingCall do
       last_command.should == Connfu::Commands::Answer.new(:call_jid => @call_jid, :client_jid => @client_jid)
     end
 
-    it 'should then say "please wait while we transfer your call" to the caller' do
-      incoming :result_iq, @call_jid, last_command.id
+    context 'when openvoice user has not recorded a greeting' do
+      it 'should then say "please wait while we transfer your call" to the caller' do
+        incoming :result_iq, @call_jid, last_command.id
 
-      last_command.should == Connfu::Commands::Say.new(:text => "please wait while we transfer your call", :call_jid => @call_jid, :client_jid => @client_jid)
+        last_command.should == Connfu::Commands::Say.new(:text => "please wait while we transfer your call", :call_jid => @call_jid, :client_jid => @client_jid)
+      end
     end
 
     it 'should then play music to the caller' do
@@ -62,11 +64,11 @@ describe IncomingCall do
         incoming :result_iq, @call_jid, last_command.id
 
         last_command.should == Connfu::Commands::NestedJoin.new(
-          :dial_to => @endpoint_one.address,
-          :call_jid => @call_jid,
-          :client_jid => @client_jid,
-          :dial_from => "sip:known-user@example.com",
-          :call_id => @call_id
+            :dial_to => @endpoint_one.address,
+            :call_jid => @call_jid,
+            :client_jid => @client_jid,
+            :dial_from => "sip:known-user@example.com",
+            :call_id => @call_id
         )
       end
 
@@ -125,7 +127,7 @@ describe IncomingCall do
         incoming :dial_result_iq, @joined_call_id, last_command.id
         incoming :answered_presence, @joined_call_jid
         incoming :hangup_presence, @call_jid
-        
+
         incoming :result_iq, @joined_call_jid, last_command.id # server responds to expected Hangup command for the openvoice user
         incoming :hangup_presence, @joined_call_jid
 
@@ -153,21 +155,21 @@ describe IncomingCall do
         incoming :result_iq, @call_jid, last_command.id
 
         last_command.should == Connfu::Commands::NestedJoin.new(
-          :dial_to => @endpoint_one.address,
-          :call_jid => @call_jid,
-          :client_jid => @client_jid,
-          :dial_from => "sip:known-user@example.com",
-          :call_id => @call_id
+            :dial_to => @endpoint_one.address,
+            :call_jid => @call_jid,
+            :client_jid => @client_jid,
+            :dial_from => "sip:known-user@example.com",
+            :call_id => @call_id
         )
 
         incoming :result_iq, @call_jid, last_command.id
 
         last_command.should == Connfu::Commands::NestedJoin.new(
-          :dial_to => @endpoint_two.address,
-          :call_jid => @call_jid,
-          :client_jid => @client_jid,
-          :dial_from => "sip:known-user@example.com",
-          :call_id => @call_id
+            :dial_to => @endpoint_two.address,
+            :call_jid => @call_jid,
+            :client_jid => @client_jid,
+            :dial_from => "sip:known-user@example.com",
+            :call_id => @call_id
         )
       end
 
@@ -277,6 +279,19 @@ describe IncomingCall do
 
         last_command.should == Connfu::Commands::Hangup.new(:call_jid => @joined_call_jid, :client_jid => @client_jid)
       end
+    end
+  end
+
+  context 'when incoming call is for a known openvoice user with a recorded greeting' do
+    before do
+      @account.update_attribute(:greeting_path, "path-to-greeting")
+      incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+    end
+
+    it 'should then play recording greeting to the caller' do
+      incoming :result_iq, @call_jid, last_command.id
+
+      last_command.should == Connfu::Commands::Say.new(:text => @account.greeting_path, :call_jid => @call_jid, :client_jid => @client_jid)
     end
   end
 end

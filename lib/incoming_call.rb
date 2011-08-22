@@ -6,7 +6,7 @@ class IncomingCall
   on :offer do |call|
     if account = Account.find_by_username(call.to[:username])
       answer
-      say 'please wait while we transfer your call'
+      say account.greeting_path || 'please wait while we transfer your call'
 
       play_hold_music
 

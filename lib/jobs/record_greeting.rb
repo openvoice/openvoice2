@@ -12,7 +12,15 @@ module Jobs
       dial :from => openvoice_number, :to => endpoint_address do |call|
         call.on_answer do
           say 'please record a greeting'
-          record_for 10
+
+          recordings = record_for 10
+
+          p "****** OVNUMBER: " + openvoice_number
+
+          account = Account.find_by_username(openvoice_number.match(/^sip:(.*)@.*/)[1])
+          account.update_attribute(:greeting_path, recordings.first)
+
+
         end
       end
     end
