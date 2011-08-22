@@ -32,20 +32,14 @@ class IncomingCall
       if event.instance_of?(Connfu::Event::Answered)
         (call_ids-[event.call_id]).each do |hangup_call_id|
           hangup_call_jid = "#{hangup_call_id}@#{Connfu.connection.jid.domain}"
-          send_command Connfu::Commands::Hangup.new(
-            :call_jid => hangup_call_jid,
-            :client_jid => client_jid
-          )
-          wait_for Connfu::Event::Hangup
+          hangup(hangup_call_jid)
         end
 
         result = wait_for Connfu::Event::Hangup
         if result.call_id == call_id # caller hangs up, hang up openvoice user
-          send_command Connfu::Commands::Hangup.new(
-            :call_jid => "#{event.call_id}@#{Connfu.connection.jid.domain}",
-            :client_jid => client_jid
-          )
-          @finished = true
+          answered_call_jid = "#{event.call_id}@#{Connfu.connection.jid.domain}"
+          hangup(answered_call_jid)
+          finish!
         end
       end
 

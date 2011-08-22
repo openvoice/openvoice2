@@ -23,7 +23,7 @@ module Connfu
       def hangup(jid=call_jid)
         send_command Connfu::Commands::Hangup.new(:call_jid => jid, :client_jid => client_jid)
         wait_for Connfu::Event::Hangup
-        @finished = true
+        finish!(jid)
       end
 
       def dial(options)
@@ -85,7 +85,7 @@ module Connfu
         }
         send_command Connfu::Commands::NestedJoin.new(command_options)
         wait_for Connfu::Event::Hangup
-        @finished = true
+        finish!
       end
     end
   end

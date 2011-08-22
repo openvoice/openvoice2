@@ -292,6 +292,10 @@ describe Connfu::Rayo::Parser do
       it "should determine the call_id" do
         @event.call_id.should eq 'call-id'
       end
+
+      it "should determine the presence_from" do
+        @event.presence_from.should eq "call-id@#{PRISM_HOST}"
+      end
     end
 
     context "a presence reject" do
