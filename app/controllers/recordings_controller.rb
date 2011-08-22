@@ -3,7 +3,6 @@ class RecordingsController < ApplicationController
 
   def create
     Connfu::Queue.enqueue(Jobs::RecordGreeting, current_account.number, current_account.endpoints.first.address)
-    render :nothing => true
+    redirect_to current_account
   end
-
 end

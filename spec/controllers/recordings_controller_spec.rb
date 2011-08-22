@@ -29,6 +29,12 @@ describe RecordingsController do
 
         Jobs::RecordGreeting.should have_queued(@account.number, @account.endpoints.first.address)
       end
+
+      it "should re-render account page" do
+        post :create
+
+        response.should redirect_to(account_path(@account))
+      end
     end
   end
 end
