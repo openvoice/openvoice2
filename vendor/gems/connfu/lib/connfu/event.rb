@@ -34,14 +34,19 @@ module Connfu
     end
 
     class Presence < Base
+      attr_reader :presence_from, :presence_to
+
+      def initialize(params = {})
+        super
+        @presence_from = params[:from]
+        @presence_to = params[:to]
+      end
     end
 
     class Offer < Presence
-
-      attr_reader :presence_from, :presence_to
       attr_reader :from, :to
 
-      def initialize(params)
+      def initialize(params = {})
         super
         @presence_from = params[:presence_from]
         @presence_to = params[:presence_to]
@@ -73,13 +78,6 @@ module Connfu
     end
 
     class Ringing < Presence
-      attr_reader :presence_from, :presence_to
-
-      def initialize(params)
-        super
-        @presence_from = params[:from]
-        @presence_to = params[:to]
-      end
     end
 
     class Answered < Presence

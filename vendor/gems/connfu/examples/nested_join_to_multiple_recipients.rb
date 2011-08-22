@@ -16,7 +16,7 @@ Connfu.start do
     logger.debug "The far end has answered"
 
     wait_for Connfu::Event::Hangup
-    @finished = true
+    finish!
     logger.debug "The far end hungup"
   end
 end

@@ -71,7 +71,11 @@ module Connfu
     end
 
     def finished?
-      @finished == true
+      @finished
+    end
+
+    def finish!(jid = call_jid)
+      @finished = (jid == call_jid)
     end
 
     def run_any_call_behaviour_for(event_name)
@@ -110,7 +114,7 @@ module Connfu
             run_any_call_behaviour_for(:answer)
           when Connfu::Event::Hangup
             run_any_call_behaviour_for(:hangup)
-            @finished = true
+            finish!(event.presence_from)
           else
             logger.warn "Unrecognized event: %p" % event
         end
@@ -127,7 +131,7 @@ module Connfu
     end
 
     def send_command(command)
-      return if @finished
+      return if finished?
       send_command_without_waiting command
       result = wait_for Connfu::Event::Result, Connfu::Event::Error
       logger.debug "Result from command: %p" % result
@@ -138,6 +142,7 @@ module Connfu
 
     def observe_events_for(call_id)
       observed_call_ids << call_id
+      jid = "#{call_id}@#{Connfu.connection.jid.domain}"
     end
 
     def wait_because_of_tropo_bug_133

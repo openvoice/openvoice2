@@ -15,9 +15,9 @@ Connfu.start do
     wait_because_of_tropo_bug_133
 
     send_command Connfu::Commands::Join.new(:client_jid => client_jid, :call_jid => call_jid, :call_id => answered_result.call_id)
-    
+
     wait_for Connfu::Event::Hangup
-    @finished = true
+    finish!
     puts "The call was answered, and has finished"
   end
 end
