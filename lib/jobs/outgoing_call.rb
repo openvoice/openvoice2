@@ -38,7 +38,6 @@ module Jobs
           case last_event_call_id
             when call_id
               call.update_state!(:caller_answered)
-              sleep 1
               @joined_call_id = dial_join({:dial_to => recipient, :dial_from => openvoice_number})
             when @joined_call_id
               call.update_state!(:recipient_answered)
