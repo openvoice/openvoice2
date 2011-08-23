@@ -6,7 +6,7 @@ describe Connfu::Dsl do
   end
 
   before do
-    Connfu.connection = TestConnection.new
+    setup_connfu(nil)
     subject.stub(:wait)
   end
 
@@ -310,10 +310,19 @@ describe Connfu::Dsl do
         subject.send(:wait_for, Connfu::Event::Answered, :timeout => 5)
       end
 
-      it 'should continue execution of the script after the timeout' do
+      it 'should schedule a timeout event to be given to the handler in the future' do
         EM.stub!(:add_timer).and_yield()
-        subject.should_receive(:continue)
+        Connfu.event_processor.should_receive(:handle_event).with do |timeout_event|
+          timeout_event.is_a?(Connfu::Dsl::Timeout) &&
+          timeout_event.call_id == subject.call_id
+        end
         subject.send(:wait_for, Connfu::Event::Answered, :timeout => 10)
+      end
+
+      it 'should tell the handler to expect a timeout event' do
+        EM.stub!(:add_timer)
+        subject.send(:wait_for, Connfu::Event::Answered, :timeout => 10)
+        subject.should be_waiting_for(Connfu::Dsl::Timeout.new(subject.call_id))
       end
 
       it 'should cancel the timer when the pending event is received' do

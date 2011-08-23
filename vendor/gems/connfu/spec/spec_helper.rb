@@ -56,6 +56,10 @@ def incoming(type, *args)
   Connfu.handle_stanza(stanza)
 end
 
+def timeout(call_id)
+  Connfu.event_processor.handle_event(Connfu::Dsl::Timeout.new(call_id))
+end
+
 def create_presence(presence_xml)
   doc = Nokogiri::XML.parse presence_xml
   Blather::Stanza::Presence.import(doc.root)

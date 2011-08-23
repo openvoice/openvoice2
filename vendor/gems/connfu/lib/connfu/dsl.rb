@@ -177,11 +177,23 @@ module Connfu
       @observed_call_ids ||= []
     end
 
+    class Timeout
+      attr_reader :call_id
+      def initialize(call_id)
+        @call_id = call_id
+      end
+    end
+
     def wait_for(*events)
       options = events.last.is_a?(Hash) ? events.pop : {}
       timeout = options[:timeout]
       @waiting_for = events
-      timer = EM.add_timer(timeout) { continue } if timeout
+      if timeout
+        @waiting_for << Connfu::Dsl::Timeout
+        timer = EM.add_timer(timeout) do
+          Connfu.event_processor.handle_event(Connfu::Dsl::Timeout.new(call_id))
+        end
+      end
       result = wait
       EM.cancel_timer(timer) if result && timer
       result
