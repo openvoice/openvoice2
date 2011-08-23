@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'webmock/rspec'
 
 describe Jobs::RecordGreeting do
 
@@ -59,10 +60,14 @@ describe Jobs::RecordGreeting do
         end
 
         it "should assign the greeting to user account" do
-          incoming :recording_result_iq, @call_jid
-          incoming :recording_stop_presence, @call_jid, 'my-super-awesome-greeting-path'
+          stub_request(:get, "http://173.255.241.49:4857/path/to/original-file").
+                   with(:headers => {'Accept'=>'*/*', 'User-Agent'=>'Ruby'}).
+                   to_return(:status => 200, :body => "/assets/original-file", :headers => {})
 
-          @account.reload.greeting_path.should == 'my-super-awesome-greeting-path'
+          incoming :recording_result_iq, @call_jid
+          incoming :recording_stop_presence, @call_jid, 'file://path/to/original-file'
+
+          @account.reload.greeting_path.should == '/assets/original-file'
         end
       end
     end
