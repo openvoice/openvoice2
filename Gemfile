@@ -39,5 +39,4 @@ group :test do
   gem 'factory_girl_rails'
   gem 'launchy', '0.3.7' # fixed at an earlier version to avoid deprecation warnings
   gem 'resque_spec'
-  gem 'webmock'
 end
