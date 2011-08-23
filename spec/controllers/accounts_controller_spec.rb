@@ -48,9 +48,23 @@ describe AccountsController do
   end
 
   describe "When not logged in" do
+    before do
+      @account = Factory(:account)
+    end
+
     describe "GET to show" do
       before do
-        get :show, :id => "1"
+        get :show, :id => @account.to_param
+      end
+
+      it "should redirect to the login page" do
+        response.should redirect_to new_session_path
+      end
+    end
+
+    describe "PUT to update" do
+      before do
+        put :update, :id => @account.to_param, :account => {}
       end
 
       it "should redirect to the login page" do
