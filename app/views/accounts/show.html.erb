@@ -3,6 +3,16 @@
 <% end %>
 
 <section class="wrapper">
+  <h3>Preferences</h3>
+
+  <%= form_for @account do |f| %>
+    <%= f.label :parallel_dial, "call all endpoints in parallel" %>
+    <%= f.check_box :parallel_dial %>
+    <%= f.submit "Update" %>
+  <% end %>
+</section>
+
+<section class="wrapper">
   <h3>My endpoints</h3>
 
   <% if current_account.endpoints.present? %>

@@ -23,4 +23,11 @@ class AccountsController < ApplicationController
       redirect_to root_path
     end
   end
+
+  def update
+    @account = Account.find_by_id(params[:id])
+    if @account.update_attributes(params[:account])
+      redirect_to @account, :notice => "Account updated"
+    end
+  end
 end

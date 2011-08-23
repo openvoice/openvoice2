@@ -61,3 +61,23 @@ end
 Then /^I should see my number$/ do
   Then 'I should see "'+ my.number + '"'
 end
+
+When /^I select parallel dialling$/ do
+  When 'I check "call all endpoints in parallel"'
+end
+
+When /^I select round\-robin dialling$/ do
+  When 'I uncheck "call all endpoints in parallel"'
+end
+
+When /^I update my account$/ do
+  When 'I press "Update"'
+end
+
+Then /^my account should be configured for parallel dialling$/ do
+  my.account.parallel_dial.should be_true
+end
+
+Then /^my account should be configured for round\-robin dialling$/ do
+  my.account.parallel_dial.should be_false
+end
