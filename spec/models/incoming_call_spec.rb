@@ -6,10 +6,11 @@ describe IncomingCall do
   before do
     @domain = 'server.whatever'
     setup_connfu(IncomingCall, @domain)
+    EM.stubs(:add_timer)
 
     @call_id = "34209dfiasdoaf"
     @call_jid = "#{@call_id}@#{@domain}"
-    @client_jid = "usera@127.0.0.whatever/voxeo"
+    @client_jid = Connfu.connection.jid
 
     @account = Factory(:account, :username =>"known-user")
   end
@@ -25,16 +26,15 @@ describe IncomingCall do
   end
 
   context 'when incoming call is for a known openvoice user' do
-    before do
-      incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
-    end
 
     it 'should answer' do
+      incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
       last_command.should == Connfu::Commands::Answer.new(:call_jid => @call_jid, :client_jid => @client_jid)
     end
 
     context 'when openvoice user has not recorded a greeting' do
       it 'should then say "please wait while we transfer your call" to the caller' do
+        incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
         incoming :result_iq, @call_jid, last_command.id
 
         last_command.should == Connfu::Commands::Say.new(:text => "please wait while we transfer your call", :call_jid => @call_jid, :client_jid => @client_jid)
@@ -42,6 +42,7 @@ describe IncomingCall do
     end
 
     it 'should then play music to the caller' do
+      incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
       incoming :result_iq, @call_jid, last_command.id
       incoming :result_iq, @call_jid, last_command.id
       incoming :say_success_presence, @call_jid
@@ -58,6 +59,7 @@ describe IncomingCall do
       end
 
       it 'should immediately ring the endpoint without waiting for the music to finish' do
+        incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
         incoming :result_iq, @call_jid, last_command.id
         incoming :result_iq, @call_jid, last_command.id
         incoming :say_success_presence, @call_jid
@@ -73,6 +75,7 @@ describe IncomingCall do
       end
 
       it 'should wait for the leg to be answered' do
+        incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
         incoming :result_iq, @call_jid, last_command.id
         incoming :result_iq, @call_jid, last_command.id
         incoming :say_success_presence, @call_Jid
@@ -83,6 +86,7 @@ describe IncomingCall do
       end
 
       it 'should hangup the caller if the openvoice endpoint rejects the call' do
+        incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
         incoming :result_iq, @call_jid, last_command.id
         incoming :result_iq, @call_jid, last_command.id
         incoming :say_success_presence, @call_jid
@@ -94,6 +98,7 @@ describe IncomingCall do
       end
 
       it 'should wait for one of the parties to hang up' do
+        incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
         incoming :result_iq, @call_jid, last_command.id
         incoming :result_iq, @call_jid, last_command.id
         incoming :say_success_presence, @call_jid
@@ -105,6 +110,7 @@ describe IncomingCall do
       end
 
       it 'should hangup the caller when the openvoice endpoint hangs up' do
+        incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
         incoming :result_iq, @call_jid, last_command.id
         incoming :result_iq, @call_jid, last_command.id
         incoming :say_success_presence, @call_jid
@@ -120,6 +126,7 @@ describe IncomingCall do
       end
 
       it 'should hangup the openvoice endpoint when the caller hangs up' do
+        incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
         incoming :result_iq, @call_jid, last_command.id
         incoming :result_iq, @call_jid, last_command.id
         incoming :say_success_presence, @call_jid
@@ -144,140 +151,327 @@ describe IncomingCall do
         @unanswered_joined_call_id = "unanswered-joined-call-id"
         @unanswered_joined_call_jid = "#{@unanswered_joined_call_id}@#{@domain}"
 
-        @endpoint_one = Factory(:endpoint, :account => @account)
-        @endpoint_two = Factory(:endpoint, :account => @account)
+        @endpoint_one = Factory(:endpoint, :account => @account, :address => "sip:endpoint-one@server.whatever")
+        @endpoint_two = Factory(:endpoint, :account => @account, :address => "sip:endpoint-two@server.whatever")
       end
 
-      it 'should immediately ring both endpoints without waiting for the music to finish' do
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :say_success_presence, @call_jid
-        incoming :result_iq, @call_jid, last_command.id
+      context 'and using the parallel dial strategy' do
+        before do
+          @account.update_attribute(:parallel_dial, true)
+        end
 
-        last_command.should == Connfu::Commands::NestedJoin.new(
-            :dial_to => @endpoint_one.address,
-            :call_jid => @call_jid,
-            :client_jid => @client_jid,
-            :dial_from => "sip:known-user@example.com",
-            :call_id => @call_id
-        )
+        it 'should immediately ring both endpoints without waiting for the music to finish' do
+          incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+          incoming :result_iq, @call_jid, last_command.id # answer
+          incoming :result_iq, @call_jid, last_command.id # say 'please wait...'
+          incoming :say_success_presence, @call_jid       # end of say 'please wait...'
+          incoming :result_iq, @call_jid, last_command.id # play music
 
-        incoming :result_iq, @call_jid, last_command.id
+          last_command.should == Connfu::Commands::NestedJoin.new(
+              :dial_to => @endpoint_one.address,
+              :call_jid => @call_jid,
+              :client_jid => @client_jid,
+              :dial_from => "sip:known-user@example.com",
+              :call_id => @call_id
+          )
 
-        last_command.should == Connfu::Commands::NestedJoin.new(
-            :dial_to => @endpoint_two.address,
-            :call_jid => @call_jid,
-            :client_jid => @client_jid,
-            :dial_from => "sip:known-user@example.com",
-            :call_id => @call_id
-        )
+          incoming :result_iq, @call_jid, last_command.id # nested join
+
+          last_command.should == Connfu::Commands::NestedJoin.new(
+              :dial_to => @endpoint_two.address,
+              :call_jid => @call_jid,
+              :client_jid => @client_jid,
+              :dial_from => "sip:known-user@example.com",
+              :call_id => @call_id
+          )
+        end
+
+        it 'should wait for one of the legs to be answered' do
+          incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :say_success_presence, @call_jid
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :dial_result_iq, @joined_call_id, last_command.id
+          incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
+
+          last_command.should_not be_instance_of(Connfu::Commands::Hangup)
+        end
+
+        it 'should hang up the unanswered leg when the other leg is answered' do
+          incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :say_success_presence, @call_jid
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :dial_result_iq, @joined_call_id, last_command.id
+          incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
+          incoming :answered_presence, @joined_call_jid
+
+          last_command.should == Connfu::Commands::Hangup.new(:call_jid => @unanswered_joined_call_jid, :client_jid => @client_jid)
+        end
+
+        it 'should wait for one of the parties to hang up' do
+          incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :say_success_presence, @call_jid
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :dial_result_iq, @joined_call_id, last_command.id
+          incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
+          incoming :answered_presence, @joined_call_jid
+          incoming :result_iq, @unanswered_joined_call_jid, last_command.id
+          incoming :hangup_presence, @unanswered_joined_call_jid
+
+          Connfu.should_not be_finished
+        end
+
+        it 'should hangup the caller when both openvoice endpoints reject the call' do
+          incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :say_success_presence, @call_jid
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :dial_result_iq, @joined_call_id, last_command.id
+          incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
+          incoming :reject_presence, @joined_call_jid
+          incoming :reject_presence, @unanswered_joined_call_jid
+
+          incoming :result_iq, @call_jid
+          incoming :hangup_presence, @call_jid
+
+          last_command.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
+          Connfu.should be_finished
+        end
+
+        it 'should allow one to reject and another openvoice number to answer' do
+          incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :say_success_presence, @call_jid
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :dial_result_iq, @joined_call_id, last_command.id
+          incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
+
+          incoming :reject_presence, @joined_call_jid
+
+          incoming :answered_presence, @unanswered_joined_call_jid
+          incoming :result_iq, @unanswered_joined_call_jid, last_command.id
+
+          last_command.should_not be_instance_of(Connfu::Commands::Hangup)
+          Connfu.should_not be_finished
+        end
+
+        it 'should hangup the caller when the openvoice endpoint hangs up' do
+          incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :say_success_presence, @call_jid
+          incoming :result_iq, @call_jid, last_command.id
+
+          incoming :dial_result_iq, @joined_call_id, last_command.id
+          incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
+
+          incoming :answered_presence, @joined_call_jid
+          incoming :result_iq, @unanswered_joined_call_jid, last_command.id
+          incoming :hangup_presence, @unanswered_joined_call_jid
+
+          incoming :hangup_presence, @joined_call_jid
+
+          last_command.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
+        end
+
+        it 'should hangup the openvoice endpoint when the caller hangs up' do
+          incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :result_iq, @call_jid, last_command.id
+          incoming :say_success_presence, @call_jid
+          incoming :result_iq, @call_jid, last_command.id
+
+          incoming :dial_result_iq, @joined_call_id, last_command.id
+          incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
+
+          incoming :answered_presence, @joined_call_jid
+          incoming :result_iq, @unanswered_joined_call_jid, last_command.id
+          incoming :hangup_presence, @unanswered_joined_call_jid
+
+          incoming :hangup_presence, @call_jid
+
+          last_command.should == Connfu::Commands::Hangup.new(:call_jid => @joined_call_jid, :client_jid => @client_jid)
+        end
       end
 
-      it 'should wait for one of the legs to be answered' do
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :say_success_presence, @call_jid
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :dial_result_iq, @joined_call_id, last_command.id
-        incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
+      context 'and using the round-robin dial strategy' do
+        before do
+          @account.update_attribute(:parallel_dial, false)
+        end
 
-        last_command.should_not be_instance_of(Connfu::Commands::Hangup)
-      end
+        it 'should dial the first endpoint' do
+          incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+          incoming :result_iq, @call_jid, last_command.id # answer
+          incoming :result_iq, @call_jid, last_command.id # say 'please wait...'
+          incoming :say_success_presence, @call_jid       # end of say 'please wait...'
+          incoming :result_iq, @call_jid, last_command.id # play music
 
-      it 'should hang up the unanswered leg when the other leg is answered' do
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :say_success_presence, @call_jid
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :dial_result_iq, @joined_call_id, last_command.id
-        incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
-        incoming :answered_presence, @joined_call_jid
+          last_command.should == Connfu::Commands::Dial.new(
+              :to => @endpoint_one.address,
+              :from => "sip:known-user@example.com",
+              :client_jid => @client_jid,
+              :rayo_host => Connfu.connection.jid.domain
+          )
+        end
 
-        last_command.should == Connfu::Commands::Hangup.new(:call_jid => @unanswered_joined_call_jid, :client_jid => @client_jid)
-      end
+        it 'should not immediately dial the second endpoint' do
+          incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+          incoming :result_iq, @call_jid, last_command.id # answer
+          incoming :result_iq, @call_jid, last_command.id # say 'please wait...'
+          incoming :say_success_presence, @call_jid       # end of say 'please wait...'
+          incoming :result_iq, @call_jid, last_command.id # play music
+          incoming :dial_result_iq, "endpoint-one-call-id", last_command.id # first dial
 
-      it 'should wait for one of the parties to hang up' do
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :say_success_presence, @call_jid
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :dial_result_iq, @joined_call_id, last_command.id
-        incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
-        incoming :answered_presence, @joined_call_jid
-        incoming :result_iq, @unanswered_joined_call_jid, last_command.id
-        incoming :hangup_presence, @unanswered_joined_call_jid
+          last_command.should be_instance_of(Connfu::Commands::Dial)
+          last_command.to.should_not == @endpoint_two.address
+        end
 
-        Connfu.should_not be_finished
-      end
+        context 'and the first endpoint answers' do
+          before do
+            incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+            incoming :result_iq, @call_jid, last_command.id # answer
+            incoming :result_iq, @call_jid, last_command.id # say 'please wait...'
+            incoming :say_success_presence, @call_jid       # end of say 'please wait...'
+            incoming :result_iq, @call_jid, last_command.id # play music
+            incoming :dial_result_iq, "endpoint-one-call-id", last_command.id # first dial
+            incoming :answered_presence, "endpoint-one-call-id@server.whatever"
+          end
 
-      it 'should hangup the caller when both openvoice endpoints reject the call' do
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :say_success_presence, @call_jid
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :dial_result_iq, @joined_call_id, last_command.id
-        incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
-        incoming :reject_presence, @joined_call_jid
-        incoming :reject_presence, @unanswered_joined_call_jid
+          it 'should not dial the second endpoint' do
+            last_command.should_not be_instance_of(Connfu::Commands::Dial)
+          end
+        end
 
-        incoming :result_iq, @call_jid
-        incoming :hangup_presence, @call_jid
+        context 'and the first endpoint does not answer' do
+          before do
+            incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+            incoming :result_iq, @call_jid, last_command.id # answer
+            incoming :result_iq, @call_jid, last_command.id # say 'please wait...'
+            incoming :say_success_presence, @call_jid       # end of say 'please wait...'
+            incoming :result_iq, @call_jid, last_command.id # play music
+            incoming :dial_result_iq, "endpoint-one-call-id", last_command.id # first dial
+            timeout @call_id
+          end
 
-        last_command.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
-        Connfu.should be_finished
-      end
+          it 'should hangup the call to the first endpoint' do
+            last_command.should == Connfu::Commands::Hangup.new(
+              :client_jid => @client_jid,
+              :call_jid => "endpoint-one-call-id@server.whatever"
+            )
+          end
 
-      it 'should allow one to reject and another openvoice number to answer' do
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :say_success_presence, @call_jid
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :dial_result_iq, @joined_call_id, last_command.id
-        incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
+          it 'should dial the second endpoint' do
+            incoming :result_iq, "endpoint-one-call-id@server.whatever", last_command.id # hangup of first call
+            incoming :hangup_presence, "endpoint-one-call-id@server.whatever" # hangup complete
 
-        incoming :reject_presence, @joined_call_jid
+            last_command.should == Connfu::Commands::Dial.new(
+                :to => @endpoint_two.address,
+                :from => "sip:known-user@example.com",
+                :client_jid => @client_jid,
+                :rayo_host => "server.whatever"
+            )
+          end
 
-        incoming :answered_presence, @unanswered_joined_call_jid
-        incoming :result_iq, @unanswered_joined_call_jid, last_command.id
+          context 'and the second endpoint does not answer either' do
+            before do
+              incoming :result_iq, "endpoint-one-call-id@server.whatever", last_command.id # hangup of first call
+              incoming :hangup_presence, "endpoint-one-call-id@server.whatever" # hangup complete
+              incoming :dial_result_iq, "endpoint-two-call-id", last_command.id # second dial
+              timeout @call_id
+            end
 
-        last_command.should_not be_instance_of(Connfu::Commands::Hangup)
-        Connfu.should_not be_finished
-      end
+            it 'should hangup the call to the second endpoint' do
+              last_command.should == Connfu::Commands::Hangup.new(
+                :client_jid => @client_jid,
+                :call_jid => "endpoint-two-call-id@server.whatever"
+              )
+            end
 
-      it 'should hangup the caller when the openvoice endpoint hangs up' do
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :say_success_presence, @call_jid
-        incoming :result_iq, @call_jid, last_command.id
+            it 'should apologise' do
+              # but probably voicemail in the future
+              incoming :result_iq, "endpoint-two-call-id@server.whatever", last_command.id # hangup of second call
+              incoming :hangup_presence, "endpoint-two-call-id@server.whatever" # hangup complete
 
-        incoming :dial_result_iq, @joined_call_id, last_command.id
-        incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
+              last_command.should == Connfu::Commands::Say.new(
+                :text => "Sorry",
+                :call_jid => @call_jid,
+                :client_jid => @client_jid
+              )
+            end
 
-        incoming :answered_presence, @joined_call_jid
-        incoming :result_iq, @unanswered_joined_call_jid, last_command.id
-        incoming :hangup_presence, @unanswered_joined_call_jid
+            it 'should hangup the incoming call' do
+              incoming :result_iq, "endpoint-two-call-id@server.whatever", last_command.id # hangup of second call
+              incoming :hangup_presence, "endpoint-two-call-id@server.whatever" # hangup complete
+              incoming :result_iq, @call_jid, last_command.id # say 'Sorry'
+              incoming :say_success_presence, @call_jid       # end of say 'Sorry'
 
-        incoming :hangup_presence, @joined_call_jid
+              last_command.should == Connfu::Commands::Hangup.new(
+                :client_jid => @client_jid,
+                :call_jid => @call_jid
+              )
+            end
+          end
+        end
 
-        last_command.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
-      end
+        context 'once an endpoint answers' do
+          before do
+            incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+            incoming :result_iq, @call_jid, last_command.id # answer
+            incoming :result_iq, @call_jid, last_command.id # say 'please wait...'
+            incoming :say_success_presence, @call_jid       # end of say 'please wait...'
+            incoming :result_iq, @call_jid, last_command.id # play music
+            # any number of dial attempts ...
+            incoming :dial_result_iq, "answering-endpoint-call-id", last_command.id # whichever dial
+            incoming :answered_presence, "answering-endpoint-call-id@server.whatever"
+            incoming :result_iq, @call_id, last_command.id # join
+          end
 
-      it 'should hangup the openvoice endpoint when the caller hangs up' do
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :result_iq, @call_jid, last_command.id
-        incoming :say_success_presence, @call_jid
-        incoming :result_iq, @call_jid, last_command.id
+          it 'should join the incoming call to the answered leg' do
+            last_command.should == Connfu::Commands::Join.new(
+              :call_jid => @call_jid,
+              :client_jid => @client_jid,
+              :call_id => "answering-endpoint-call-id"
+            )
+          end
 
-        incoming :dial_result_iq, @joined_call_id, last_command.id
-        incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
+          it 'should not hang up the call' do
+            incoming :joined_presence, @call_jid, "answering-endpoint-call-id" # join complete to original call
+            incoming :joined_presence, "answering-endpoint-call-id@server.whatever", @call_id # join complete to new call
 
-        incoming :answered_presence, @joined_call_jid
-        incoming :result_iq, @unanswered_joined_call_jid, last_command.id
-        incoming :hangup_presence, @unanswered_joined_call_jid
+            last_command.should_not be_instance_of(Connfu::Commands::Hangup)
+          end
 
-        incoming :hangup_presence, @call_jid
+          it 'should hangup the openvoice leg when the incoming caller hangs up' do
+            incoming :joined_presence, @call_jid, "answering-endpoint-call-id" # join complete to original call
+            incoming :joined_presence, "answering-endpoint-call-id@server.whatever", @call_id # join complete to new call
+            # gossip and chatting
+            incoming :hangup_presence, @call_jid # hangup from incoming leg
 
-        last_command.should == Connfu::Commands::Hangup.new(:call_jid => @joined_call_jid, :client_jid => @client_jid)
+            last_command.should == Connfu::Commands::Hangup.new(
+              :call_jid => "answering-endpoint-call-id@server.whatever",
+              :client_jid => @client_jid
+            )
+          end
+
+          it 'should hangup the incoming leg when the answered endpoint hangs up' do
+            incoming :joined_presence, @call_jid, "answering-endpoint-call-id" # join complete to original call
+            incoming :joined_presence, "answering-endpoint-call-id@server.whatever", @call_id # join complete to new call
+            # gossip and chatting
+            incoming :hangup_presence, "answering-endpoint-call-id@server.whatever" # hangup from answering endpoint
+
+            last_command.should == Connfu::Commands::Hangup.new(
+              :call_jid => @call_jid,
+              :client_jid => @client_jid
+            )
+          end
+        end
       end
     end
   end

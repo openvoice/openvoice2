@@ -10,22 +10,54 @@ class IncomingCall
 
       play_hold_music
 
-      call_ids = []
-      account.endpoints.each do |endpoint|
-        call_ids << dial_join({:dial_from => call.to[:address], :dial_to => endpoint.address})
+      if account.parallel_dial?
+        call_ids = []
+        account.endpoints.each do |endpoint|
+          call_ids << dial_join({:dial_from => call.to[:address], :dial_to => endpoint.address})
+        end
+
+        answered_event = wait_for_one_leg_to_answer(call_ids)
+
+        if answered_event.instance_of?(Connfu::Event::Answered)
+          unanswered_calls = call_ids-[answered_event.call_id]
+          hangup_calls(unanswered_calls)
+
+          answered_call_id = answered_event.call_id
+          hangup_openvoice_leg_when_caller_hangs_up(answered_call_id)
+        end
+      else
+        answered_event = nil
+        account.endpoints.each do |endpoint|
+          result = dial(:from => call.to[:address], :to => endpoint.address)
+          answered_event = wait_for Connfu::Event::Answered, :timeout => 10
+
+          if answered_event.is_a?(Connfu::Event::Answered)
+            break
+          else
+            hangup "#{result.ref_id}@#{Connfu.connection.jid.domain}"
+          end
+        end
+
+        if answered_event.is_a?(Connfu::Event::Answered)
+          wait_because_of_tropo_bug_133
+
+          result = send_command Connfu::Commands::Join.new(
+            :call_jid => call_jid,
+            :client_jid => client_jid,
+            :call_id => answered_event.call_id
+          )
+          wait_for Connfu::Event::Joined
+          logger.debug "Call established"
+
+          answered_call_id = answered_event.call_id
+          hangup_openvoice_leg_when_caller_hangs_up(answered_call_id)
+        else
+          logger.debug "The call wasn't answered."
+          say "Sorry"
+        end
       end
 
-      answered_event = wait_for_one_leg_to_answer(call_ids)
-
-      if answered_event.instance_of?(Connfu::Event::Answered)
-        unanswered_calls = call_ids-[answered_event.call_id]
-        hangup_calls(unanswered_calls)
-
-        answered_call_id = answered_event.call_id
-        hangup_recipient_when_caller_hangs_up(answered_call_id)
-      end
-
-      logger.debug "The call was answered, and has finished"
+      logger.debug "The call has finished"
     end
   end
 
@@ -61,12 +93,15 @@ class IncomingCall
     end
   end
 
-  def hangup_recipient_when_caller_hangs_up(answered_call_id)
+  def hangup_openvoice_leg_when_caller_hangs_up(answered_call_id)
     result = wait_for Connfu::Event::Hangup
     if result.call_id == call_id # caller hangs up, hang up openvoice user
+      logger.debug "The caller hung up; now hanging up the openvoice-established leg"
       answered_call_jid = "#{answered_call_id}@#{Connfu.connection.jid.domain}"
       hangup(answered_call_jid)
       finish!
+    else
+      logger.debug "Must've been the openvoice-established leg hanging up."
     end
   end
 end
