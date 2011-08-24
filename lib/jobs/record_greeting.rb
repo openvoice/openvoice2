@@ -9,12 +9,12 @@ module Jobs
       Connfu::Jobs::Dial.queue
     end
 
-    def self.perform(openvoice_number, endpoint_address)
-      dial :from => openvoice_number, :to => endpoint_address do |call|
+    def self.perform(openvoice_address, endpoint_address)
+      dial :from => openvoice_address, :to => endpoint_address do |call|
         call.on_answer do
           say 'please record a greeting'
           recordings = record_for 10
-          account = Account.find_by_username(openvoice_number.match(/^sip:(.*)@.*/)[1])
+          account = Account.find_by_username(openvoice_address.match(/^sip:(.*)@.*/)[1])
           original_file = recordings.first
           asset_handler_path = Rails.configuration.asset_handler_server + original_file.gsub('file:', '')
 

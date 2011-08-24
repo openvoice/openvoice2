@@ -1,8 +1,8 @@
 class Call < ActiveRecord::Base
   belongs_to :endpoint
 
-  def openvoice_number
-    endpoint.account.number
+  def openvoice_address
+    endpoint.account.address
   end
 
   def update_state!(state)

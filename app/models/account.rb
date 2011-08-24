@@ -5,7 +5,7 @@ class Account < ActiveRecord::Base
   validates_presence_of :email, :username
   validates_uniqueness_of :email, :username
 
-  def number
+  def address
     "sip:#{username}@#{Connfu.config.host}"
   end
 

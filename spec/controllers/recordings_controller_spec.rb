@@ -27,7 +27,7 @@ describe RecordingsController do
         Connfu::Queue.implementation = ::Resque
         post :create
 
-        Jobs::RecordGreeting.should have_queued(@account.number, @account.endpoints.first.address)
+        Jobs::RecordGreeting.should have_queued(@account.address, @account.endpoints.first.address)
       end
 
       it "should re-render account page" do

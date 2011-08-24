@@ -46,8 +46,8 @@ describe Account do
         Connfu.stubs(:config).returns(stub("config", :host => "127.0.0.1"))
       end
 
-      it "should have a number on the Prism server" do
-        subject.number.should eq "sip:#{subject.username}@127.0.0.1"
+      it "should have an address on the Prism server" do
+        subject.address.should eq "sip:#{subject.username}@127.0.0.1"
       end
     end
   end

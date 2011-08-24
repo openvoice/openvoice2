@@ -10,7 +10,7 @@ Scenario: A signup
   Then I should see the notice "Your account has been created successfully"
   And I should be logged in
   And I should be on my account page
-  And I should see my number
+  And I should see my address
 
 Scenario: An unsuccessful signup
 

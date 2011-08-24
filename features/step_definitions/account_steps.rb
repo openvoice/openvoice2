@@ -58,8 +58,8 @@ Then /^I should be logged out$/ do
   Then 'I should see "Login"'
 end
 
-Then /^I should see my number$/ do
-  Then 'I should see "'+ my.number + '"'
+Then /^I should see my address$/ do
+  Then 'I should see "'+ my.address + '"'
 end
 
 When /^I select parallel dialling$/ do

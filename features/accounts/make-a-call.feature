@@ -1,6 +1,6 @@
 Feature: Make a call from my OpenVoice account
 
-Scenario: Calling a number
+Scenario: Calling a sip address
   Given that I am logged in
   And I visit my account page
   And I have an endpoint "sip:endpoint@example.com"

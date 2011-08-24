@@ -22,7 +22,7 @@ describe Jobs::OutgoingCall do
       last_command.class.should == Connfu::Commands::Dial
     end
     
-    it 'should dial from the openvoice2 number' do
+    it 'should dial from the openvoice2 address' do
       last_command.from.should == "sip:my-openvoice-username@#{Connfu.config.host}"
     end
     
@@ -56,7 +56,7 @@ describe Jobs::OutgoingCall do
           last_command.dial_to.should == "sip:recipient@example.com"
         end
 
-        it 'should dial from the openvoice2 number' do
+        it 'should dial from the openvoice2 address' do
           last_command.dial_from.should == "sip:my-openvoice-username@#{Connfu.config.host}"
         end
         

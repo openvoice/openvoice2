@@ -11,14 +11,14 @@ describe Jobs::RecordGreeting do
     before do
       @account = Factory(:account, :username => "my-openvoice-username")
       @endpoint = "sip:endpoint-to-call@example.com"
-      Jobs::RecordGreeting.perform(@account.number, @endpoint)
+      Jobs::RecordGreeting.perform(@account.address, @endpoint)
     end
 
     it "should issue a dial command" do
       last_command.should be_instance_of Connfu::Commands::Dial
     end
 
-    it 'should dial from the openvoice2 number' do
+    it 'should dial from the openvoice2 address' do
       last_command.from.should == "sip:my-openvoice-username@#{Connfu.config.host}"
     end
 

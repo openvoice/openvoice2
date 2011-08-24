@@ -18,8 +18,8 @@ module ActorSupport
       @password ||= "letmein"
     end
 
-    def number
-      @number ||= "sip:me@127.0.0.1"
+    def address
+      @address ||= "sip:me@127.0.0.1"
     end
   end
 

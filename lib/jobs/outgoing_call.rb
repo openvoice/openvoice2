@@ -10,10 +10,10 @@ module Jobs
 
     def self.perform(call_record_id)
       call = Call.find_by_id(call_record_id)
-      caller, recipient, openvoice_number = call.endpoint.address, call.recipient_address, call.openvoice_number
+      caller, recipient, openvoice_address = call.endpoint.address, call.recipient_address, call.openvoice_address
       @rejected = false
 
-      dial :to => caller, :from => openvoice_number do |c|
+      dial :to => caller, :from => openvoice_address do |c|
         c.on_timeout do
           call.update_state!(:call_timed_out)
           hangup "#{call_id}@#{Connfu.connection.jid.domain}"
@@ -38,7 +38,7 @@ module Jobs
           case last_event_call_id
             when call_id
               call.update_state!(:caller_answered)
-              @joined_call_id = dial_join({:dial_to => recipient, :dial_from => openvoice_number})
+              @joined_call_id = dial_join({:dial_to => recipient, :dial_from => openvoice_address})
             when @joined_call_id
               call.update_state!(:recipient_answered)
           end
