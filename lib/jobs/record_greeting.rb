@@ -1,4 +1,5 @@
 require "connfu"
+require 'open-uri'
 
 module Jobs
   class RecordGreeting
