@@ -28,7 +28,7 @@ describe IncomingCall do
   context 'when incoming call is for a known openvoice number' do
     
     before do
-      @openvoice_number = '02079460000'
+      @openvoice_number = Factory(:phone_number)
       @account.update_attribute(:number, @openvoice_number)
     end
     

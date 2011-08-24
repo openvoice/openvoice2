@@ -11,9 +11,9 @@ describe 'layouts/application.html.erb' do
     end
   
     it 'should display the openvoice number' do
-      @account.number = '02079460000'
+      @account.number = Factory(:phone_number)
       render
-      assert_select '#ov-number', :text => /02079460000/
+      assert_select '#ov-number', :text => /#{@account.number}/
     end
   
     it "should not display the openvoice number if the user doesn't have one" do

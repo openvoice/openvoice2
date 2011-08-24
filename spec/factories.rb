@@ -6,6 +6,11 @@ Factory.sequence :username do |n|
   "person#{n}"
 end
 
+Factory.sequence :phone_number do |n|
+  last_three_digits = format('%03d', n)
+  "02079460#{last_three_digits}"
+end
+
 Factory.define(:account) do |f|
   f.email { Factory.create(:email) }
   f.username { Factory.create(:username) }
