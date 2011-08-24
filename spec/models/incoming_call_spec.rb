@@ -24,8 +24,22 @@ describe IncomingCall do
       Connfu.connection.commands.none? { |c| c.instance_of?(Connfu::Commands::Answer) }.should be_true
     end
   end
+  
+  context 'when incoming call is for a known openvoice number' do
+    
+    before do
+      @openvoice_number = '02079460000'
+      @account.update_attribute(:number, @openvoice_number)
+    end
+    
+    it 'should answer' do
+      incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:#{@openvoice_number}@example.com>"
+      last_command.should == Connfu::Commands::Answer.new(:call_jid => @call_jid, :client_jid => @client_jid)
+    end
+    
+  end
 
-  context 'when incoming call is for a known openvoice user' do
+  context 'when incoming call is for a known openvoice address' do
 
     it 'should answer' do
       incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
