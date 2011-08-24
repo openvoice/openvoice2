@@ -18,6 +18,12 @@ describe Account do
       subject.email = "existing-email"
       subject.should_not be_valid
     end
+    
+    it "is invalid with a duplicate number" do
+      another_account = Factory.create(:account, :number => 'existing-number')
+      subject.number = 'existing-number'
+      subject.should_not be_valid
+    end
 
     it "is invalid without an username" do
       subject.username = nil

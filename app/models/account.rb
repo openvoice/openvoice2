@@ -3,7 +3,7 @@ class Account < ActiveRecord::Base
   has_many :endpoints
 
   validates_presence_of :email, :username
-  validates_uniqueness_of :email, :username
+  validates_uniqueness_of :email, :username, :number
 
   def address
     "sip:#{username}@#{Connfu.config.host}"
