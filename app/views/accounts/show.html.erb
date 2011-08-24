@@ -29,9 +29,16 @@
   <p><%= link_to 'Add a new endpoint', new_endpoint_path %></p>
 </section>
 
-<% if current_account.endpoints.present?  %>
 <section class="wrapper" id="record-greeting">
   <h3>Account greeting</h3>
-  <%= button_to "Record", recordings_path %>
+  <% if current_account.greeting_path.present? %>
+    <audio controls="controls" id="account-greeting">
+      <source src="<%= current_account.greeting_path %>" type="audio/wav" />
+      Your browser does not support the audio element.
+    </audio>
+  <% end %>
+
+  <% if current_account.endpoints.present?  %>
+    <p><%= button_to "Record", recordings_path %></p>
+  <% end %>
 </section>
-<% end %>
