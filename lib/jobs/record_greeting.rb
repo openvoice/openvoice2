@@ -14,7 +14,15 @@ module Jobs
           say 'please record a greeting'
           recordings = record_for 10
           account = Account.find_by_username(openvoice_number.match(/^sip:(.*)@.*/)[1])
-          account.update_attribute(:greeting_path, recordings.first)
+          original_file = recordings.first
+          asset_handler_path = Rails.configuration.asset_handler_server + original_file.gsub('file:', '')
+
+          begin
+            greeting_asset_path = open(asset_handler_path).read
+            account.update_attribute(:greeting_path, greeting_asset_path)
+          rescue Errno::ECONNREFUSED, OpenURI::HTTPError => e
+            logger.warn "Could not connect to AssetHandler"
+          end
         end
       end
     end

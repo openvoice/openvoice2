@@ -59,10 +59,37 @@ describe Jobs::RecordGreeting do
         end
 
         it "should assign the greeting to user account" do
-          incoming :recording_result_iq, @call_jid
-          incoming :recording_stop_presence, @call_jid, 'my-super-awesome-greeting-path'
+          new_asset_location = "#{Rails.configuration.asset_handler_server}/assets/original-file"
+          stub_request(:get, "#{Rails.configuration.asset_handler_server}/path/to/original-file").
+                   to_return(:status => 200, :body => new_asset_location)
 
-          @account.reload.greeting_path.should == 'my-super-awesome-greeting-path'
+          incoming :recording_result_iq, @call_jid
+          incoming :recording_stop_presence, @call_jid, 'file:/path/to/original-file'
+
+          @account.reload.greeting_path.should == new_asset_location
+        end
+      end
+
+      describe "recording the user's greeting when the Asset Handler service is unavailable" do
+        before do
+          incoming :result_iq, @call_jid
+          incoming :say_success_presence, @call_jid
+        end
+
+        it "should handle exception raised when connection refused" do
+          stub_request(:any, "#{Rails.configuration.asset_handler_server}/path/to/original-file").to_raise(Errno::ECONNREFUSED)
+
+          incoming :recording_result_iq, @call_jid
+
+          lambda { incoming :recording_stop_presence, @call_jid, 'file:/path/to/original-file' }.should_not raise_error
+        end
+
+        it "should not assign greeting_path to user account if 404 is returned" do
+          stub_request(:get, "#{Rails.configuration.asset_handler_server}/path/to/original-file").
+                   to_return(:status => 404, :body => "File not found")
+
+          incoming :recording_result_iq, @call_jid
+          lambda { incoming :recording_stop_presence, @call_jid, 'file:/path/to/original-file' }.should_not raise_error
         end
       end
     end
