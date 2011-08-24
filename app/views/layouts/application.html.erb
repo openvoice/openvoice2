@@ -27,6 +27,9 @@
         <h1>OpenVoice</h1>
         <% if logged_in? %>
         <h3 id="ov-address">Your address is <span id="address"><%= current_account.address %></span></h3>
+        <% if current_account.number %>
+        <h3 id="ov-number">Your number is <span id="number"><%= current_account.number %></span></h3>
+        <% end %>
         <% end %>
         <h2 id="subtitle"><%= yield :subtitle %></h2>
         <%= render :partial => "shared/notices" %>
