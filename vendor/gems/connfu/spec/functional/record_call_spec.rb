@@ -55,6 +55,23 @@ describe "Recording a call" do
     end
   end
 
+  describe "when the caller hangs up during recording" do
+    testing_dsl do
+      on :offer do |call|
+        record_for 5
+        say "very interesting"
+      end
+    end
+
+    it "should not send any commands after the hangup is detected" do
+      incoming :offer_presence, @call_jid, @client_jid
+      incoming :recording_result_iq, @call_jid, @recording_ref_id
+      incoming :recording_hangup_presence, @component_jid
+
+      last_command.should_not be_instance_of(Connfu::Commands::Say)
+    end
+  end
+
   describe "without explicit stop command" do
 
     testing_dsl do

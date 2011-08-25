@@ -47,6 +47,20 @@ describe Connfu::Dsl do
       subject.call_id.should == "call-id"
     end
   end
+  
+  describe 'finish!' do
+    subject { DslTest.new(:call_jid => "call-id@example.com") }
+    
+    it 'should mark the call as finished when the specified call_jid matches the current call_jid' do
+      subject.finish!('call-id@example.com')
+      subject.should be_finished
+    end
+    
+    it 'should mark the call as finished when the specified call_jid is a component of the current call' do
+      subject.finish!('call-id@example.com/component-id')
+      subject.should be_finished
+    end
+  end
 
   describe 'handle_event' do
     it 'should log unhandled event for debugging purposes' do

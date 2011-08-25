@@ -92,6 +92,10 @@ describe Connfu::Rayo::Parser do
       it "should create an event that contains the uri of the recording" do
         @event.uri.should == "file:///tmp/recording.mp3"
       end
+
+      it "should determine the presence_from" do
+        @event.presence_from.should eq "call-id@#{PRISM_HOST}/ref-id"
+      end
     end
 
     context "a normal result iq" do
