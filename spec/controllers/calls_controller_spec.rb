@@ -66,6 +66,7 @@ describe CallsController do
 
         @endpoint.calls.count.should eq 1
         @endpoint.calls.last.party_address.should eq "party-address"
+        @endpoint.calls.last.incoming.should be_false
 
         Jobs::OutgoingCall.should have_queued(@endpoint.calls.last.id)
       end
