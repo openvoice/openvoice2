@@ -473,6 +473,17 @@ describe IncomingCall do
               :beep => true
             )
           end
+          
+          it 'should not play a message if the caller hangs up during the recording' do
+            incoming :result_iq, @call_jid # stop music
+            incoming :result_iq, @call_jid, last_command.id # say 'please leave a message'
+            incoming :say_success_presence, @call_jid
+            incoming :result_iq, @call_jid, last_command.id # recording started
+            incoming :recording_hangup_presence, @call_jid
+            incoming :hangup_presence, @call_jid
+
+            last_command.should_not be_instance_of(Connfu::Commands::Say)
+          end
 
           it 'should play a message end of the message recording' do
             incoming :result_iq, @call_jid # stop music
