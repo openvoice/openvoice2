@@ -12,9 +12,8 @@ class IncomingCall
       play_hold_music
 
       if account.parallel_dial?
-        call_ids = []
-        account.endpoints.each do |endpoint|
-          call_ids << dial_join({:dial_from => call.to[:address], :dial_to => endpoint.address})
+        call_ids = account.endpoints.map do |endpoint|
+          dial_join({:dial_from => call.to[:address], :dial_to => endpoint.address})
         end
 
         answered_event = wait_for_one_leg_to_answer(call_ids)
