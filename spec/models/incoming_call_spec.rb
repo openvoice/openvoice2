@@ -432,6 +432,78 @@ describe IncomingCall do
           end
         end
 
+        context 'and the first endpoint rejects' do
+          before do
+            incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+            incoming :result_iq, @call_jid, last_command.id # answer
+            incoming :result_iq, @call_jid, last_command.id # say 'please wait...'
+            incoming :say_success_presence, @call_jid       # end of say 'please wait...'
+            incoming :say_result_iq, @call_jid, "hold-music-component-id" # play music
+            incoming :dial_result_iq, "endpoint-one-call-id", last_command.id # first dial
+            incoming :reject_presence, "endpoint-one-call-id@#{Connfu.connection.jid.domain}"
+          end
+
+          it 'should stop playing the hold music' do
+            last_command.should == Connfu::Commands::Stop.new(
+              :call_jid => @call_jid,
+              :client_jid => @client_jid,
+              :ref_id => "hold-music-component-id"
+            )
+          end
+
+          it 'should ask the caller to leave a message' do
+            incoming :result_iq, @call_jid # stop music
+
+            last_command.should == Connfu::Commands::Say.new(
+              :call_jid => @call_jid,
+              :client_jid => @client_jid,
+              :text => "Please leave a message"
+            )
+          end
+
+          it 'should start recording a message' do
+            incoming :result_iq, @call_jid # stop music
+            incoming :result_iq, @call_jid, last_command.id # say 'please leave a message'
+            incoming :say_success_presence, @call_jid
+
+            last_command.should == Connfu::Commands::Recording::Start.new(
+              :call_jid => @call_jid,
+              :client_jid => @client_jid,
+              :max_length => 60_000, # milliseconds
+              :beep => true
+            )
+          end
+
+          it 'should play a message end of the message recording' do
+            incoming :result_iq, @call_jid # stop music
+            incoming :result_iq, @call_jid, last_command.id # say 'please leave a message'
+            incoming :say_success_presence, @call_jid
+            incoming :result_iq, @call_jid, last_command.id # recording started
+            incoming :recording_stop_presence, @call_jid # recording finished
+
+            last_command.should == Connfu::Commands::Say.new(
+              :call_jid => @call_jid,
+              :client_jid => @client_jid,
+              :text => "Message complete"
+            )
+          end
+
+          it 'should hangup the caller' do
+            incoming :result_iq, @call_jid # stop music
+            incoming :result_iq, @call_jid, last_command.id # say 'please leave a message'
+            incoming :say_success_presence, @call_jid
+            incoming :result_iq, @call_jid, last_command.id # recording started
+            incoming :recording_stop_presence, @call_jid # recording finished
+            incoming :result_iq, @call_jid # 'message complete' say
+            incoming :say_success_presence, @call_jid
+            
+            last_command.should == Connfu::Commands::Hangup.new(
+              :call_jid => @call_jid,
+              :client_jid => @client_jid
+            )
+          end
+        end
+
         context 'once an endpoint answers' do
           before do
             incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"

@@ -38,18 +38,23 @@ class IncomingCall
         answered_event = nil
         endpoint = account.endpoints.detect do |endpoint|
           result = dial(:from => call.to[:address], :to => endpoint.address)
-          answered_event = wait_for Connfu::Event::Answered, :timeout => 10
-
-          answered_event.is_a?(Connfu::Event::Answered).tap do |answered|
-            hangup "#{result.ref_id}@#{Connfu.connection.jid.domain}" unless answered
+          answered_event = wait_for Connfu::Event::Answered, Connfu::Event::Rejected, :timeout => 10
+          
+          if answered_event.is_a?(Connfu::Event::Answered) ||
+             answered_event.is_a?(Connfu::Event::Rejected)
+            true
+          else
+            hangup "#{result.ref_id}@#{Connfu.connection.jid.domain}"
+            false
           end
         end
 
-        if answered_event.is_a?(Connfu::Event::Answered)
+        case answered_event
+        when Connfu::Event::Answered
           call_record.state = Call::ANSWERED
           call_record.endpoint = endpoint
           call_record.save!
-
+          
           wait_because_of_tropo_bug_133
 
           result = send_command Connfu::Commands::Join.new(
@@ -62,6 +67,11 @@ class IncomingCall
 
           answered_call_id = answered_event.call_id
           hangup_openvoice_leg_when_caller_hangs_up(answered_call_id)
+        when Connfu::Event::Rejected
+          stop_hold_music
+          say "Please leave a message"
+          record_for(60, :beep => true)
+          say "Message complete"
         else
           logger.debug "The call wasn't answered."
           say "Sorry"
@@ -76,10 +86,19 @@ class IncomingCall
 
   def play_hold_music
     # Not waiting after the command means the music will stop when one of the calls is answered
-    send_command Connfu::Commands::Say.new(
+    result = send_command Connfu::Commands::Say.new(
       :call_jid => call_jid,
       :client_jid => client_jid,
       :text => "http://www.phono.com/audio/troporocks.mp3"
+    )
+    @hold_music_component_id = result.ref_id
+  end
+  
+  def stop_hold_music
+    send_command Connfu::Commands::Stop.new(
+      :call_jid => call_jid,
+      :client_jid => client_jid,
+      :ref_id => @hold_music_component_id
     )
   end
 
