@@ -116,25 +116,29 @@ describe IncomingCall do
           Connfu.should_not be_finished
         end
 
-        it 'should hangup the caller when the openvoice endpoint hangs up' do
-          incoming :answered_presence, @joined_call_jid # openvoice endpoint answers
-          incoming :hangup_presence, @joined_call_jid # openvoice endpoint hangs up
-          incoming :result_iq, @call_jid, last_command.id # server responds to expected Hangup command for the caller
-          incoming :hangup_presence, @call_jid # caller hangs up
+        describe "and the call openvoice endpoint has answered" do
+          before do
+            incoming :answered_presence, @joined_call_jid # openvoice endpoint answers
+          end
 
-          last_command.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
-          Connfu.should be_finished
-        end
+          it 'should hangup the caller when the openvoice endpoint hangs up' do
+            incoming :hangup_presence, @joined_call_jid # openvoice endpoint hangs up
+            incoming :result_iq, @call_jid, last_command.id # server responds to expected Hangup command for the caller
+            incoming :hangup_presence, @call_jid # caller hangs up
 
-        it 'should hangup the openvoice endpoint when the caller hangs up' do
-          incoming :answered_presence, @joined_call_jid
-          incoming :hangup_presence, @call_jid
+            last_command.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
+            Connfu.should be_finished
+          end
 
-          incoming :result_iq, @joined_call_jid, last_command.id # server responds to expected Hangup command for the openvoice user
-          incoming :hangup_presence, @joined_call_jid
+          it 'should hangup the openvoice endpoint when the caller hangs up' do
+            incoming :hangup_presence, @call_jid
 
-          last_command.should == Connfu::Commands::Hangup.new(:call_jid => @joined_call_jid, :client_jid => @client_jid)
-          Connfu.should be_finished
+            incoming :result_iq, @joined_call_jid, last_command.id # server responds to expected Hangup command for the openvoice user
+            incoming :hangup_presence, @joined_call_jid
+
+            last_command.should == Connfu::Commands::Hangup.new(:call_jid => @joined_call_jid, :client_jid => @client_jid)
+            Connfu.should be_finished
+          end
         end
       end
     end
