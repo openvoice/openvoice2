@@ -28,14 +28,12 @@ class IncomingCall
         end
       else
         answered_event = nil
-        account.endpoints.each do |endpoint|
+        account.endpoints.detect do |endpoint|
           result = dial(:from => call.to[:address], :to => endpoint.address)
           answered_event = wait_for Connfu::Event::Answered, :timeout => 10
 
-          if answered_event.is_a?(Connfu::Event::Answered)
-            break
-          else
-            hangup "#{result.ref_id}@#{Connfu.connection.jid.domain}"
+          answered_event.is_a?(Connfu::Event::Answered).tap do |answered|
+            hangup "#{result.ref_id}@#{Connfu.connection.jid.domain}" unless answered
           end
         end
 
