@@ -67,14 +67,11 @@ class IncomingCall
 
           answered_call_id = answered_event.call_id
           hangup_openvoice_leg_when_caller_hangs_up(answered_call_id)
-        when Connfu::Event::Rejected
+        else
           stop_hold_music
           say "Please leave a message"
           record_for(60, :beep => true)
           say "Message complete"
-        else
-          logger.debug "The call wasn't answered."
-          say "Sorry"
         end
       end
 

@@ -367,7 +367,7 @@ describe IncomingCall do
             incoming :result_iq, @call_jid, last_command.id # answer
             incoming :result_iq, @call_jid, last_command.id # say 'please wait...'
             incoming :say_success_presence, @call_jid       # end of say 'please wait...'
-            incoming :result_iq, @call_jid, last_command.id # play music
+            incoming :say_result_iq, @call_jid, "hold-music-component-id" # play music
             incoming :dial_result_iq, "endpoint-one-call-id", last_command.id # first dial
             timeout @call_id
           end
@@ -406,27 +406,87 @@ describe IncomingCall do
               )
             end
 
-            it 'should apologise' do
-              # but probably voicemail in the future
-              incoming :result_iq, "endpoint-two-call-id@server.whatever", last_command.id # hangup of second call
-              incoming :hangup_presence, "endpoint-two-call-id@server.whatever" # hangup complete
-
-              last_command.should == Connfu::Commands::Say.new(
-                :text => "Sorry",
+            it 'should stop playing the hold music' do
+              incoming :result_iq, "endpoint-two-call-id@server.whatever" # hangup
+              incoming :hangup_presence, "endpoint-two-call-id@server.whatever"
+              
+              last_command.should == Connfu::Commands::Stop.new(
                 :call_jid => @call_jid,
-                :client_jid => @client_jid
+                :client_jid => @client_jid,
+                :ref_id => "hold-music-component-id"
               )
             end
 
-            it 'should hangup the incoming call' do
-              incoming :result_iq, "endpoint-two-call-id@server.whatever", last_command.id # hangup of second call
-              incoming :hangup_presence, "endpoint-two-call-id@server.whatever" # hangup complete
-              incoming :result_iq, @call_jid, last_command.id # say 'Sorry'
-              incoming :say_success_presence, @call_jid       # end of say 'Sorry'
+            it 'should ask the caller to leave a message' do
+              incoming :result_iq, "endpoint-two-call-id@server.whatever" # hangup
+              incoming :hangup_presence, "endpoint-two-call-id@server.whatever"
+              incoming :result_iq, @call_jid # stop music
+
+              last_command.should == Connfu::Commands::Say.new(
+                :call_jid => @call_jid,
+                :client_jid => @client_jid,
+                :text => "Please leave a message"
+              )
+            end
+
+            it 'should start recording a message' do
+              incoming :result_iq, "endpoint-two-call-id@server.whatever" # hangup
+              incoming :hangup_presence, "endpoint-two-call-id@server.whatever"
+              incoming :result_iq, @call_jid # stop music
+              incoming :result_iq, @call_jid, last_command.id # say 'please leave a message'
+              incoming :say_success_presence, @call_jid
+
+              last_command.should == Connfu::Commands::Recording::Start.new(
+                :call_jid => @call_jid,
+                :client_jid => @client_jid,
+                :max_length => 60_000, # milliseconds
+                :beep => true
+              )
+            end
+
+            it 'should not play a message if the caller hangs up during the recording' do
+              incoming :result_iq, "endpoint-two-call-id@server.whatever" # hangup
+              incoming :hangup_presence, "endpoint-two-call-id@server.whatever"
+              incoming :result_iq, @call_jid # stop music
+              incoming :result_iq, @call_jid, last_command.id # say 'please leave a message'
+              incoming :say_success_presence, @call_jid
+              incoming :result_iq, @call_jid, last_command.id # recording started
+              incoming :recording_hangup_presence, @call_jid
+              incoming :hangup_presence, @call_jid
+
+              last_command.should_not be_instance_of(Connfu::Commands::Say)
+            end
+
+            it 'should play a message end of the message recording' do
+              incoming :result_iq, "endpoint-two-call-id@server.whatever" # hangup
+              incoming :hangup_presence, "endpoint-two-call-id@server.whatever"
+              incoming :result_iq, @call_jid # stop music
+              incoming :result_iq, @call_jid, last_command.id # say 'please leave a message'
+              incoming :say_success_presence, @call_jid
+              incoming :result_iq, @call_jid, last_command.id # recording started
+              incoming :recording_stop_presence, @call_jid # recording finished
+
+              last_command.should == Connfu::Commands::Say.new(
+                :call_jid => @call_jid,
+                :client_jid => @client_jid,
+                :text => "Message complete"
+              )
+            end
+
+            it 'should hangup the caller' do
+              incoming :result_iq, "endpoint-two-call-id@server.whatever" # hangup
+              incoming :hangup_presence, "endpoint-two-call-id@server.whatever"
+              incoming :result_iq, @call_jid # stop music
+              incoming :result_iq, @call_jid, last_command.id # say 'please leave a message'
+              incoming :say_success_presence, @call_jid
+              incoming :result_iq, @call_jid, last_command.id # recording started
+              incoming :recording_stop_presence, @call_jid # recording finished
+              incoming :result_iq, @call_jid # 'message complete' say
+              incoming :say_success_presence, @call_jid
 
               last_command.should == Connfu::Commands::Hangup.new(
-                :client_jid => @client_jid,
-                :call_jid => @call_jid
+                :call_jid => @call_jid,
+                :client_jid => @client_jid
               )
             end
           end
