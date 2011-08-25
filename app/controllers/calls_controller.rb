@@ -1,12 +1,11 @@
 class CallsController < ApplicationController
   before_filter :authenticate
-  before_filter :load_endpoint, :except => [:new]
+  before_filter :load_endpoint
 
   respond_to :html
   respond_to :json, :only => [:show]
 
   def new
-    @endpoint = current_account.endpoints.find(params[:endpoint_id])
     @call = @endpoint.calls.build
   end
 
