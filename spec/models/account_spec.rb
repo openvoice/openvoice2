@@ -20,8 +20,14 @@ describe Account do
     end
     
     it "is invalid with a duplicate number" do
-      another_account = Factory.create(:account, :number => 'existing-number')
-      subject.number = 'existing-number'
+      number = Account.voxeo_provisioned_numbers.first
+      another_account = Factory.create(:account, :number => number)
+      subject.number = number
+      subject.should_not be_valid
+    end
+    
+    it "is invalid if the number doesn't exist in the list of provisioned numbers" do
+      subject.number = 'non-provisioned-number'
       subject.should_not be_valid
     end
 
