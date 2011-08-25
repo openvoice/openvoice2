@@ -5,6 +5,7 @@ class IncomingCall
   include Connfu::Dsl
   on :offer do |call|
     if account = Account.find_by_number(call.to[:username]) || Account.find_by_username(call.to[:username])
+      call_record = account.calls.create!(:incoming => true, :party_address => call.from)
       answer
       say account.greeting_path || 'please wait while we transfer your call'
 

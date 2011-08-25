@@ -46,6 +46,13 @@ describe IncomingCall do
       last_command.should == Connfu::Commands::Answer.new(:call_jid => @call_jid, :client_jid => @client_jid)
     end
 
+    it 'should log the incoming call' do
+      incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>", :from => "tel:+44790012345"
+      logged_call = @account.calls.last
+      logged_call.incoming.should be_true
+      logged_call.party_address.should eql("tel:+44790012345")
+    end
+
     context 'when openvoice user has not recorded a greeting' do
       it 'should then say "please wait while we transfer your call" to the caller' do
         incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
@@ -110,7 +117,7 @@ describe IncomingCall do
         end
 
         it 'should hangup the caller when the openvoice endpoint hangs up' do
-          incoming :answered_presence, @joined_call_jid # openvoice endpoint answers
+          incoming :answered_presence, @joined_call_jid # openvoice endpoint answers
           incoming :hangup_presence, @joined_call_jid # openvoice endpoint hangs up
           incoming :result_iq, @call_jid, last_command.id # server responds to expected Hangup command for the caller
           incoming :hangup_presence, @call_jid # caller hangs up
