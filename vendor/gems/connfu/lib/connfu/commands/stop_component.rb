@@ -1,8 +1,12 @@
 module Connfu
   module Commands
     module StopComponent
+      def component_id
+        @params[:ref_id]
+      end
+      
       def component_jid
-        call_jid + "/" + @params[:ref_id]
+        call_jid + "/" + component_id
       end
 
       def recipient_jid

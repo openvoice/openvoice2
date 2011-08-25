@@ -130,7 +130,7 @@ describe Connfu::Rayo::Parser do
 
     context "a say complete iq" do
       before do
-        @node = create_presence(say_success_presence("call-id@#{PRISM_HOST}"))
+        @node = create_presence(say_success_presence("call-id@#{PRISM_HOST}/component-id"))
         @event = Connfu::Rayo::Parser.parse_event_from(@node)
       end
 
@@ -140,6 +140,10 @@ describe Connfu::Rayo::Parser do
 
       it "should determine the call_id value of say complete" do
         @event.call_id.should eq "call-id"
+      end
+      
+      it "should determine the presence_from value" do
+        @event.presence_from.should eq "call-id@#{PRISM_HOST}/component-id"
       end
     end
 

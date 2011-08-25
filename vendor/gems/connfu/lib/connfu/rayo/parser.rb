@@ -11,7 +11,7 @@ module Connfu
         if node.xpath('//x:offer', 'x' => rayo('1')).any?
           Connfu::Event::Offer.new(offer_params(node).merge(:call_id => call_id))
         elsif node.xpath('//x:success', 'x' => tropo('say:complete:1')).any?
-          Connfu::Event::SayComplete.new(:call_id => call_id)
+          Connfu::Event::SayComplete.new(:call_id => call_id, :from => to)
         elsif node.type == :result
           if (ref = node.xpath('x:ref', 'x' => rayo('1')).first)
             Connfu::Event::Result.new(:call_id => call_id, :ref_id => ref.attributes['id'].value, :command_id => node.attributes['id'].value)

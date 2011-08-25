@@ -56,6 +56,7 @@ module Connfu
       self.call_jid = params[:call_jid]
       self.client_jid = params[:client_jid]
       self.call_id = params[:call_id]
+      @active_component_ids = []
     end
 
     def call_jid=(jid)
@@ -121,6 +122,9 @@ module Connfu
           when Connfu::Event::Hangup
             run_any_call_behaviour_for(:hangup)
             finish!(event.presence_from)
+          when Connfu::Event::SayComplete
+            jid = Blather::JID.new(event.presence_from)
+            @active_component_ids.delete(jid.resource)
           else
             logger.warn "Unrecognized event: %p" % event
         end
@@ -138,8 +142,10 @@ module Connfu
 
     def send_command(command)
       return if finished?
+      return if command.is_a?(Connfu::Commands::Stop) && !@active_component_ids.include?(command.component_id)
       send_command_without_waiting command
       result = wait_for Connfu::Event::Result, Connfu::Event::Error
+      @active_component_ids << result.ref_id if result && command.is_a?(Connfu::Commands::Say)
       logger.debug "Result from command: %p" % result
       raise if result.is_a?(Connfu::Event::Error)
 

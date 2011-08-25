@@ -36,3 +36,36 @@ describe "say something on a call" do
     last_command.should == Connfu::Commands::Say.new(:text => 'http://www.phono.com/audio/troporocks.mp3', :call_jid => @call_jid, :client_jid => @client_jid)
   end
 end
+
+describe "stopping a say command" do
+  testing_dsl do
+    on :offer do |call|
+      answer
+      send_command Connfu::Commands::Say.new(:text => 'hello world', :call_jid => 'call-jid', :client_jid => 'client-jid')
+      dial :to => "anyone", :from => "anyone else"
+      send_command Connfu::Commands::Stop.new(:ref_id => 'component-id', :call_jid => 'call-jid', :client_jid => 'client-jid')
+    end
+  end
+
+  let(:stop_command) { Connfu::Commands::Stop.new(:ref_id => 'component-id', :call_jid => 'call-jid', :client_jid => 'client-jid') }
+  let(:call_jid) { "call-id@#{PRISM_HOST}" }
+
+  it 'should send the stop command to an active say component' do
+    incoming :offer_presence, call_jid
+    incoming :result_iq, call_jid, last_command.id
+    incoming :say_result_iq, call_jid
+    incoming :dial_result_iq, "dummy-call-so-we-can-wait-id", last_command.id
+
+    last_command.should == stop_command
+  end
+
+  it 'should not send the stop command if the say component has already finished' do
+    incoming :offer_presence, call_jid
+    incoming :result_iq, call_jid, last_command.id
+    incoming :say_result_iq, call_jid, 'component-id'
+    incoming :say_success_presence, "#{call_jid}/component-id"
+    incoming :dial_result_iq, "dummy-call-so-we-can-wait-id", last_command.id
+
+    last_command.should_not == stop_command
+  end
+end
