@@ -55,17 +55,17 @@ describe CallsController do
         response.headers["Content-Type"].should eq "application/json; charset=utf-8"
         json_call = JSON.parse(response.body)
         json_call.should_not be_nil
-        json_call["recipient_address"].should eq @call.recipient_address
+        json_call["party_address"].should eq @call.party_address
       end
     end
 
     describe "POST to create" do
       it "should create the call and queue the outgoing call" do
         Connfu::Queue.implementation = ::Resque
-        post :create, :endpoint_id => @endpoint.id, :call => {:recipient_address => 'recipient-address'}
+        post :create, :endpoint_id => @endpoint.id, :call => {:party_address => 'party-address'}
 
         @endpoint.calls.count.should eq 1
-        @endpoint.calls.last.recipient_address.should eq "recipient-address"
+        @endpoint.calls.last.party_address.should eq "party-address"
 
         Jobs::OutgoingCall.should have_queued(@endpoint.calls.last.id)
       end
@@ -73,7 +73,7 @@ describe CallsController do
       it "should redirect to the new call" do
         Connfu::Queue.stubs(:enqueue)
 
-        post :create, :endpoint_id => @endpoint.id, :call => {:recipient_address => 'recipient-address'}
+        post :create, :endpoint_id => @endpoint.id, :call => {:party_address => 'recipient-address'}
 
         assert_redirected_to endpoint_call_path(@endpoint, @endpoint.calls.last)
       end

@@ -5,8 +5,8 @@
 <section class="wrapper ptop">
   <%= form_for [@endpoint, @call] do |call| %>
     <p>
-      <%= call.label :recipient_address, 'Number to call' %>
-      <%= call.text_field :recipient_address %>
+      <%= call.label :party_address, 'Number to call' %>
+      <%= call.text_field :party_address %>
     </p>
     <p>
       <%= call.submit "Call" %>

@@ -10,7 +10,7 @@ module Jobs
 
     def self.perform(call_record_id)
       call = Call.find_by_id(call_record_id)
-      caller, recipient, openvoice_address = call.endpoint.address, call.recipient_address, call.openvoice_address
+      caller, recipient, openvoice_address = call.endpoint.address, call.party_address, call.openvoice_address
       @rejected = false
 
       dial :to => caller, :from => openvoice_address do |c|

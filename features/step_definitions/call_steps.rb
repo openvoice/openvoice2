@@ -10,7 +10,7 @@ Given /^the caller "(.*)" is ringing$/ do |caller|
 end
 
 Given /^the recipient "([^"]*)" has answered the call$/ do |recipient|
-  Call.find_by_recipient_address(recipient).update_attributes(:state => :recipient_answered)
+  Call.find_by_party_address(recipient).update_attributes(:state => :recipient_answered)
 end
 
 Then /^I should see that the caller is ringing$/ do
@@ -23,5 +23,5 @@ end
 
 Then /^a call should be initiated from "(.*)" to "(.*)"$/ do |caller, recipient|
   endpoint = Endpoint.find_by_address(caller)
-  Jobs::OutgoingCall.should have_queued(Call.find_all_by_recipient_address_and_endpoint_id(recipient, endpoint.id).last.id)
+  Jobs::OutgoingCall.should have_queued(Call.find_all_by_party_address_and_endpoint_id(recipient, endpoint.id).last.id)
 end
