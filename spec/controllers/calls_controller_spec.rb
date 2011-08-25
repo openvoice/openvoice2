@@ -47,7 +47,7 @@ describe CallsController do
 
     describe "Javascript GET request to show" do
       before do
-        @call = Factory(:call, :endpoint => @endpoint)
+        @call = Factory(:call, :endpoint => @endpoint, :account => @account)
         get :show, :id => @call.id, :endpoint_id => @endpoint.id, :format => :json
       end
 
@@ -67,6 +67,7 @@ describe CallsController do
         @endpoint.calls.count.should eq 1
         @endpoint.calls.last.party_address.should eq "party-address"
         @endpoint.calls.last.incoming.should be_false
+        @endpoint.calls.last.account.should eql(@account)
 
         Jobs::OutgoingCall.should have_queued(@endpoint.calls.last.id)
       end
@@ -76,7 +77,7 @@ describe CallsController do
 
         post :create, :endpoint_id => @endpoint.id, :call => {:party_address => 'recipient-address'}
 
-        assert_redirected_to endpoint_call_path(@endpoint, @endpoint.calls.last)
+        assert_redirected_to call_path(@endpoint.calls.last)
       end
     end
   end

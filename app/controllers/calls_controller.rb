@@ -1,6 +1,6 @@
 class CallsController < ApplicationController
   before_filter :authenticate
-  before_filter :load_endpoint
+  before_filter :load_endpoint, :except => [:show]
 
   respond_to :html
   respond_to :json, :only => [:show]
@@ -10,17 +10,17 @@ class CallsController < ApplicationController
   end
 
   def create
-    @call = @endpoint.calls.build(params[:call])
+    @call = current_account.calls.build(params[:call].merge(:endpoint => @endpoint))
     if @call.save
       Connfu::Queue.enqueue(Jobs::OutgoingCall, @call.id)
-      redirect_to endpoint_call_path(@endpoint, @call)
+      redirect_to call_path(@call)
     else
       render :new
     end
   end
 
   def show
-    @call = @endpoint.calls.find(params[:id])
+    @call = current_account.calls.find(params[:id])
     respond_with @call do |format|
       format.json { render :text => @call.to_json(:methods => :display_state) }
     end

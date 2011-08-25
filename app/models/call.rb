@@ -1,4 +1,5 @@
 class Call < ActiveRecord::Base
+  belongs_to :account
   belongs_to :endpoint
 
   def openvoice_address

@@ -16,7 +16,7 @@ module NavigationHelpers
       account_path(my.account)
     when /^my latest call page for "(.*)"/
       endpoint = my.account.endpoints.find_by_address($1)
-      endpoint_call_path(endpoint, endpoint.calls.last)
+      call_path(endpoint.calls.last)
 
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
