@@ -121,6 +121,12 @@ describe IncomingCall do
             incoming :answered_presence, @joined_call_jid # openvoice endpoint answers
           end
 
+          it 'should log the call as answered by the endpoint' do
+            logged_call = @account.calls.last
+            logged_call.endpoint.should eql(@endpoint_one)
+            logged_call.state.should eql(Call::ANSWERED)
+          end
+
           it 'should hangup the caller when the openvoice endpoint hangs up' do
             incoming :hangup_presence, @joined_call_jid # openvoice endpoint hangs up
             incoming :result_iq, @call_jid, last_command.id # server responds to expected Hangup command for the caller
@@ -346,6 +352,12 @@ describe IncomingCall do
 
           it 'should not dial the second endpoint' do
             last_command.should_not be_instance_of(Connfu::Commands::Dial)
+          end
+
+          it 'should log the call as answered by the endpoint' do
+            logged_call = @account.calls.last
+            logged_call.endpoint.should eql(@endpoint_one)
+            logged_call.state.should eql(Call::ANSWERED)
           end
         end
 

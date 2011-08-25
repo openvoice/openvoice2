@@ -12,14 +12,23 @@ class IncomingCall
       play_hold_music
 
       if account.parallel_dial?
-        call_ids = account.endpoints.map do |endpoint|
-          dial_join({:dial_from => call.to[:address], :dial_to => endpoint.address})
+        parallel_calls = account.endpoints.inject({}) do |memo, endpoint|
+          call_id = dial_join({:dial_from => call.to[:address], :dial_to => endpoint.address})
+          memo[call_id] = endpoint
+          memo
         end
+
+        call_ids = parallel_calls.keys
 
         answered_event = wait_for_one_leg_to_answer(call_ids)
 
         if answered_event.instance_of?(Connfu::Event::Answered)
-          unanswered_calls = call_ids-[answered_event.call_id]
+          call_record.state = Call::ANSWERED
+          call_record.endpoint = parallel_calls[answered_event.call_id]
+          call_record.save!
+
+          unanswered_calls = call_ids - [answered_event.call_id]
+
           hangup_calls(unanswered_calls)
 
           answered_call_id = answered_event.call_id
@@ -27,7 +36,7 @@ class IncomingCall
         end
       else
         answered_event = nil
-        account.endpoints.detect do |endpoint|
+        endpoint = account.endpoints.detect do |endpoint|
           result = dial(:from => call.to[:address], :to => endpoint.address)
           answered_event = wait_for Connfu::Event::Answered, :timeout => 10
 
@@ -37,6 +46,10 @@ class IncomingCall
         end
 
         if answered_event.is_a?(Connfu::Event::Answered)
+          call_record.state = Call::ANSWERED
+          call_record.endpoint = endpoint
+          call_record.save!
+
           wait_because_of_tropo_bug_133
 
           result = send_command Connfu::Commands::Join.new(

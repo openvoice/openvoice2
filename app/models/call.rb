@@ -10,6 +10,7 @@ class Call < ActiveRecord::Base
     :caller_answered,
     :recipient_answered,
     :recipient_busy,
+    :answered,
     :ended
   ]
 
