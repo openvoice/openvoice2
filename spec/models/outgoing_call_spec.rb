@@ -39,7 +39,7 @@ describe Jobs::OutgoingCall do
       end
 
       it 'should set the Call state to caller ringing' do
-        @call.reload.state.should eq :caller_ringing
+        @call.reload.state.should eq Call::CALLER_RINGING
       end
 
       describe "when the openvoice endpoint answers" do
@@ -61,7 +61,7 @@ describe Jobs::OutgoingCall do
         end
 
         it 'should set the Call state to caller answered' do
-          @call.reload.state.should eq :caller_answered
+          @call.reload.state.should eq Call::CALLER_ANSWERED
         end
 
         describe "when recipient is ringing" do
@@ -73,7 +73,7 @@ describe Jobs::OutgoingCall do
           end
 
           it "should set the state to recipient ringing" do
-            @call.reload.state.should eq :recipient_ringing
+            @call.reload.state.should eq Call::RECIPIENT_RINGING
           end
 
           describe "when recipient answers" do
@@ -86,7 +86,7 @@ describe Jobs::OutgoingCall do
             end
 
             it "should set the state to recipient answered" do
-              @call.reload.state.should eq :recipient_answered
+              @call.reload.state.should eq Call::RECIPIENT_ANSWERED
             end
 
             describe "and the recipient hangs up" do
@@ -102,7 +102,7 @@ describe Jobs::OutgoingCall do
               end
 
               it "should set the state to call ended" do
-                @call.reload.state.should eq :call_ended
+                @call.reload.state.should eq Call::ENDED
               end
             end
 
@@ -119,7 +119,7 @@ describe Jobs::OutgoingCall do
               end
 
               it "should set the state to call ended" do
-                @call.reload.state.should eq :call_ended
+                @call.reload.state.should eq Call::ENDED
               end
             end
           end
@@ -130,7 +130,7 @@ describe Jobs::OutgoingCall do
             end
 
             it "should set the state to call rejected" do
-              @call.reload.state.should eq :call_rejected
+              @call.reload.state.should eq Call::REJECTED
             end
 
             it "should hang up the openvoice user's endpoint" do
@@ -156,7 +156,7 @@ describe Jobs::OutgoingCall do
             end
 
             it "shold set the state to call timed out" do
-              @call.reload.state.should eq :call_timed_out
+              @call.reload.state.should eq Call::TIMED_OUT
             end
 
             it "should hang up the openvoice user's endpoint" do
@@ -182,7 +182,7 @@ describe Jobs::OutgoingCall do
             end
 
             it "shold set the state to call recipient busy" do
-              @call.reload.state.should eq :recipient_busy
+              @call.reload.state.should eq Call::RECIPIENT_BUSY
             end
 
             it "should hang up the openvoice user's endpoint" do
@@ -214,7 +214,7 @@ describe Jobs::OutgoingCall do
         end
 
         it "should set the call state to rejected" do
-          @call.reload.state.should eq :call_rejected
+          @call.reload.state.should eq Call::REJECTED
         end
 
         it "should mark the handler as finished" do
