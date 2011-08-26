@@ -408,7 +408,7 @@ describe IncomingCall do
                 last_command.should_not be_instance_of(Connfu::Commands::Say)
               end
 
-              it 'should play a message end of the message recording' do
+              it 'should play a message at the end of the message recording' do
                 incoming :recording_stop_presence, @call_jid # recording finished
 
                 last_command.should == Connfu::Commands::Say.new(
@@ -489,7 +489,7 @@ describe IncomingCall do
               last_command.should_not be_instance_of(Connfu::Commands::Say)
             end
 
-            it 'should play a message end of the message recording' do
+            it 'should play a message at the end of the message recording' do
               incoming :recording_stop_presence, @call_jid # recording finished
 
               last_command.should == Connfu::Commands::Say.new(
