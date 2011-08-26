@@ -66,13 +66,13 @@ class IncomingCall
   end
 
   def establish_call_using_round_robin
-    answered_event = nil
+    event = nil
     endpoint = account.endpoints.detect do |endpoint|
       result = dial(:from => offer.to[:address], :to => endpoint.address)
-      answered_event = wait_for Connfu::Event::Answered, Connfu::Event::Rejected, :timeout => 10
+      event = wait_for Connfu::Event::Answered, Connfu::Event::Rejected, :timeout => 10
 
-      if answered_event.is_a?(Connfu::Event::Answered) ||
-         answered_event.is_a?(Connfu::Event::Rejected)
+      if event.is_a?(Connfu::Event::Answered) ||
+         event.is_a?(Connfu::Event::Rejected)
         true
       else
         hangup "#{result.ref_id}@#{Connfu.connection.jid.domain}"
@@ -80,7 +80,7 @@ class IncomingCall
       end
     end
 
-    case answered_event
+    case event
     when Connfu::Event::Answered
 
       wait_because_of_tropo_bug_133
@@ -88,12 +88,12 @@ class IncomingCall
       result = send_command Connfu::Commands::Join.new(
         :call_jid => call_jid,
         :client_jid => client_jid,
-        :call_id => answered_event.call_id
+        :call_id => event.call_id
       )
 
       wait_for Connfu::Event::Joined
       logger.debug "Call established"
-      [answered_event.call_id, endpoint]
+      [event.call_id, endpoint]
     else
       stop_hold_music
       say "Please leave a message"
