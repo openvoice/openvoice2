@@ -143,8 +143,8 @@ describe IncomingCall do
 
     context 'with one endpoint' do
       before do
-        @joined_call_id = "joined-call-id"
-        @joined_call_jid = "joined-call-id@#{@domain}"
+        @openvoice_endpoint_call_id = "openvoice-endpoint-call-id"
+        @openvoice_endpoint_call_jid = "openvoice-endpoint-call-id@#{@domain}"
 
         @endpoint_one = Factory(:endpoint, :account => @account)
 
@@ -167,7 +167,7 @@ describe IncomingCall do
 
       describe "once the dial has happened" do
         before do
-          incoming :dial_result_iq, @joined_call_id, last_command.id
+          incoming :dial_result_iq, @openvoice_endpoint_call_id, last_command.id
         end
 
         it 'should wait for the leg to be answered' do
@@ -175,20 +175,20 @@ describe IncomingCall do
         end
 
         it 'should hangup the caller if the openvoice endpoint rejects the call' do
-          incoming :reject_presence, @joined_call_jid
+          incoming :reject_presence, @openvoice_endpoint_call_jid
 
           last_command.should == Connfu::Commands::Hangup.new(:call_jid => "#{@incoming_call_id}@#{@domain}", :client_jid => @client_jid)
         end
 
         it 'should wait for one of the parties to hang up' do
-          incoming :ringing_presence, @joined_call_jid
+          incoming :ringing_presence, @openvoice_endpoint_call_jid
 
           Connfu.should_not be_finished
         end
 
         describe "and the call openvoice endpoint has answered" do
           before do
-            incoming :answered_presence, @joined_call_jid # openvoice endpoint answers
+            incoming :answered_presence, @openvoice_endpoint_call_jid # openvoice endpoint answers
           end
 
           it 'should log the call as answered by the endpoint' do
@@ -198,7 +198,7 @@ describe IncomingCall do
           end
 
           it 'should hangup the caller when the openvoice endpoint hangs up' do
-            incoming :hangup_presence, @joined_call_jid # openvoice endpoint hangs up
+            incoming :hangup_presence, @openvoice_endpoint_call_jid # openvoice endpoint hangs up
             incoming :result_iq, @incoming_call_jid, last_command.id # server responds to expected Hangup command for the caller
             incoming :hangup_presence, @incoming_call_jid # caller hangs up
 
@@ -208,10 +208,10 @@ describe IncomingCall do
 
           it 'should hangup the openvoice endpoint when the caller hangs up' do
             incoming :hangup_presence, @incoming_call_jid
-            incoming :result_iq, @joined_call_jid, last_command.id # server responds to expected Hangup command for the openvoice user
-            incoming :hangup_presence, @joined_call_jid
+            incoming :result_iq, @openvoice_endpoint_call_jid, last_command.id # server responds to expected Hangup command for the openvoice user
+            incoming :hangup_presence, @openvoice_endpoint_call_jid
 
-            last_command.should == Connfu::Commands::Hangup.new(:call_jid => @joined_call_jid, :client_jid => @client_jid)
+            last_command.should == Connfu::Commands::Hangup.new(:call_jid => @openvoice_endpoint_call_jid, :client_jid => @client_jid)
             Connfu.should be_finished
           end
         end
@@ -220,8 +220,8 @@ describe IncomingCall do
 
     context 'with two endpoints' do
       before do
-        @joined_call_id = 'joined-call-id'
-        @joined_call_jid = "joined-call-id@#{@domain}"
+        @openvoice_endpoint_call_id = 'openvoice-endpoint-call-id'
+        @openvoice_endpoint_call_jid = "openvoice-endpoint-call-id@#{@domain}"
 
         @unanswered_joined_call_id = "unanswered-joined-call-id"
         @unanswered_joined_call_jid = "#{@unanswered_joined_call_id}@#{@domain}"
@@ -263,7 +263,7 @@ describe IncomingCall do
 
         context 'having dialed both endpoints' do
           before do
-            incoming :dial_result_iq, @joined_call_id, last_command.id
+            incoming :dial_result_iq, @openvoice_endpoint_call_id, last_command.id
             incoming :dial_result_iq, @unanswered_joined_call_id, last_command.id
           end
 
@@ -272,13 +272,13 @@ describe IncomingCall do
           end
 
           it 'should hang up the unanswered leg when the other leg is answered' do
-            incoming :answered_presence, @joined_call_jid
+            incoming :answered_presence, @openvoice_endpoint_call_jid
 
             last_command.should == Connfu::Commands::Hangup.new(:call_jid => @unanswered_joined_call_jid, :client_jid => @client_jid)
           end
 
           it 'should wait for one of the parties to hang up' do
-            incoming :answered_presence, @joined_call_jid
+            incoming :answered_presence, @openvoice_endpoint_call_jid
             incoming :result_iq, @unanswered_joined_call_jid, last_command.id
             incoming :hangup_presence, @unanswered_joined_call_jid
 
@@ -286,7 +286,7 @@ describe IncomingCall do
           end
 
           it 'should hangup the caller when both openvoice endpoints reject the call' do
-            incoming :reject_presence, @joined_call_jid
+            incoming :reject_presence, @openvoice_endpoint_call_jid
             incoming :reject_presence, @unanswered_joined_call_jid
 
             incoming :result_iq, @incoming_call_jid
@@ -297,7 +297,7 @@ describe IncomingCall do
           end
 
           it 'should allow one to reject and another openvoice number to answer' do
-            incoming :reject_presence, @joined_call_jid
+            incoming :reject_presence, @openvoice_endpoint_call_jid
 
             incoming :answered_presence, @unanswered_joined_call_jid
             incoming :result_iq, @unanswered_joined_call_jid, last_command.id
@@ -307,23 +307,23 @@ describe IncomingCall do
           end
 
           it 'should hangup the caller when the openvoice endpoint hangs up' do
-            incoming :answered_presence, @joined_call_jid
+            incoming :answered_presence, @openvoice_endpoint_call_jid
             incoming :result_iq, @unanswered_joined_call_jid, last_command.id
             incoming :hangup_presence, @unanswered_joined_call_jid
 
-            incoming :hangup_presence, @joined_call_jid
+            incoming :hangup_presence, @openvoice_endpoint_call_jid
 
             last_command.should == Connfu::Commands::Hangup.new(:call_jid => @incoming_call_jid, :client_jid => @client_jid)
           end
 
           it 'should hangup the openvoice endpoint when the caller hangs up' do
-            incoming :answered_presence, @joined_call_jid
+            incoming :answered_presence, @openvoice_endpoint_call_jid
             incoming :result_iq, @unanswered_joined_call_jid, last_command.id
             incoming :hangup_presence, @unanswered_joined_call_jid
 
             incoming :hangup_presence, @incoming_call_jid
 
-            last_command.should == Connfu::Commands::Hangup.new(:call_jid => @joined_call_jid, :client_jid => @client_jid)
+            last_command.should == Connfu::Commands::Hangup.new(:call_jid => @openvoice_endpoint_call_jid, :client_jid => @client_jid)
           end
         end
       end
