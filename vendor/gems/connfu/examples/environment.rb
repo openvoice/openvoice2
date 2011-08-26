@@ -9,8 +9,8 @@ CONNFU_CONFIG = {
   }
 }
 CONNFU_CONFIG['amazon'] = CONNFU_CONFIG['default'].merge(:connfu_uri => 'jid://usera:1@46.137.85.52')
-CONNFU_CONFIG['odin'] = CONNFU_CONFIG['default'].merge(:connfu_uri => 'jid://usera:1@173.255.241.49')
-CONNFU_CONFIG['thor'] = CONNFU_CONFIG['default'].merge(:connfu_uri => 'jid://usera:1@173.255.243.5')
+CONNFU_CONFIG['odin'] = CONNFU_CONFIG['default'].merge(:connfu_uri => 'jid://usera:1@odin.openvoice2.com')
+CONNFU_CONFIG['thor'] = CONNFU_CONFIG['default'].merge(:connfu_uri => 'jid://usera:1@thor.openvoice2.com')
 
 CONNFU_ENV = ENV['CONNFU_ENV'] || 'default'
 

@@ -16,7 +16,7 @@ module Connfu
       end
 
       def stop_recording
-        send_command Connfu::Commands::Recording::Stop.new(:call_jid => call_jid, :client_jid => client_jid, :ref_id => @ref_id)
+        send_command Connfu::Commands::Recording::Stop.new(:call_jid => call_jid, :client_jid => client_jid, :component_id => @component_id)
         event = wait_for(Connfu::Event::RecordingStopComplete)
         recordings << event.uri
       end
@@ -30,7 +30,7 @@ module Connfu
         command_options[:format] = options[:format] if options.has_key?(:format)
         command_options[:codec] = options[:codec] if options.has_key?(:codec)
         result = send_command Connfu::Commands::Recording::Start.new(command_options)
-        @ref_id = result.ref_id
+        @component_id = result.ref_id
       end
     end
   end

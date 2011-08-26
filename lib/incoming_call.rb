@@ -95,7 +95,7 @@ class IncomingCall
     send_command Connfu::Commands::Stop.new(
       :call_jid => call_jid,
       :client_jid => client_jid,
-      :ref_id => @hold_music_component_id
+      :component_id => @hold_music_component_id
     )
   end
 

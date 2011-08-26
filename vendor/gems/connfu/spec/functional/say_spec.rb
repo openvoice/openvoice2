@@ -43,11 +43,11 @@ describe "stopping a say command" do
       answer
       send_command Connfu::Commands::Say.new(:text => 'hello world', :call_jid => 'call-jid', :client_jid => 'client-jid')
       dial :to => "anyone", :from => "anyone else"
-      send_command Connfu::Commands::Stop.new(:ref_id => 'component-id', :call_jid => 'call-jid', :client_jid => 'client-jid')
+      send_command Connfu::Commands::Stop.new(:component_id => 'component-id', :call_jid => 'call-jid', :client_jid => 'client-jid')
     end
   end
 
-  let(:stop_command) { Connfu::Commands::Stop.new(:ref_id => 'component-id', :call_jid => 'call-jid', :client_jid => 'client-jid') }
+  let(:stop_command) { Connfu::Commands::Stop.new(:component_id => 'component-id', :call_jid => 'call-jid', :client_jid => 'client-jid') }
   let(:call_jid) { "call-id@#{PRISM_HOST}" }
 
   it 'should send the stop command to an active say component' do

@@ -413,7 +413,7 @@ describe IncomingCall do
               last_command.should == Connfu::Commands::Stop.new(
                 :call_jid => @call_jid,
                 :client_jid => @client_jid,
-                :ref_id => "hold-music-component-id"
+                :component_id => "hold-music-component-id"
               )
             end
 
@@ -507,7 +507,7 @@ describe IncomingCall do
             last_command.should == Connfu::Commands::Stop.new(
               :call_jid => @call_jid,
               :client_jid => @client_jid,
-              :ref_id => "hold-music-component-id"
+              :component_id => "hold-music-component-id"
             )
           end
 

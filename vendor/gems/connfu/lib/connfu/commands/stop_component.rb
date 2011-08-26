@@ -2,7 +2,7 @@ module Connfu
   module Commands
     module StopComponent
       def component_id
-        @params[:ref_id]
+        @params[:component_id]
       end
       
       def component_jid

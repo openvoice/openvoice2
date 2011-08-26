@@ -290,8 +290,8 @@ describe Connfu::Dsl do
 
     it 'should send a stop command to connection' do
       subject.stub(:wait_for).and_return(Connfu::Event::RecordingStopComplete.new)
-      subject.instance_eval { @ref_id = 'foo' }
-      Connfu.connection.should_receive(:send_command).with(Connfu::Commands::Recording::Stop.new(:client_jid => 'client-jid', :call_jid => 'call-jid', :ref_id => 'foo'))
+      subject.instance_eval { @component_id = 'foo' }
+      Connfu.connection.should_receive(:send_command).with(Connfu::Commands::Recording::Stop.new(:client_jid => 'client-jid', :call_jid => 'call-jid', :component_id => 'foo'))
       subject.stop_recording
     end
   end

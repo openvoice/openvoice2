@@ -5,8 +5,8 @@ describe "Recording a call" do
   before :each do
     @call_jid = "call-id@server.whatever"
     @client_jid = "usera@127.0.0.whatever/voxeo"
-    @recording_ref_id = "abc123"
-    @component_jid = "#{@call_jid}/#{@recording_ref_id}"
+    @recording_component_id = "abc123"
+    @component_jid = "#{@call_jid}/#{@recording_component_id}"
     @recording_path = "file:///tmp/recording.mp3"
   end
 
@@ -29,16 +29,16 @@ describe "Recording a call" do
 
     it "should send the stop recording command with the recording ID when start recording has been sent" do
       incoming :offer_presence, @call_jid, @client_jid
-      incoming :recording_result_iq, @call_jid, @recording_ref_id
+      incoming :recording_result_iq, @call_jid, @recording_component_id
 
-      last_command.should == Connfu::Commands::Recording::Stop.new(:call_jid => @call_jid, :client_jid => @client_jid, :ref_id => @recording_ref_id)
+      last_command.should == Connfu::Commands::Recording::Stop.new(:call_jid => @call_jid, :client_jid => @client_jid, :component_id => @recording_component_id)
     end
 
     it "should be able to access the recording URI once the recording is complete" do
       dsl_instance.should_receive(:do_something).with([@recording_path])
 
       incoming :offer_presence, @call_jid, @client_jid
-      incoming :recording_result_iq, @call_jid, @recording_ref_id
+      incoming :recording_result_iq, @call_jid, @recording_component_id
       incoming :result_iq, @call_jid
       incoming :recording_stop_presence, @component_jid, @recording_path
     end
@@ -47,7 +47,7 @@ describe "Recording a call" do
       dsl_instance.stub(:do_something)
 
       incoming :offer_presence, @call_jid, @client_jid
-      incoming :recording_result_iq, @call_jid, @recording_ref_id
+      incoming :recording_result_iq, @call_jid, @recording_component_id
       incoming :result_iq, @call_jid
       incoming :recording_stop_presence, @component_jid, @recording_path
 
@@ -65,7 +65,7 @@ describe "Recording a call" do
 
     it "should not send any commands after the hangup is detected" do
       incoming :offer_presence, @call_jid, @client_jid
-      incoming :recording_result_iq, @call_jid, @recording_ref_id
+      incoming :recording_result_iq, @call_jid, @recording_component_id
       incoming :recording_hangup_presence, @component_jid
 
       last_command.should_not be_instance_of(Connfu::Commands::Say)
@@ -86,7 +86,7 @@ describe "Recording a call" do
         dsl_instance.should_receive(:do_something).with([@recording_path])
 
         incoming :offer_presence, @call_jid, @client_jid
-        incoming :recording_result_iq, @call_jid, @recording_ref_id
+        incoming :recording_result_iq, @call_jid, @recording_component_id
         incoming :recording_stop_presence, @component_jid, @recording_path
       end
     end
@@ -96,7 +96,7 @@ describe "Recording a call" do
         dsl_instance.should_receive(:do_something).with([@recording_path])
 
         incoming :offer_presence, @call_jid, @client_jid
-        incoming :recording_result_iq, @call_jid, @recording_ref_id
+        incoming :recording_result_iq, @call_jid, @recording_component_id
         incoming :recording_hangup_presence, @component_jid, @recording_path
       end
     end
