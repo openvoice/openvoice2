@@ -3,9 +3,9 @@ require 'connfu'
 
 class IncomingCall
   include Connfu::Dsl
-  on :offer do |call|
-    if account = Account.find_by_number(call.to[:username]) || Account.find_by_username(call.to[:username])
-      call_record = account.calls.create!(:incoming => true, :party_address => call.from)
+  on :offer do |offer|
+    if account = Account.find_by_number(offer.to[:username]) || Account.find_by_username(offer.to[:username])
+      call_record = account.calls.create!(:incoming => true, :party_address => offer.from)
       answer
       say account.greeting_path || 'please wait while we transfer your call'
 
@@ -13,7 +13,7 @@ class IncomingCall
 
       if account.parallel_dial?
         parallel_calls = account.endpoints.inject({}) do |memo, endpoint|
-          call_id = dial_join({:dial_from => call.to[:address], :dial_to => endpoint.address})
+          call_id = dial_join({:dial_from => offer.to[:address], :dial_to => endpoint.address})
           memo[call_id] = endpoint
           memo
         end
@@ -37,7 +37,7 @@ class IncomingCall
       else
         answered_event = nil
         endpoint = account.endpoints.detect do |endpoint|
-          result = dial(:from => call.to[:address], :to => endpoint.address)
+          result = dial(:from => offer.to[:address], :to => endpoint.address)
           answered_event = wait_for Connfu::Event::Answered, Connfu::Event::Rejected, :timeout => 10
           
           if answered_event.is_a?(Connfu::Event::Answered) ||
