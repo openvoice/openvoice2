@@ -203,21 +203,6 @@ describe Connfu::Dsl do
     end
   end
 
-  describe "transfer using join" do
-    it 'should send NestedJoin command to connection' do
-      dial_to = 'sip:dial-to@example.com'
-      dial_from = 'sip:dial-from@example.com'
-      Connfu.connection.should_receive(:send_command).with(Connfu::Commands::NestedJoin.new(
-        :dial_to => dial_to,
-        :dial_from => dial_from,
-        :client_jid => 'client-jid',
-        :call_jid => 'call-jid',
-        :call_id => 'call-id'
-      ))
-      subject.transfer_using_join(dial_from, dial_to)
-    end
-  end
-
   describe 'recording' do
     it 'should send a start command to connection' do
       subject.stub(:wait_for).and_return(Connfu::Event::Result.new)

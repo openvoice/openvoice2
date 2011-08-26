@@ -24,6 +24,6 @@ describe "answering a call" do
     dsl_instance.should_receive(:do_something)
 
     incoming :offer_presence, @call_jid, @client_jid
-    incoming :result_iq, @call_jid
+    incoming :answer_result_iq, @call_jid
   end
 end

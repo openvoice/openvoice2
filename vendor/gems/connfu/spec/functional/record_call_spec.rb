@@ -14,6 +14,7 @@ describe "Recording a call" do
 
     testing_dsl do
       on :offer do |call|
+        answer
         start_recording
         stop_recording
         do_something(recordings)
@@ -23,12 +24,14 @@ describe "Recording a call" do
 
     it "should send first record start command" do
       incoming :offer_presence, @call_jid, @client_jid
+      incoming :answer_result_iq, @call_jid
 
       last_command.should == Connfu::Commands::Recording::Start.new(:call_jid => @call_jid, :client_jid => @client_jid)
     end
 
     it "should send the stop recording command with the recording ID when start recording has been sent" do
       incoming :offer_presence, @call_jid, @client_jid
+      incoming :answer_result_iq, @call_jid
       incoming :recording_result_iq, @call_jid, @recording_component_id
 
       last_command.should == Connfu::Commands::Recording::Stop.new(:call_jid => @call_jid, :client_jid => @client_jid, :component_id => @recording_component_id)
@@ -38,8 +41,9 @@ describe "Recording a call" do
       dsl_instance.should_receive(:do_something).with([@recording_path])
 
       incoming :offer_presence, @call_jid, @client_jid
+      incoming :answer_result_iq, @call_jid
       incoming :recording_result_iq, @call_jid, @recording_component_id
-      incoming :result_iq, @call_jid
+      incoming :recording_stop_result_iq, @call_jid, @recording_component_id
       incoming :recording_stop_presence, @component_jid, @recording_path
     end
 
@@ -47,8 +51,9 @@ describe "Recording a call" do
       dsl_instance.stub(:do_something)
 
       incoming :offer_presence, @call_jid, @client_jid
+      incoming :answer_result_iq, @call_jid
       incoming :recording_result_iq, @call_jid, @recording_component_id
-      incoming :result_iq, @call_jid
+      incoming :recording_stop_result_iq, @call_jid, @recording_component_id
       incoming :recording_stop_presence, @component_jid, @recording_path
 
       last_command.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
@@ -58,6 +63,7 @@ describe "Recording a call" do
   describe "when the caller hangs up during recording" do
     testing_dsl do
       on :offer do |call|
+        answer
         record_for 5
         say "very interesting"
       end
@@ -65,6 +71,7 @@ describe "Recording a call" do
 
     it "should not send any commands after the hangup is detected" do
       incoming :offer_presence, @call_jid, @client_jid
+      incoming :answer_result_iq, @call_jid
       incoming :recording_result_iq, @call_jid, @recording_component_id
       incoming :recording_hangup_presence, @component_jid
 
@@ -76,6 +83,7 @@ describe "Recording a call" do
 
     testing_dsl do
       on :offer do |call|
+        answer
         record_for 5
         do_something(recordings)
       end
@@ -86,6 +94,7 @@ describe "Recording a call" do
         dsl_instance.should_receive(:do_something).with([@recording_path])
 
         incoming :offer_presence, @call_jid, @client_jid
+        incoming :answer_result_iq, @call_jid
         incoming :recording_result_iq, @call_jid, @recording_component_id
         incoming :recording_stop_presence, @component_jid, @recording_path
       end
@@ -96,6 +105,7 @@ describe "Recording a call" do
         dsl_instance.should_receive(:do_something).with([@recording_path])
 
         incoming :offer_presence, @call_jid, @client_jid
+        incoming :answer_result_iq, @call_jid
         incoming :recording_result_iq, @call_jid, @recording_component_id
         incoming :recording_hangup_presence, @component_jid, @recording_path
       end

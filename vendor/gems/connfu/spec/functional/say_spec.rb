@@ -4,6 +4,7 @@ describe "say something on a call" do
 
   testing_dsl do
     on :offer do |call|
+      answer
       say('hello, this is connfu')
       say('http://www.phono.com/audio/troporocks.mp3')
     end
@@ -17,12 +18,14 @@ describe "say something on a call" do
 
   it "should send first say command" do
     incoming :offer_presence, @call_jid, @client_jid
+    incoming :answer_result_iq, @call_jid
 
     last_command.should == Connfu::Commands::Say.new(:text => 'hello, this is connfu', :call_jid => @call_jid, :client_jid => @client_jid)
   end
 
   it "should not send the second say command if the first command's success hasn't been received" do
     incoming :offer_presence, @call_jid, @client_jid
+    incoming :answer_result_iq, @call_jid
     incoming :say_result_iq, @call_jid
 
     last_command.should == Connfu::Commands::Say.new(:text => 'hello, this is connfu', :call_jid => @call_jid, :client_jid => @client_jid)
@@ -30,6 +33,7 @@ describe "say something on a call" do
 
   it "should send the second say command once the first say command has completed" do
     incoming :offer_presence, @call_jid, @client_jid
+    incoming :answer_result_iq, @call_jid
     incoming :say_result_iq, @call_jid
     incoming :say_success_presence, @call_jid
 
@@ -52,7 +56,7 @@ describe "stopping a say command" do
 
   it 'should send the stop command to an active say component' do
     incoming :offer_presence, call_jid
-    incoming :result_iq, call_jid, last_command.id
+    incoming :answer_result_iq, call_jid, last_command.id
     incoming :say_result_iq, call_jid
     incoming :dial_result_iq, "dummy-call-so-we-can-wait-id", last_command.id
 
@@ -61,7 +65,7 @@ describe "stopping a say command" do
 
   it 'should not send the stop command if the say component has already finished' do
     incoming :offer_presence, call_jid
-    incoming :result_iq, call_jid, last_command.id
+    incoming :answer_result_iq, call_jid, last_command.id
     incoming :say_result_iq, call_jid, 'component-id'
     incoming :say_success_presence, "#{call_jid}/component-id"
     incoming :dial_result_iq, "dummy-call-so-we-can-wait-id", last_command.id

@@ -41,8 +41,8 @@ describe "defining behaviour after a hangup" do
 
   it "should not send any commands after the hangup" do
     incoming :offer_presence, @call_jid, @client_jid
-    incoming :result_iq, @call_jid # from the answer command
-    incoming :result_iq, @call_jid # from the hangup command
+    incoming :answer_result_iq, @call_jid
+    incoming :hangup_result_iq, @call_jid
     incoming :hangup_presence, @call_jid
 
     last_command.should == Connfu::Commands::Hangup.new(:call_jid => @call_jid, :client_jid => @client_jid)
@@ -70,11 +70,11 @@ describe "hanging up an observed call" do
 
   it "should still send commands once the other call is hung up" do
     incoming :offer_presence, @call_jid, @client_jid
-    incoming :result_iq, @call_jid # from the answer command
+    incoming :answer_result_iq, @call_jid
     incoming :dial_result_iq, @other_call_id, last_command.id # from the dial command
     incoming :ringing_presence, @other_call_jid
     incoming :answered_presence, @other_call_jid
-    incoming :result_iq, @other_call_jid # from the hangup command
+    incoming :hangup_result_iq, @other_call_jid
     incoming :hangup_presence, @other_call_jid
 
     last_command.should == Connfu::Commands::Say.new(:text => "Phew, glad he's gone", :call_jid => @call_jid, :client_jid => @client_jid)
@@ -96,8 +96,8 @@ describe "receiving hangup from a caller" do
 
   it "should not send an implicit hangup command" do
     incoming :offer_presence, @call_jid, @client_jid
-    incoming :result_iq, @call_jid # from the answer command
-    incoming :result_iq, @call_jid # from the say command
+    incoming :answer_result_iq, @call_jid
+    incoming :say_result_iq, @call_jid # from the say command
     incoming :hangup_presence, @call_jid # via the user hanging up
     incoming :say_success_presence, @call_jid
 

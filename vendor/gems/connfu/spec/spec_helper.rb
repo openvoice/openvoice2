@@ -48,6 +48,7 @@ def setup_connfu(handler_class, domain='openvoice.org')
 end
 
 def incoming(type, *args)
+  raise "Invalid args. You almost certainly don't want to be passing 'nil' into #incoming" if args.any? { |arg| arg.nil? }
   stanza = if type.to_s =~ /_iq$/
     create_iq(send(type, *args))
   else
@@ -116,6 +117,9 @@ end
 def result_iq(call_jid="call-id@#{PRISM_HOST}", id='blather0008')
   "<iq type='result' id='#{id}' from='#{call_jid}' to='#{PRISM_JID}/voxeo'/>"
 end
+alias :answer_result_iq :result_iq
+alias :hangup_result_iq :result_iq
+alias :recording_stop_result_iq :result_iq
 
 def error_iq(call_jid="call-id@#{PRISM_HOST}", id='blather000c')
   %{<iq type='error' id='#{id}' from='#{call_jid}' to='#{PRISM_JID}/voxeo'>
@@ -152,11 +156,15 @@ def offer_presence(call_jid="call-id@#{PRISM_HOST}", client_jid="#{PRISM_JID}/vo
   </presence>"
 end
 
-def say_result_iq(call_jid="call-id@#{PRISM_HOST}", component_id="component-id")
+def component_result_iq(call_jid="call-id@#{PRISM_HOST}", component_id="component-id")
   %{<iq type="result" id="blather000a" from="#{call_jid}" to="#{PRISM_JID}/voxeo">
     <ref xmlns="#{rayo('1')}" id="#{component_id}"/>
   </iq>}
 end
+alias :say_result_iq :component_result_iq
+alias :ask_result_iq :component_result_iq
+alias :recording_result_iq :component_result_iq
+alias :transfer_result_iq :component_result_iq
 
 def say_success_presence(call_jid="call-id@#{PRISM_HOST}/component-id")
   "<presence from='#{call_jid}' to='#{PRISM_JID}/voxeo'>
@@ -219,12 +227,6 @@ def unjoined_presence(call_jid="call-id-1@#{PRISM_HOST}", other_call_id='call-id
   %{<presence from="#{call_jid}" to="#{PRISM_JID}/voxeo">
     <unjoined xmlns="#{rayo('1')}" call-id="#{other_call_id}"/>
   </presence>}
-end
-
-def recording_result_iq(call_jid="call-id@#{PRISM_HOST}", component_id="component-id")
-  %{<iq type="result" id="blather000a" from="#{call_jid}" to="#{PRISM_JID}/voxeo">
-    <ref xmlns="#{rayo('1')}" id="#{component_id}"/>
-  </iq>}
 end
 
 def recording_stop_presence(call_jid="call-id@#{PRISM_HOST}/component-id", path="file:///tmp/recording.mp3")

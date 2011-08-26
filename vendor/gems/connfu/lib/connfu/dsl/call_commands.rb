@@ -74,19 +74,6 @@ module Connfu
 
         joined_call_id
       end
-
-      def transfer_using_join(dial_from, dial_to)
-        command_options = {
-          :call_jid => call_jid,
-          :client_jid => client_jid,
-          :dial_to => dial_to,
-          :dial_from => dial_from,
-          :call_id => call_id
-        }
-        send_command Connfu::Commands::NestedJoin.new(command_options)
-        wait_for Connfu::Event::Hangup
-        finish!
-      end
     end
   end
 end
