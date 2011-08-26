@@ -364,12 +364,6 @@ describe IncomingCall do
           it 'should not dial the second endpoint' do
             last_command.should_not be_instance_of(Connfu::Commands::Dial)
           end
-
-          it 'should log the call as answered by the endpoint' do
-            logged_call = @account.calls.last
-            logged_call.endpoint.should eql(@endpoint_one)
-            logged_call.state.should eql(Call::ANSWERED)
-          end
         end
 
         context 'and the first endpoint does not answer' do
@@ -451,6 +445,12 @@ describe IncomingCall do
             before do
               incoming :joined_presence, @call_jid, "answering-endpoint-call-id" # join complete to original call
               incoming :joined_presence, "answering-endpoint-call-id@server.whatever", @call_id # join complete to new call
+            end
+
+            it 'should log the call as answered by the endpoint' do
+              logged_call = @account.calls.last
+              logged_call.endpoint.should eql(@endpoint_one)
+              logged_call.state.should eql(Call::ANSWERED)
             end
 
             it 'should not hang up the call' do

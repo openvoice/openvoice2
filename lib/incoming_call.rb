@@ -16,10 +16,14 @@ class IncomingCall
 
       play_hold_music
 
-      if account.parallel_dial?
-        establish_call_using_parallel_dial
-      else
-        establish_call_using_round_robin
+      call_id, endpoint = *establish_call
+
+      if call_id
+        call_record.state = Call::ANSWERED
+        call_record.endpoint = endpoint
+        call_record.save!
+
+        hangup_openvoice_leg_when_caller_hangs_up(call_id)
       end
 
       logger.debug "The call has finished"
@@ -30,6 +34,14 @@ class IncomingCall
 
   def account
     @account ||= Account.find_by_number(offer.to[:username]) || Account.find_by_username(offer.to[:username])
+  end
+
+  def establish_call
+    if account.parallel_dial?
+      establish_call_using_parallel_dial
+    else
+      establish_call_using_round_robin
+    end
   end
 
   def establish_call_using_parallel_dial
@@ -44,16 +56,12 @@ class IncomingCall
     answered_event = wait_for_one_leg_to_answer(call_ids)
 
     if answered_event.instance_of?(Connfu::Event::Answered)
-      call_record.state = Call::ANSWERED
-      call_record.endpoint = parallel_calls[answered_event.call_id]
-      call_record.save!
-
       unanswered_calls = call_ids - [answered_event.call_id]
 
       hangup_calls(unanswered_calls)
 
       answered_call_id = answered_event.call_id
-      hangup_openvoice_leg_when_caller_hangs_up(answered_call_id)
+      [answered_call_id, parallel_calls[answered_call_id]]
     end
   end
 
@@ -74,9 +82,6 @@ class IncomingCall
 
     case answered_event
     when Connfu::Event::Answered
-      call_record.state = Call::ANSWERED
-      call_record.endpoint = endpoint
-      call_record.save!
 
       wait_because_of_tropo_bug_133
 
@@ -85,16 +90,16 @@ class IncomingCall
         :client_jid => client_jid,
         :call_id => answered_event.call_id
       )
+
       wait_for Connfu::Event::Joined
       logger.debug "Call established"
-
-      answered_call_id = answered_event.call_id
-      hangup_openvoice_leg_when_caller_hangs_up(answered_call_id)
+      [answered_event.call_id, endpoint]
     else
       stop_hold_music
       say "Please leave a message"
       record_for(60, :beep => true)
       say "Message complete"
+      nil
     end
   end
 
