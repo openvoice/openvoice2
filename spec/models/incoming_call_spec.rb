@@ -109,15 +109,13 @@ describe IncomingCall do
   end
 
   context 'when incoming call is for a known openvoice address' do
-    before do
-      incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>", :from => "tel:+44790012345"
-    end
-
     it 'should answer' do
+      incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>", :from => "tel:+44790012345"
       last_command.should == Connfu::Commands::Answer.new(:call_jid => @call_jid, :client_jid => @client_jid)
     end
 
     it 'should log the incoming call' do
+      incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>", :from => "tel:+44790012345"
       logged_call = @account.calls.last
       logged_call.incoming.should be_true
       logged_call.party_address.should eql("tel:+44790012345")
@@ -125,6 +123,7 @@ describe IncomingCall do
 
     context 'when openvoice user has not recorded a greeting' do
       before do
+        incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>", :from => "tel:+44790012345"
         incoming :result_iq, @call_jid, last_command.id
       end
 
@@ -134,6 +133,7 @@ describe IncomingCall do
     end
 
     it 'should then play music to the caller' do
+      incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>", :from => "tel:+44790012345"
       incoming :result_iq, @call_jid, last_command.id
       incoming :result_iq, @call_jid, last_command.id
       incoming :say_success_presence, @call_jid
@@ -228,17 +228,17 @@ describe IncomingCall do
 
         @endpoint_one = Factory(:endpoint, :account => @account, :address => "sip:endpoint-one@server.whatever")
         @endpoint_two = Factory(:endpoint, :account => @account, :address => "sip:endpoint-two@server.whatever")
-
-        incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
-        incoming :result_iq, @call_jid, last_command.id # answer
-        incoming :result_iq, @call_jid, last_command.id # say 'please wait...'
-        incoming :say_success_presence, @call_jid       # end of say 'please wait...'
-        incoming :result_iq, @call_jid, last_command.id # play music
       end
 
       context 'and using the parallel dial strategy' do
         before do
           @account.update_attribute(:parallel_dial, true)
+
+          incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
+          incoming :result_iq, @call_jid, last_command.id # answer
+          incoming :result_iq, @call_jid, last_command.id # say 'please wait...'
+          incoming :say_success_presence, @call_jid       # end of say 'please wait...'
+          incoming :result_iq, @call_jid, last_command.id # play music
         end
 
         it 'should immediately ring both endpoints without waiting for the music to finish' do
@@ -425,11 +425,6 @@ describe IncomingCall do
 
         context 'and the first endpoint rejects' do
           before do
-            incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
-            incoming :result_iq, @call_jid, last_command.id # answer
-            incoming :result_iq, @call_jid, last_command.id # say 'please wait...'
-            incoming :say_success_presence, @call_jid       # end of say 'please wait...'
-            incoming :say_result_iq, @call_jid, "hold-music-component-id" # play music
             incoming :dial_result_iq, "endpoint-one-call-id", last_command.id # first dial
             incoming :reject_presence, "endpoint-one-call-id@#{Connfu.connection.jid.domain}"
           end
@@ -439,12 +434,6 @@ describe IncomingCall do
 
         context 'once an endpoint answers' do
           before do
-            incoming :offer_presence, @call_jid, @client_jid, :to => "<sip:known-user@example.com>"
-            incoming :result_iq, @call_jid, last_command.id # answer
-            incoming :result_iq, @call_jid, last_command.id # say 'please wait...'
-            incoming :say_success_presence, @call_jid       # end of say 'please wait...'
-            incoming :result_iq, @call_jid, last_command.id # play music
-            # any number of dial attempts ...
             incoming :dial_result_iq, "answering-endpoint-call-id", last_command.id # whichever dial
             incoming :answered_presence, "answering-endpoint-call-id@server.whatever"
             incoming :result_iq, @call_id, last_command.id # join
