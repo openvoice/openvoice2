@@ -3,6 +3,10 @@ require 'connfu/transfer_state'
 module Connfu
   module Event
     class TransferEvent < Presence
+      def self.parse(node)
+        return unless (results = node.xpath("//x:*", 'x' => tropo('transfer:complete:1'))).any?
+        Connfu::TransferState.event_map[results.first.name.to_sym].new(:call_id => node.from.node)
+      end
     end
 
     class TransferSuccess < TransferEvent

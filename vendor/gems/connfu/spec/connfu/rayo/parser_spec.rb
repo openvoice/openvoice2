@@ -2,38 +2,42 @@ require 'spec_helper'
 
 describe Connfu::Rayo::Parser do
   describe "#parse_event_from" do
-    context 'an offer iq' do
+    context 'for an offer presence' do
       before do
-        @from_jid = "call-id@#{PRISM_HOST}"
-        @node = create_presence(offer_presence(@from_jid, 'to-value', :from => "offer-from", :to => "<sip:username@example.com>"))
-        @event = Connfu::Rayo::Parser.parse_event_from(@node)
+        @call_id = 'call-id'
+        @from_jid = "#{@call_id}@#{PRISM_HOST}"
+        @client_jid = 'client-jid'
+        @offer_from = 'offer-from'
+        @offer_to = '<sip:username@example.com>'
+        @node = create_presence(offer_presence(@from_jid, @client_jid, :from => @offer_from, :to => @offer_to))
+        @offer_event = Connfu::Rayo::Parser.parse_event_from(@node)
       end
 
       it "should create an offer event" do
-        @event.should be_instance_of Connfu::Event::Offer
+        @offer_event.should be_instance_of Connfu::Event::Offer
       end
 
       it "should determine the from value of the presence" do
-        @event.presence_from.should eq @from_jid
+        @offer_event.presence_from.should eq @from_jid
       end
 
       it "should determine the to value of the presence" do
-        @event.presence_to.should eq 'to-value'
+        @offer_event.presence_to.should eq @client_jid
       end
 
-      it "should determine the call_id value of the offer" do
-        @event.call_id.should eq 'call-id'
+      it "should determine the value of call_id" do
+        @offer_event.call_id.should eq @call_id
       end
 
       it "should determine the from value of the offer" do
-        @event.from.should eq "offer-from"
+        @offer_event.from.should eq @offer_from
       end
 
       it "should determine the to value of the offer" do
-        @event.to[:address].should eq "sip:username@example.com"
-        @event.to[:username].should eq "username"
-        @event.to[:host].should eq "example.com"
-        @event.to[:scheme].should eq "sip"
+        @offer_event.to[:address].should eq "sip:username@example.com"
+        @offer_event.to[:username].should eq "username"
+        @offer_event.to[:host].should eq "example.com"
+        @offer_event.to[:scheme].should eq "sip"
       end
     end
 
@@ -64,7 +68,7 @@ describe Connfu::Rayo::Parser do
       end
     end
 
-    context "a recording stop complete presence" do
+    context "for a recording stop complete presence" do
       before do
         @node = create_presence(recording_stop_presence("call-id@#{PRISM_HOST}/ref-id", 'file:///tmp/recording.mp3'))
         @event = Connfu::Rayo::Parser.parse_event_from(@node)
@@ -79,7 +83,7 @@ describe Connfu::Rayo::Parser do
       end
     end
 
-    context "a recording hangup complete presence" do
+    context "for a recording hangup complete presence" do
       before do
         @node = create_presence(recording_hangup_presence("call-id@#{PRISM_HOST}/ref-id", 'file:///tmp/recording.mp3'))
         @event = Connfu::Rayo::Parser.parse_event_from(@node)
