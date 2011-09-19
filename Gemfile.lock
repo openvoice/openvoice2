@@ -9,8 +9,9 @@ GIT
       niceogiri (>= 0.0.4)
       nokogiri (>= 1.4.0)
 
-PATH
-  remote: ./vendor/gems/connfu
+GIT
+  remote: git@github.com:o2Labs/play.git
+  revision: 6f16b10f05f0a1a6d31eae8ed2d4b34b8bfa75b0
   specs:
     connfu (0.0.3)
       blather (= 0.5.4)

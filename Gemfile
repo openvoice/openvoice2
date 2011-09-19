@@ -18,7 +18,7 @@ gem 'jquery-rails'
 
 gem 'thin'
 
-gem 'connfu', :path => './vendor/gems/connfu'
+gem 'connfu', :git => 'git@github.com:o2Labs/play.git'
 
 # Bundle is crap so need this for Connfu
 gem 'minitest', '2.3.1'
