@@ -23,6 +23,7 @@ end
 describe "Dialing and answering a call" do
   
   it "should dial and answer the call" do
+    pending 'we need to resolve leaking prism session issue'
     logfile = File.expand_path('../../../log/xmpp_test.log', __FILE__)
     Connfu.io_log = Connfu::Logging::IOLogger.new(logfile)
     

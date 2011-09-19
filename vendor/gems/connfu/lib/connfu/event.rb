@@ -1,10 +1,8 @@
 module Connfu
   module Event
-    autoload :TransferEvent, 'connfu/event/transfer_event'
-    autoload :TransferSuccess, 'connfu/event/transfer_event'
-    autoload :TransferTimeout, 'connfu/event/transfer_event'
-    autoload :TransferRejected, 'connfu/event/transfer_event'
-    autoload :TransferBusy, 'connfu/event/transfer_event'
+    [:TransferBusy, :TransferEvent, :TransferRejected, :TransferSuccess, :TransferTimeout].each do |t|
+      autoload t, 'connfu/event/transfer_event'
+    end
 
     class Base
       extend Connfu::Rayo::Namespacing
