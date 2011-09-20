@@ -1,4 +1,11 @@
 GIT
+  remote: git://github.com/o2Labs/play.git
+  revision: 6f16b10f05f0a1a6d31eae8ed2d4b34b8bfa75b0
+  specs:
+    connfu (0.0.3)
+      blather (= 0.5.4)
+
+GIT
   remote: git://github.com/zlu/blather.git
   revision: 04ef1dc60eccc16616e299f634304e9e4d8f8edb
   specs:
@@ -8,13 +15,6 @@ GIT
       minitest (>= 1.7.1)
       niceogiri (>= 0.0.4)
       nokogiri (>= 1.4.0)
-
-GIT
-  remote: git@github.com:o2Labs/play.git
-  revision: 6f16b10f05f0a1a6d31eae8ed2d4b34b8bfa75b0
-  specs:
-    connfu (0.0.3)
-      blather (= 0.5.4)
 
 GEM
   remote: http://rubygems.org/
