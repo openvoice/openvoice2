@@ -155,8 +155,8 @@ describe Jobs::OutgoingCall do
               incoming :timeout_presence, @joined_call_jid
             end
 
-            it "shold set the state to call timed out" do
-              @call.reload.state.should eq Call::TIMED_OUT
+            it "should set the state to call timeout" do
+              @call.reload.state.should eq :timeout
             end
 
             it "should hang up the openvoice user's endpoint" do

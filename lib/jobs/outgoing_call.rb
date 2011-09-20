@@ -15,7 +15,7 @@ module Jobs
 
       dial :to => caller, :from => openvoice_address do |c|
         c.on_timeout do
-          call.update_state!(Call::TIMED_OUT)
+          call.update_state!(c.state)
           hangup "#{call_id}@#{Connfu.connection.jid.domain}"
         end
         c.on_reject do

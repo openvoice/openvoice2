@@ -3,7 +3,6 @@ class Call < ActiveRecord::Base
   belongs_to :endpoint
 
   STATES = [
-    :timed_out,
     :rejected,
     :caller_ringing,
     :recipient_ringing,
