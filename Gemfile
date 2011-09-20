@@ -8,7 +8,7 @@ gem 'rails', '3.1.0'
 gem 'pg'
 
 # Asset template engines
-gem 'sass-rails', '~> 3.1.0.rc.5'
+#gem 'sass-rails', '~> 3.1.0.rc.5'
 gem 'coffee-script'
 gem 'uglifier'
 
