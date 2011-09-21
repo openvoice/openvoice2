@@ -7,9 +7,9 @@ describe Call do
     end
 
     it "persists state to given value" do
-      subject.update_state!(Call::REJECTED)
+      subject.update_state!(:rejected)
       subject.reload
-      subject.state.should eql(Call::REJECTED)
+      subject.state.should eql(Connfu::Dsl::CallBehaviour::REJECTED)
     end
   end
 end

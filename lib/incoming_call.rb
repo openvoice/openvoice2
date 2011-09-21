@@ -19,7 +19,7 @@ class IncomingCall
       call_id, endpoint = *establish_call
 
       if call_id
-        call_record.state = Call::ANSWERED
+        call_record.state = Connfu::Dsl::CallBehaviour::ANSWERED
         call_record.endpoint = endpoint
         call_record.save!
 

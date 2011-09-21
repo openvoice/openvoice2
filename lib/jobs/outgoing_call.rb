@@ -19,7 +19,7 @@ module Jobs
           hangup "#{call_id}@#{Connfu.connection.jid.domain}"
         end
         c.on_reject do
-          call.update_state!(Call::REJECTED)
+          call.update_state!(c.state)
           if call_id != last_event_call_id
             hangup "#{call_id}@#{Connfu.connection.jid.domain}"
             @rejected = true
@@ -29,27 +29,27 @@ module Jobs
         c.on_ringing do
           case last_event_call_id
             when call_id
-              call.update_state!(Call::CALLER_RINGING)
+              call.update_state!("caller " + c.state.to_s)
             when @joined_call_id
-              call.update_state!(Call::RECIPIENT_RINGING)
+              call.update_state!("recipient " + c.state.to_s)
           end
         end
         c.on_answer do
           case last_event_call_id
             when call_id
-              call.update_state!(Call::CALLER_ANSWERED)
+              call.update_state!("caller " + c.state.to_s)
               @joined_call_id = dial_join({:dial_to => recipient, :dial_from => openvoice_address})
             when @joined_call_id
-              call.update_state!(Call::RECIPIENT_ANSWERED)
+              call.update_state!("recipient " + c.state.to_s)
           end
         end
         c.on_busy do
-          call.update_state!(Call::RECIPIENT_BUSY)
+          call.update_state!(c.state)
           hangup "#{call_id}@#{Connfu.connection.jid.domain}"
         end
         c.on_hangup do
           unless @rejected
-            call.update_state!(Call::ENDED)
+            call.update_state!(c.state)
             if call_id == last_event_call_id
               hangup "#{@joined_call_id}@#{Connfu.connection.jid.domain}"
             else

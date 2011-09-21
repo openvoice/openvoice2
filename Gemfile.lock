@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/o2Labs/play.git
-  revision: 6f16b10f05f0a1a6d31eae8ed2d4b34b8bfa75b0
+  revision: 21d421cf217dd86e0b04590be95d484e682db4d2
   specs:
     connfu (0.0.3)
       blather (= 0.5.4)

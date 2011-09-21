@@ -194,7 +194,7 @@ describe IncomingCall do
           it 'should log the call as answered by the endpoint' do
             logged_call = @account.calls.last
             logged_call.endpoint.should eql(@endpoint_one)
-            logged_call.state.should eql(Call::ANSWERED)
+            logged_call.state.should eql(Connfu::Dsl::CallBehaviour::ANSWERED)
           end
 
           it 'should hangup the caller when the openvoice endpoint hangs up' do
@@ -450,7 +450,7 @@ describe IncomingCall do
             it 'should log the call as answered by the endpoint' do
               logged_call = @account.calls.last
               logged_call.endpoint.should eql(@endpoint_one)
-              logged_call.state.should eql(Call::ANSWERED)
+              logged_call.state.should eql(Connfu::Dsl::CallBehaviour::ANSWERED)
             end
 
             it 'should not hang up the call' do
