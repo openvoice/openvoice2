@@ -4,3 +4,10 @@ notifications:
   recipients:
     - zlu@me.com
 
+postgres:
+  adapter: postgresql
+  database: openvoice2_test
+  username: postgres
+
+before_script:
+  - "psql -c 'create database openvoice2_test;' -U postgres >/dev/null"
