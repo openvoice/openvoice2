@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/aler/therubyracer-heroku.git
+  revision: f7c42f8689828c48f2d6e97a0aa1abb942890a60
+  specs:
+    therubyracer-heroku (0.8.1.pre3)
+
+GIT
   remote: git://github.com/o2Labs/play.git
   revision: 21d421cf217dd86e0b04590be95d484e682db4d2
   specs:
@@ -183,7 +189,6 @@ GEM
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
     term-ansicolor (1.0.6)
-    therubyracer-heroku (0.8.1.pre3)
     thin (1.2.11)
       daemons (>= 1.0.9)
       eventmachine (>= 0.12.6)
@@ -227,7 +232,7 @@ DEPENDENCIES
   resque (= 1.17.1)
   resque_spec
   rspec-rails
-  therubyracer-heroku (~> 0.8.1.pre3)
+  therubyracer-heroku (~> 0.8.1.pre3)!
   thin
   uglifier
   webmock
