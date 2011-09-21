@@ -96,7 +96,7 @@ class IncomingCall
       [event.call_id, endpoint]
     else
       stop_hold_music
-      say "Please leave a message"
+      say "Please leave a message after the beep"
       record_for(60, :beep => true)
       say "Message complete"
       nil
