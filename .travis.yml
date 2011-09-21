@@ -1,0 +1,6 @@
+rvm: 1.9.2
+
+notifications:
+  recipients:
+    - zlu@me.com
+
